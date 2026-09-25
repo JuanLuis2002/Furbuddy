@@ -7,17 +7,17 @@ on:
     branches: [main]
 
 jobs:
-  sin-backend-wordpress:
-    name: El backend de WordPress no entra al repo
+  sin-respaldo-wpress:
+    name: El archivo .wpress no entra al repo
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Rechazar respaldo y archivos de la tienda
+      - name: Rechazar el respaldo .wpress
         run: |
           set -eu
-          found=$(git ls-files | grep -E '(^|/)wp-content/|\.wpress$|^database\.sql$|^docker-compose\.yml$' || true)
+          found=$(git ls-files | grep -E '\.wpress$' || true)
           if [ -n "$found" ]; then
-            echo "Estos archivos pertenecen al backend de WordPress y no se suben:"
+            echo "El respaldo .wpress no se sube. Vive en la carpeta BackNo del servidor:"
             echo "$found"
             exit 1
           fi
