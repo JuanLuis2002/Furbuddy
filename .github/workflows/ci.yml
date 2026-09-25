@@ -1,10 +1,14 @@
-name: CI
+name: CI y despliegue
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
+concurrency:
+  group: furbuddy-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   sin-respaldo-wpress:
@@ -17,7 +21,7 @@ jobs:
           set -eu
           found=$(git ls-files | grep -E '\.wpress$' || true)
           if [ -n "$found" ]; then
-            echo "El respaldo .wpress no se sube. Vive en la carpeta BackNo del servidor:"
+            echo "El respaldo .wpress no se sube. Vive en /root/BackNo en la VPS:"
             echo "$found"
             exit 1
           fi
@@ -25,6 +29,9 @@ jobs:
   api:
     name: API Python
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -32,32 +39,45 @@ jobs:
           python-version: "3.12"
       - name: Probar la API
         run: |
-          set -eu
-          if [ ! -f api/requirements.txt ]; then
-            echo "La API Python todavia no esta en el repositorio."
-            exit 0
-          fi
-          python -m pip install -r api/requirements.txt
-          if [ -d api/tests ]; then
-            python -m pytest api/tests
-          else
-            python -m compileall -q api
-          fi
+          python -m pip install -r requirements-dev.txt
+          python -m pytest
 
   web:
     name: Frontend Vue
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
       - name: Probar el frontend
         run: |
-          set -eu
-          if [ ! -f frontend/package.json ]; then
-            echo "El frontend Vue todavia no esta en el repositorio."
-            exit 0
-          fi
-          npm ci --prefix frontend
-          npm test --prefix frontend
+          npm ci
+          npm test
+
+  desplegar:
+    name: Desplegar en la VPS
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [sin-respaldo-wpress, api, web]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publicar Vue y Python
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          command_timeout: 30m
+          script_stop: true
+          script: |
+            set -eu
+            cd /root/Furbuddy
+            git fetch origin main
+            git reset --hard origin/main
+            docker compose up -d --build
