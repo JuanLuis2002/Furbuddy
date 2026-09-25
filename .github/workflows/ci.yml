@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  sin-backend-wordpress:
+    name: El backend de WordPress no entra al repo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rechazar respaldo y archivos de la tienda
+        run: |
+          set -eu
+          found=$(git ls-files | grep -E '(^|/)wp-content/|\.wpress$|^database\.sql$|^docker-compose\.yml$' || true)
+          if [ -n "$found" ]; then
+            echo "Estos archivos pertenecen al backend de WordPress y no se suben:"
+            echo "$found"
+            exit 1
+          fi
+
+  api:
+    name: API Python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Probar la API
+        run: |
+          set -eu
+          if [ ! -f api/requirements.txt ]; then
+            echo "La API Python todavia no esta en el repositorio."
+            exit 0
+          fi
+          python -m pip install -r api/requirements.txt
+          if [ -d api/tests ]; then
+            python -m pytest api/tests
+          else
+            python -m compileall -q api
+          fi
+
+  web:
+    name: Frontend Vue
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Probar el frontend
+        run: |
+          set -eu
+          if [ ! -f frontend/package.json ]; then
+            echo "El frontend Vue todavia no esta en el repositorio."
+            exit 0
+          fi
+          npm ci --prefix frontend
+          npm test --prefix frontend

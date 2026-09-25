@@ -1,9 +1,10 @@
 .env
-.restore/
+.venv/
+__pycache__/
+*.py[cod]
+node_modules/
+dist/
+.wpress
 *.wpress
-wp-content/cache/
-wp-content/litespeed/
-wp-content/backups-dup-lite/
-wp-content/upgrade/
-wp-content/uploads/wc-logs/
-wp-content/debug.log
+wp-content/
+database.sql
