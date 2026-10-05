@@ -2,8 +2,8 @@
    facial regions so the fur and silhouette remain continuous. */
 window.createFurbuddyEyeRig = function (canvas, images) {
   const gl = canvas.getContext('webgl2', {
-    alpha: true, antialias: false, depth: false, stencil: false,
-    premultipliedAlpha: false, preserveDrawingBuffer: false,
+    alpha: true, antialias: true, depth: false, stencil: false,
+    premultipliedAlpha: true, preserveDrawingBuffer: false,
   });
   if (!gl) return null;
 
@@ -150,6 +150,7 @@ window.createFurbuddyEyeRig = function (canvas, images) {
   const loaded = Promise.all(images.map(image => image.complete && image.naturalWidth ? Promise.resolve() : image.decode()))
     .then(() => {
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
       for (let i = 0; i < images.length; i++) {
         const texture = gl.createTexture();
         gl.activeTexture(gl.TEXTURE0 + i);
@@ -177,6 +178,8 @@ window.createFurbuddyEyeRig = function (canvas, images) {
     gl.uniform1f(tailLocation, tail);
     gl.uniform1f(blinkLocation, Math.max(0, Math.min(1, blink)));
     gl.uniform1f(delightLocation, Math.max(0, Math.min(1, delight)));
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
   return { loaded, draw };
