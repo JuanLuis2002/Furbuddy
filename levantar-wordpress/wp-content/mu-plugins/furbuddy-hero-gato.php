@@ -27,9 +27,17 @@ add_action(
 		);
 
 		wp_enqueue_script(
+			'furbuddy-hero-gato-eyes',
+			$url . 'eye-rig.js',
+			array(),
+			(string) filemtime( $dir . '/eye-rig.js' ),
+			true
+		);
+
+		wp_enqueue_script(
 			'furbuddy-hero-gato',
 			$url . 'hero.js',
-			array(),
+			array( 'furbuddy-hero-gato-eyes' ),
 			(string) filemtime( $dir . '/hero.js' ),
 			true
 		);
