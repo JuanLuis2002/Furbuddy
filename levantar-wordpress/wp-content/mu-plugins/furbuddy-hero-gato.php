@@ -10,6 +10,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_action(
+	'wp_head',
+	static function () {
+		if ( ! is_front_page() ) {
+			return;
+		}
+
+		echo '<style id="furbuddy-hero-gato-critical">.wp-block-stackable-columns:has(#el-lugar-favorito-de-tus-mascotas) .wp-block-stackable-image img{visibility:hidden}</style>' . "\n";
+	},
+	1
+);
+
+add_action(
 	'wp_enqueue_scripts',
 	static function () {
 		if ( ! is_front_page() ) {
