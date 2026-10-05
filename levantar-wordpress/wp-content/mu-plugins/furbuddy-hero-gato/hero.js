@@ -104,6 +104,7 @@
 		stage.appendChild(sound);
 		figure.appendChild(stage);
 
+		var eyeRig = null;
 		if (window.createFurbuddyEyeRig) {
 			var openEyes = new Image();
 			var blankEyes = new Image();
@@ -146,7 +147,6 @@
 		var rightEarV = 0;
 		var tail = 0;
 		var tailV = 0;
-		var eyeRig = null;
 		var tipX = 0;
 		var tipY = 0;
 		var tipVx = 0;
@@ -286,9 +286,12 @@
 		}
 
 		function placeThread() {
-			if (!stage.clientWidth) {
+			var width = stage.clientWidth;
+			var height = stage.clientHeight;
+			if (!width || !height) {
 				return;
 			}
+			thread.setAttribute("viewBox", "0 0 " + width + " " + height);
 			var attach = ballAttachment();
 			var cx = (attach.x + tipX) / 2;
 			var cy = (attach.y + tipY) / 2 + Math.min(28, 7 + Math.abs(tipX - attach.x) * 0.06);
@@ -319,35 +322,37 @@
 		}
 
 		function stepToy(dt) {
-			if (reduced || draggingBall || !toy.ready) {
+			if (!toy.ready) {
 				return;
 			}
-			var bounds = ballBounds();
-			toy.vy += 1050 * dt;
-			toy.x += toy.vx * dt;
-			toy.y += toy.vy * dt;
-			if (toy.x < bounds.minX || toy.x > bounds.maxX) {
-				toy.x = clamp(toy.x, bounds.minX, bounds.maxX);
-				toy.vx *= -0.65;
-				toy.angleV *= -0.52;
-			}
-			if (toy.y > bounds.floorY) {
-				toy.y = bounds.floorY;
-				toy.vy *= -0.55;
-				toy.vx *= 0.78;
-				toy.angleV = toy.vx / Math.max(1, bounds.radius) * 180 / Math.PI;
-				if (Math.abs(toy.vy) < 27) {
-					toy.vy = 0;
+			if (!reduced && !draggingBall) {
+				var bounds = ballBounds();
+				toy.vy += 1050 * dt;
+				toy.x += toy.vx * dt;
+				toy.y += toy.vy * dt;
+				if (toy.x < bounds.minX || toy.x > bounds.maxX) {
+					toy.x = clamp(toy.x, bounds.minX, bounds.maxX);
+					toy.vx *= -0.65;
+					toy.angleV *= -0.52;
 				}
+				if (toy.y > bounds.floorY) {
+					toy.y = bounds.floorY;
+					toy.vy *= -0.55;
+					toy.vx *= 0.78;
+					toy.angleV = toy.vx / Math.max(1, bounds.radius) * 180 / Math.PI;
+					if (Math.abs(toy.vy) < 27) {
+						toy.vy = 0;
+					}
+				}
+				if (toy.y < bounds.minY) {
+					toy.y = bounds.minY;
+					toy.vy *= -0.6;
+				}
+				toy.angle += toy.angleV * dt;
+				toy.angleV *= Math.exp(-1.1 * dt);
+				toy.vx *= Math.exp(-0.75 * dt);
+				positionBall();
 			}
-			if (toy.y < bounds.minY) {
-				toy.y = bounds.minY;
-				toy.vy *= -0.6;
-			}
-			toy.angle += toy.angleV * dt;
-			toy.angleV *= Math.exp(-1.1 * dt);
-			toy.vx *= Math.exp(-0.75 * dt);
-			positionBall();
 			if (!draggingTip) {
 				var attach = ballAttachment();
 				var targetX = attach.x - 43;
@@ -552,7 +557,7 @@
 			stepToy(dt);
 			var eyesOn = stage.classList.contains("has-eyes");
 			if (!reduced && now >= until) {
-				if (now - quietSince > 9000 && pointerX === null && !draggingBall && !draggingTip) {
+				if (now - quietSince > 9000 && !draggingBall && !draggingTip) {
 					show("sleep");
 				} else if (!eyesOn && now >= nextBlink) {
 					show("blink");
