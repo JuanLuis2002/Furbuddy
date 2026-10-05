@@ -67,7 +67,7 @@ window.createFurbuddyEyeRig = function (canvas, images) {
       float socket = max(leftSocket, rightSocket);
       vec4 color = mix(openPixel, blankPixel, socket);
 
-      vec2 offset = uLook * vec2(16.0, 11.0);
+      vec2 offset = uLook * vec2(10.0, 5.0);
       vec2 sourcePoint = point - offset;
       vec2 sourceUv = vec2(sourcePoint.x / SIZE.x, 1.0 - sourcePoint.y / SIZE.y);
       vec4 openSource = texture(uOpen, sourceUv);
