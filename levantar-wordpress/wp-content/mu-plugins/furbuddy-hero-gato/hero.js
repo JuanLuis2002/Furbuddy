@@ -407,6 +407,10 @@
 			quietSince = performance.now();
 		});
 
+		cat.addEventListener("pointerenter", function () {
+			quietSince = performance.now();
+			delightUntil = performance.now() + 1900;
+		});
 		cat.addEventListener("click", function (event) {
 			event.stopPropagation();
 			leap("hey, that tickles!");
