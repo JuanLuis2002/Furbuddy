@@ -16,7 +16,7 @@ add_action(
 			return;
 		}
 
-		echo '<style id="furbuddy-hero-gato-critical">.wp-block-stackable-columns:has(#el-lugar-favorito-de-tus-mascotas) .wp-block-stackable-image img{visibility:hidden}</style>' . "\n";
+		echo '<style id="furbuddy-hero-gato-critical">.wp-block-stackable-columns:has(#el-lugar-favorito-de-tus-mascotas) .wp-block-stackable-image img:not(.furbuddy-hero-cat):not(.furbuddy-hero-ball){visibility:hidden}</style>' . "\n";
 	},
 	1
 );

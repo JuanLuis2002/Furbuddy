@@ -4,7 +4,7 @@
 	overflow: visible;
 }
 
-.wp-block-stackable-columns:has(#el-lugar-favorito-de-tus-mascotas) .wp-block-stackable-image img,
+.wp-block-stackable-columns:has(#el-lugar-favorito-de-tus-mascotas) .wp-block-stackable-image img:not(.furbuddy-hero-cat):not(.furbuddy-hero-ball),
 .furbuddy-hero-gato-host .stk-img {
 	visibility: hidden;
 }
