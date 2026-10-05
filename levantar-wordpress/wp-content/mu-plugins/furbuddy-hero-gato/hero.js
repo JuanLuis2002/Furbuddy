@@ -190,14 +190,14 @@
 			}, 2500);
 		}
 
-		function burst() {
+		function burst(symbol) {
 			if (reduced) {
 				return;
 			}
 			for (var i = 0; i < 10; i++) {
 				var part = document.createElement("span");
 				part.className = "furbuddy-particle";
-				part.textContent = "✳";
+				part.textContent = symbol || "✳";
 				var angle = Math.PI * 2 * i / 10;
 				part.style.setProperty("--dx", Math.cos(angle) * (70 + Math.random() * 60) + "px");
 				part.style.setProperty("--dy", Math.sin(angle) * (50 + Math.random() * 50) + "px");
@@ -215,12 +215,17 @@
 			until = performance.now() + (reduced ? 150 : 780);
 			stage.classList.add("is-leaping");
 			show("leap");
-			burst();
+			burst("✳");
 			say(message);
 			delightUntil = performance.now() + 2600;
 			tone(710, 0.15);
 			window.setTimeout(function () {
+				if (until > performance.now() + 40) {
+					return;
+				}
 				stage.classList.remove("is-leaping");
+				burst("✦");
+				tone(390, 0.07);
 			}, reduced ? 150 : 780);
 		}
 
