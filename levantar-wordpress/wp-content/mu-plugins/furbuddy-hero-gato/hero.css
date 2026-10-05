@@ -1,0 +1,63 @@
+.furbuddy-hero-gato-host {
+	position: relative;
+}
+
+.furbuddy-hero-gato-host .stk-img {
+	visibility: hidden;
+}
+
+.furbuddy-hero-stage {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+}
+
+.furbuddy-hero-cat,
+.furbuddy-hero-ball {
+	position: absolute;
+	object-fit: contain;
+	user-select: none;
+	-webkit-user-drag: none;
+}
+
+.furbuddy-hero-cat {
+	inset: 4% 0 0;
+	width: 100%;
+	height: 96%;
+	cursor: pointer;
+}
+
+.furbuddy-hero-ball {
+	width: 27%;
+	height: auto;
+	left: 6%;
+	bottom: 4%;
+	cursor: grab;
+	touch-action: none;
+	z-index: 3;
+	transition: left 0.28s ease, bottom 0.28s ease;
+}
+
+.furbuddy-hero-ball.is-dragging {
+	cursor: grabbing;
+}
+
+.furbuddy-hero-sound {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 4;
+	border: 0;
+	border-radius: 999px;
+	padding: 0.35rem 0.7rem;
+	background: rgba(255, 255, 255, 0.88);
+	color: #1d3b45;
+	font: 600 0.75rem/1 system-ui, sans-serif;
+	cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.furbuddy-hero-ball {
+		cursor: default;
+	}
+}
