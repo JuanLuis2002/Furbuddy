@@ -1,7 +1,22 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 
-app = FastAPI(title="Furbuddy API")
+app = FastAPI(title="Furbuddy API", docs_url=None)
+
+SCALAR_HTML = """<!doctype html>
+<html>
+  <head>
+    <title>Furbuddy API</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <script id="api-reference" data-url="/openapi.json"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+  </body>
+</html>
+"""
 
 app.add_middleware(
     CORSMiddleware,
@@ -9,6 +24,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/docs", include_in_schema=False)
+def scalar_docs():
+    return HTMLResponse(SCALAR_HTML)
 
 
 @app.get("/api/status")
