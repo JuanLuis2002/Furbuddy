@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
 
-from app.frmUsuarios.schemas import PaginaUsuarios, UsuarioEntrada, UsuarioSalida
+from app.frmUsuarios.schemas import PaginaUsuarios, UsuarioEdicion, UsuarioEntrada, UsuarioSalida
 from app.frmUsuarios.servicio import (
     TiendaError,
     TiendaNoConfigurada,
+    actualizar_usuario,
     crear_usuario,
     eliminar_usuario,
     listar_usuarios,
@@ -40,6 +41,16 @@ def usuarios(
 def nuevo_usuario(datos: UsuarioEntrada, sesion: dict = Depends(sesion_actual)):
     try:
         return crear_usuario(datos.model_dump())
+    except TiendaNoConfigurada as error:
+        raise HTTPException(status_code=503, detail="Falta configurar WooCommerce") from error
+    except TiendaError as error:
+        raise HTTPException(status_code=error.codigo, detail=error.mensaje) from error
+
+
+@router.put("/usuarios/{usuario_id}", response_model=UsuarioSalida)
+def cambiar_usuario(usuario_id: int, datos: UsuarioEdicion, sesion: dict = Depends(sesion_actual)):
+    try:
+        return actualizar_usuario(usuario_id, datos.model_dump())
     except TiendaNoConfigurada as error:
         raise HTTPException(status_code=503, detail="Falta configurar WooCommerce") from error
     except TiendaError as error:

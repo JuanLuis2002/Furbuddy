@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { crearUsuario, eliminarUsuario, listarUsuarios } from "./frmUsuarios.js"
+import { crearUsuario, editarUsuario, eliminarUsuario, listarUsuarios } from "./frmUsuarios.js"
 
 beforeEach(() => {
   const memoria = new Map()
@@ -36,6 +36,21 @@ describe("frmUsuarios", () => {
       return { ok: true, status: 201, json: async () => ({ id: 2, usuario: "leo" }) }
     })
     expect(JSON.parse(cuerpo).usuario).toBe("leo")
+  })
+
+  it("envia la edicion del usuario a la API", async () => {
+    sessionStorage.setItem("furbuddy-sesion", JSON.stringify({ token: "abc" }))
+    let metodo = ""
+    let cuerpo = ""
+    await editarUsuario(9, { nombre: "Leo", apellido: "Diaz", email: "leo@furbuddy.xyz", password: "" }, async (ruta, opciones) => {
+      metodo = opciones.method
+      cuerpo = opciones.body
+      expect(ruta).toBe("/api/usuarios/9")
+      return { ok: true, status: 200, json: async () => ({ id: 9, nombre: "Leo" }) }
+    })
+    expect(metodo).toBe("PUT")
+    expect(JSON.parse(cuerpo).apellido).toBe("Diaz")
+    expect(JSON.parse(cuerpo).password).toBe("")
   })
 
   it("pide borrar el usuario en WooCommerce", async () => {

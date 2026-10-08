@@ -69,7 +69,8 @@ def test_usuarios_lista_woocommerce(monkeypatch):
             "usuarios": [{
                 "id": 9,
                 "usuario": "luz",
-                "nombre": "Luz Perez",
+                "nombre": "Luz",
+                "apellido": "Perez",
                 "email": "luz@furbuddy.xyz",
                 "rol": "customer",
             }],
@@ -97,7 +98,8 @@ def test_usuarios_crea_en_woocommerce(monkeypatch):
         lambda datos: {
             "id": 10,
             "usuario": datos["usuario"],
-            "nombre": datos["nombre"] + " " + datos["apellido"],
+            "nombre": datos["nombre"],
+            "apellido": datos["apellido"],
             "email": datos["email"],
             "rol": "customer",
         },
@@ -171,7 +173,76 @@ def test_servicio_crea_customer_de_woocommerce():
     )
     assert cliente.enviado[0] == "customers"
     assert cliente.enviado[1]["email"] == "leo@furbuddy.xyz"
+    assert creado["nombre"] == "Leo"
+    assert creado["apellido"] == "Diaz"
     assert creado["rol"] == "customer"
+
+
+def test_usuarios_actualiza_en_woocommerce(monkeypatch):
+    preparar_sesion(monkeypatch)
+    token = crear_token({"id": 1, "usuario": "admin"})
+    monkeypatch.setattr(
+        "app.frmUsuarios.router.actualizar_usuario",
+        lambda usuario_id, datos: {
+            "id": usuario_id,
+            "usuario": "leo",
+            "nombre": datos["nombre"],
+            "apellido": datos["apellido"],
+            "email": datos["email"],
+            "rol": "customer",
+        },
+    )
+
+    respuesta = client.put(
+        "/api/usuarios/10",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "nombre": "Leo",
+            "apellido": "Diaz",
+            "email": "leo@furbuddy.xyz",
+            "password": "",
+        },
+    )
+    assert respuesta.status_code == 200
+    assert respuesta.json()["apellido"] == "Diaz"
+
+
+def test_servicio_actualiza_customer_de_woocommerce():
+    from app.frmUsuarios.servicio import actualizar_usuario
+
+    class Cliente:
+        def __init__(self):
+            self.enviado = None
+
+        def put(self, endpoint, data):
+            self.enviado = (endpoint, data)
+            return Respuesta(200, {
+                "id": 10,
+                "username": "leo",
+                "first_name": data["first_name"],
+                "last_name": data["last_name"],
+                "email": data["email"],
+                "role": "customer",
+            })
+
+    cliente = Cliente()
+    actualizado = actualizar_usuario(10, {
+        "nombre": "Leo",
+        "apellido": "Diaz",
+        "email": "leo@furbuddy.xyz",
+        "password": "clave-larga",
+    }, cliente)
+    assert cliente.enviado[0] == "customers/10"
+    assert cliente.enviado[1]["password"] == "clave-larga"
+    assert "username" not in cliente.enviado[1]
+    assert actualizado["nombre"] == "Leo"
+    actualizar_usuario(10, {
+        "nombre": "Leo",
+        "apellido": "Diaz",
+        "email": "leo@furbuddy.xyz",
+        "password": "",
+    }, cliente)
+    assert "password" not in cliente.enviado[1]
 
 
 def test_usuarios_elimina_en_woocommerce(monkeypatch):
@@ -214,6 +285,8 @@ def test_servicio_lista_y_borra_customers():
     lista = listar_usuarios(2, 5, cliente)
     eliminar_usuario(9, cliente)
     assert lista["total"] == 12
+    assert lista["usuarios"][0]["nombre"] == "Luz"
+    assert lista["usuarios"][0]["apellido"] == "Perez"
     assert lista["usuarios"][0]["rol"] == "administrator"
     assert cliente.borrado == ("customers/9", {"force": True})
 

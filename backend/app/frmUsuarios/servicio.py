@@ -28,11 +28,11 @@ def cliente_woocommerce():
 
 
 def resumir(item: dict) -> dict:
-    nombre = f"{item.get('first_name', '')} {item.get('last_name', '')}".strip()
     return {
         "id": item["id"],
         "usuario": item.get("username") or "",
-        "nombre": nombre,
+        "nombre": item.get("first_name") or "",
+        "apellido": item.get("last_name") or "",
         "email": item.get("email") or "",
         "rol": item.get("role") or "customer",
     }
@@ -80,6 +80,22 @@ def crear_usuario(datos: dict, cliente=None) -> dict:
             "password": datos["password"],
         },
     )
+    if respuesta.status_code not in (200, 201):
+        codigo = 400 if respuesta.status_code < 500 else 502
+        raise TiendaError(mensaje_tienda(respuesta), codigo)
+    return resumir(respuesta.json())
+
+
+def actualizar_usuario(usuario_id: int, datos: dict, cliente=None) -> dict:
+    api = cliente or cliente_woocommerce()
+    cuerpo = {
+        "first_name": datos["nombre"],
+        "last_name": datos["apellido"],
+        "email": datos["email"],
+    }
+    if datos.get("password"):
+        cuerpo["password"] = datos["password"]
+    respuesta = api.put(f"customers/{usuario_id}", cuerpo)
     if respuesta.status_code not in (200, 201):
         codigo = 400 if respuesta.status_code < 500 else 502
         raise TiendaError(mensaje_tienda(respuesta), codigo)

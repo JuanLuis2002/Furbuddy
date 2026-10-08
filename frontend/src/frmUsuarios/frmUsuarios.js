@@ -38,6 +38,20 @@ export async function crearUsuario(datos, fetchImpl = fetch) {
   )
 }
 
+export async function editarUsuario(id, datos, fetchImpl = fetch) {
+  const sesion = leerSesion()
+  return pedir(
+    `/api/usuarios/${id}`,
+    sesion?.token,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    },
+    fetchImpl,
+  )
+}
+
 export async function eliminarUsuario(id, fetchImpl = fetch) {
   const sesion = leerSesion()
   return pedir(`/api/usuarios/${id}`, sesion?.token, { method: "DELETE" }, fetchImpl)
