@@ -21,8 +21,8 @@ onUnmounted(() => {
 <style>
 .furbuddy-login-gato {
   position: relative;
-  width: min(100%, 640px);
-  height: min(88vh, 760px);
+  width: min(100%, 550px);
+  aspect-ratio: 1;
   margin: 0 auto;
 }
 
@@ -126,6 +126,8 @@ onUnmounted(() => {
   z-index: 3;
   width: 88%;
   height: 92%;
+  object-fit: contain;
+  object-position: 50% 50%;
   pointer-events: none;
   opacity: 0;
 }
@@ -265,13 +267,6 @@ onUnmounted(() => {
   100% {
     opacity: 0;
     transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.05) rotate(var(--rotation));
-  }
-}
-
-@media (max-width: 959px) {
-  .furbuddy-login-gato {
-    height: 46vh;
-    min-height: 260px;
   }
 }
 
