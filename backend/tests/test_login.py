@@ -62,20 +62,31 @@ def test_usuarios_pide_sesion():
 def test_usuarios_lista_woocommerce(monkeypatch):
     preparar_sesion(monkeypatch)
     token = crear_token({"id": 1, "usuario": "admin"})
-    monkeypatch.setattr(
-        "app.frmUsuarios.router.listar_usuarios",
-        lambda: [{
-            "id": 9,
-            "usuario": "luz",
-            "nombre": "Luz Perez",
-            "email": "luz@furbuddy.xyz",
-            "rol": "customer",
-        }],
-    )
+    def pagina(numero, tamano):
+        assert numero == 2
+        assert tamano == 5
+        return {
+            "usuarios": [{
+                "id": 9,
+                "usuario": "luz",
+                "nombre": "Luz Perez",
+                "email": "luz@furbuddy.xyz",
+                "rol": "customer",
+            }],
+            "total": 12,
+            "pagina": numero,
+            "por_pagina": tamano,
+        }
 
-    respuesta = client.get("/api/usuarios", headers={"Authorization": f"Bearer {token}"})
+    monkeypatch.setattr("app.frmUsuarios.router.listar_usuarios", pagina)
+
+    respuesta = client.get(
+        "/api/usuarios?pagina=2&por_pagina=5",
+        headers={"Authorization": f"Bearer {token}"},
+    )
     assert respuesta.status_code == 200
-    assert respuesta.json()[0]["usuario"] == "luz"
+    assert respuesta.json()["total"] == 12
+    assert respuesta.json()["usuarios"][0]["usuario"] == "luz"
 
 
 def test_usuarios_crea_en_woocommerce(monkeypatch):
@@ -163,10 +174,55 @@ def test_servicio_crea_customer_de_woocommerce():
     assert creado["rol"] == "customer"
 
 
+def test_usuarios_elimina_en_woocommerce(monkeypatch):
+    preparar_sesion(monkeypatch)
+    token = crear_token({"id": 1, "usuario": "admin"})
+    borrados = []
+    monkeypatch.setattr("app.frmUsuarios.router.eliminar_usuario", lambda usuario_id: borrados.append(usuario_id))
+
+    respuesta = client.delete("/api/usuarios/9", headers={"Authorization": f"Bearer {token}"})
+    assert respuesta.status_code == 204
+    assert borrados == [9]
+
+
+def test_servicio_lista_y_borra_customers():
+    from app.frmUsuarios.servicio import eliminar_usuario, listar_usuarios
+
+    class Cliente:
+        def __init__(self):
+            self.borrado = None
+
+        def get(self, endpoint, params):
+            assert endpoint == "customers"
+            assert params["role"] == "all"
+            assert params["page"] == 2
+            assert params["per_page"] == 5
+            return Respuesta(200, [{
+                "id": 9,
+                "username": "luz",
+                "first_name": "Luz",
+                "last_name": "Perez",
+                "email": "luz@furbuddy.xyz",
+                "role": "administrator",
+            }], {"X-WP-Total": "12"})
+
+        def delete(self, endpoint, params):
+            self.borrado = (endpoint, params)
+            return Respuesta(200, {})
+
+    cliente = Cliente()
+    lista = listar_usuarios(2, 5, cliente)
+    eliminar_usuario(9, cliente)
+    assert lista["total"] == 12
+    assert lista["usuarios"][0]["rol"] == "administrator"
+    assert cliente.borrado == ("customers/9", {"force": True})
+
+
 class Respuesta:
-    def __init__(self, status_code, cuerpo):
+    def __init__(self, status_code, cuerpo, headers=None):
         self.status_code = status_code
         self._cuerpo = cuerpo
+        self.headers = headers or {}
 
     def json(self):
         return self._cuerpo

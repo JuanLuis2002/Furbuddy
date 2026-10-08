@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { crearUsuario, listarUsuarios } from "./frmUsuarios.js"
+import { crearUsuario, eliminarUsuario, listarUsuarios } from "./frmUsuarios.js"
 
 beforeEach(() => {
   const memoria = new Map()
@@ -14,13 +14,18 @@ describe("frmUsuarios", () => {
   it("pide la lista con la sesion guardada", async () => {
     sessionStorage.setItem("furbuddy-sesion", JSON.stringify({ token: "abc" }))
     let encabezado = ""
-    const lista = await listarUsuarios(async (ruta, opciones) => {
+    const lista = await listarUsuarios(2, 5, async (ruta, opciones) => {
       encabezado = opciones.headers.Authorization
-      expect(ruta).toBe("/api/usuarios")
-      return { ok: true, status: 200, json: async () => [{ id: 1, usuario: "luz" }] }
+      expect(ruta).toBe("/api/usuarios?pagina=2&por_pagina=5")
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ usuarios: [{ id: 1, usuario: "luz" }], total: 12 }),
+      }
     })
     expect(encabezado).toBe("Bearer abc")
-    expect(lista[0].usuario).toBe("luz")
+    expect(lista.usuarios[0].usuario).toBe("luz")
+    expect(lista.total).toBe(12)
   })
 
   it("envia el usuario nuevo a la API", async () => {
@@ -31,5 +36,16 @@ describe("frmUsuarios", () => {
       return { ok: true, status: 201, json: async () => ({ id: 2, usuario: "leo" }) }
     })
     expect(JSON.parse(cuerpo).usuario).toBe("leo")
+  })
+
+  it("pide borrar el usuario en WooCommerce", async () => {
+    sessionStorage.setItem("furbuddy-sesion", JSON.stringify({ token: "abc" }))
+    let metodo = ""
+    await eliminarUsuario(9, async (ruta, opciones) => {
+      metodo = opciones.method
+      expect(ruta).toBe("/api/usuarios/9")
+      return { ok: true, status: 204, json: async () => ({}) }
+    })
+    expect(metodo).toBe("DELETE")
   })
 })

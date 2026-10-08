@@ -9,6 +9,13 @@ class UsuarioSalida(BaseModel):
     rol: str
 
 
+class PaginaUsuarios(BaseModel):
+    usuarios: list[UsuarioSalida]
+    total: int
+    pagina: int
+    por_pagina: int
+
+
 class UsuarioEntrada(BaseModel):
     nombre: str = Field(min_length=1)
     apellido: str = Field(min_length=1)

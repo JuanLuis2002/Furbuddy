@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
+from app.frmConfiguracion.router import router as router_configuracion
 from app.frmLogin.router import router as router_login
 from app.frmUsuarios.router import router as router_usuarios
 
@@ -30,6 +31,7 @@ app.add_middleware(
 
 app.include_router(router_login)
 app.include_router(router_usuarios)
+app.include_router(router_configuracion)
 
 
 @app.get("/docs", include_in_schema=False)

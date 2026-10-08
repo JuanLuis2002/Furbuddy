@@ -18,9 +18,10 @@ async function pedir(ruta, token, opciones, fetchImpl) {
   return datos
 }
 
-export async function listarUsuarios(fetchImpl = fetch) {
+export async function listarUsuarios(pagina, porPagina, fetchImpl = fetch) {
   const sesion = leerSesion()
-  return pedir("/api/usuarios", sesion?.token, { method: "GET" }, fetchImpl)
+  const ruta = `/api/usuarios?pagina=${pagina}&por_pagina=${porPagina}`
+  return pedir(ruta, sesion?.token, { method: "GET" }, fetchImpl)
 }
 
 export async function crearUsuario(datos, fetchImpl = fetch) {
@@ -35,4 +36,9 @@ export async function crearUsuario(datos, fetchImpl = fetch) {
     },
     fetchImpl,
   )
+}
+
+export async function eliminarUsuario(id, fetchImpl = fetch) {
+  const sesion = leerSesion()
+  return pedir(`/api/usuarios/${id}`, sesion?.token, { method: "DELETE" }, fetchImpl)
 }

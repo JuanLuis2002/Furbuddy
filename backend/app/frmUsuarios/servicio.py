@@ -48,12 +48,24 @@ def mensaje_tienda(respuesta) -> str:
     return "WooCommerce rechazo la operacion"
 
 
-def listar_usuarios(cliente=None) -> list[dict]:
+def listar_usuarios(pagina: int = 1, por_pagina: int = 10, cliente=None) -> dict:
     api = cliente or cliente_woocommerce()
-    respuesta = api.get("customers", params={"per_page": 50, "role": "all"})
+    respuesta = api.get(
+        "customers",
+        params={"per_page": por_pagina, "role": "all", "page": pagina},
+    )
     if respuesta.status_code != 200:
         raise TiendaError(mensaje_tienda(respuesta), 502)
-    return [resumir(item) for item in respuesta.json()]
+    lote = respuesta.json()
+    if not isinstance(lote, list):
+        lote = []
+    total = int(respuesta.headers.get("X-WP-Total") or len(lote))
+    return {
+        "usuarios": [resumir(item) for item in lote],
+        "total": total,
+        "pagina": pagina,
+        "por_pagina": por_pagina,
+    }
 
 
 def crear_usuario(datos: dict, cliente=None) -> dict:
@@ -72,3 +84,11 @@ def crear_usuario(datos: dict, cliente=None) -> dict:
         codigo = 400 if respuesta.status_code < 500 else 502
         raise TiendaError(mensaje_tienda(respuesta), codigo)
     return resumir(respuesta.json())
+
+
+def eliminar_usuario(usuario_id: int, cliente=None) -> None:
+    api = cliente or cliente_woocommerce()
+    respuesta = api.delete(f"customers/{usuario_id}", params={"force": True})
+    if respuesta.status_code not in (200, 204):
+        codigo = 400 if respuesta.status_code < 500 else 502
+        raise TiendaError(mensaje_tienda(respuesta), codigo)

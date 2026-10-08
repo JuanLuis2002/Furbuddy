@@ -15,6 +15,7 @@ const LLAVE = "furbuddy-sesion"
 
 export function guardarSesion(datos) {
   sessionStorage.setItem(LLAVE, JSON.stringify(datos))
+  window.dispatchEvent(new Event("furbuddy-sesion"))
 }
 
 export function leerSesion() {

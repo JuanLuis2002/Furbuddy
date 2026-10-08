@@ -1,7 +1,13 @@
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
 
-from app.frmUsuarios.schemas import UsuarioEntrada, UsuarioSalida
-from app.frmUsuarios.servicio import TiendaError, TiendaNoConfigurada, crear_usuario, listar_usuarios
+from app.frmUsuarios.schemas import PaginaUsuarios, UsuarioEntrada, UsuarioSalida
+from app.frmUsuarios.servicio import (
+    TiendaError,
+    TiendaNoConfigurada,
+    crear_usuario,
+    eliminar_usuario,
+    listar_usuarios,
+)
 from app.sesion import leer_token
 
 router = APIRouter(prefix="/api", tags=["frmUsuarios"])
@@ -16,10 +22,14 @@ def sesion_actual(authorization: str = Header(default="")) -> dict:
     return datos
 
 
-@router.get("/usuarios", response_model=list[UsuarioSalida])
-def usuarios(sesion: dict = Depends(sesion_actual)):
+@router.get("/usuarios", response_model=PaginaUsuarios)
+def usuarios(
+    pagina: int = Query(default=1, ge=1),
+    por_pagina: int = Query(default=10, ge=1, le=100),
+    sesion: dict = Depends(sesion_actual),
+):
     try:
-        return listar_usuarios()
+        return listar_usuarios(pagina, por_pagina)
     except TiendaNoConfigurada as error:
         raise HTTPException(status_code=503, detail="Falta configurar WooCommerce") from error
     except TiendaError as error:
@@ -30,6 +40,16 @@ def usuarios(sesion: dict = Depends(sesion_actual)):
 def nuevo_usuario(datos: UsuarioEntrada, sesion: dict = Depends(sesion_actual)):
     try:
         return crear_usuario(datos.model_dump())
+    except TiendaNoConfigurada as error:
+        raise HTTPException(status_code=503, detail="Falta configurar WooCommerce") from error
+    except TiendaError as error:
+        raise HTTPException(status_code=error.codigo, detail=error.mensaje) from error
+
+
+@router.delete("/usuarios/{usuario_id}", status_code=204)
+def quitar_usuario(usuario_id: int, sesion: dict = Depends(sesion_actual)):
+    try:
+        eliminar_usuario(usuario_id)
     except TiendaNoConfigurada as error:
         raise HTTPException(status_code=503, detail="Falta configurar WooCommerce") from error
     except TiendaError as error:
