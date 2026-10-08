@@ -1,0 +1,172 @@
+from fastapi.testclient import TestClient
+
+from app.frmLogin.servicio import CredencialesInvalidas, SinPermiso
+from app.frmUsuarios.servicio import TiendaError
+from app.main import app
+from app.sesion import crear_token
+
+client = TestClient(app)
+
+
+def preparar_sesion(monkeypatch):
+    monkeypatch.setenv("FURBUDDY_SESION_SECRETO", "secreto-de-prueba")
+
+
+def test_login_devuelve_token(monkeypatch):
+    preparar_sesion(monkeypatch)
+    monkeypatch.setattr(
+        "app.frmLogin.router.autenticar_wordpress",
+        lambda usuario, password: {
+            "id": 4,
+            "usuario": usuario,
+            "nombre": "Ana",
+            "email": "ana@furbuddy.xyz",
+        },
+    )
+
+    respuesta = client.post("/api/login", json={"usuario": "ana", "password": "clave-larga"})
+
+    assert respuesta.status_code == 200
+    cuerpo = respuesta.json()
+    assert cuerpo["usuario"] == "ana"
+    assert cuerpo["token"]
+
+
+def test_login_rechaza_credenciales(monkeypatch):
+    preparar_sesion(monkeypatch)
+
+    def fallar(usuario, password):
+        raise CredencialesInvalidas()
+
+    monkeypatch.setattr("app.frmLogin.router.autenticar_wordpress", fallar)
+    respuesta = client.post("/api/login", json={"usuario": "ana", "password": "mala"})
+    assert respuesta.status_code == 401
+
+
+def test_login_rechaza_cliente(monkeypatch):
+    preparar_sesion(monkeypatch)
+
+    def fallar(usuario, password):
+        raise SinPermiso()
+
+    monkeypatch.setattr("app.frmLogin.router.autenticar_wordpress", fallar)
+    respuesta = client.post("/api/login", json={"usuario": "cliente", "password": "clave-larga"})
+    assert respuesta.status_code == 403
+
+
+def test_usuarios_pide_sesion():
+    respuesta = client.get("/api/usuarios")
+    assert respuesta.status_code == 401
+
+
+def test_usuarios_lista_woocommerce(monkeypatch):
+    preparar_sesion(monkeypatch)
+    token = crear_token({"id": 1, "usuario": "admin"})
+    monkeypatch.setattr(
+        "app.frmUsuarios.router.listar_usuarios",
+        lambda: [{
+            "id": 9,
+            "usuario": "luz",
+            "nombre": "Luz Perez",
+            "email": "luz@furbuddy.xyz",
+            "rol": "customer",
+        }],
+    )
+
+    respuesta = client.get("/api/usuarios", headers={"Authorization": f"Bearer {token}"})
+    assert respuesta.status_code == 200
+    assert respuesta.json()[0]["usuario"] == "luz"
+
+
+def test_usuarios_crea_en_woocommerce(monkeypatch):
+    preparar_sesion(monkeypatch)
+    token = crear_token({"id": 1, "usuario": "admin"})
+    monkeypatch.setattr(
+        "app.frmUsuarios.router.crear_usuario",
+        lambda datos: {
+            "id": 10,
+            "usuario": datos["usuario"],
+            "nombre": datos["nombre"] + " " + datos["apellido"],
+            "email": datos["email"],
+            "rol": "customer",
+        },
+    )
+
+    respuesta = client.post(
+        "/api/usuarios",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "nombre": "Leo",
+            "apellido": "Diaz",
+            "usuario": "leo",
+            "email": "leo@furbuddy.xyz",
+            "password": "clave-larga",
+        },
+    )
+    assert respuesta.status_code == 201
+    assert respuesta.json()["email"] == "leo@furbuddy.xyz"
+
+
+def test_crear_usuario_muestra_error_de_tienda(monkeypatch):
+    preparar_sesion(monkeypatch)
+    token = crear_token({"id": 1, "usuario": "admin"})
+
+    def fallar(datos):
+        raise TiendaError("El correo ya existe", 400)
+
+    monkeypatch.setattr("app.frmUsuarios.router.crear_usuario", fallar)
+    respuesta = client.post(
+        "/api/usuarios",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "nombre": "Leo",
+            "apellido": "Diaz",
+            "usuario": "leo",
+            "email": "leo@furbuddy.xyz",
+            "password": "clave-larga",
+        },
+    )
+    assert respuesta.status_code == 400
+
+
+def test_servicio_crea_customer_de_woocommerce():
+    from app.frmUsuarios.servicio import crear_usuario
+
+    class Cliente:
+        def __init__(self):
+            self.enviado = None
+
+        def post(self, endpoint, data):
+            self.enviado = (endpoint, data)
+            return Respuesta(201, {
+                "id": 3,
+                "username": data["username"],
+                "first_name": data["first_name"],
+                "last_name": data["last_name"],
+                "email": data["email"],
+                "role": "customer",
+            })
+
+    cliente = Cliente()
+    creado = crear_usuario(
+        {
+            "nombre": "Leo",
+            "apellido": "Diaz",
+            "usuario": "leo",
+            "email": "leo@furbuddy.xyz",
+            "password": "clave-larga",
+        },
+        cliente,
+    )
+    assert cliente.enviado[0] == "customers"
+    assert cliente.enviado[1]["email"] == "leo@furbuddy.xyz"
+    assert creado["rol"] == "customer"
+
+
+class Respuesta:
+    def __init__(self, status_code, cuerpo):
+        self.status_code = status_code
+        self._cuerpo = cuerpo
+
+    def json(self):
+        return self._cuerpo
