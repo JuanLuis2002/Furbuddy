@@ -7,9 +7,9 @@ Tienda de accesorios para mascotas. La tienda publicada es WordPress. La vista V
 | Qué | URL |
 | --- | --- |
 | Tienda | https://furbuddy.xyz |
-| Vista Vue | http://213.199.47.230:3001 |
-| API Python | http://213.199.47.230:8092/api/status |
-| Documentación Scalar | http://213.199.47.230:8092/docs |
+| Vista Vue | https://app.furbuddy.xyz |
+| API Python | https://api.furbuddy.xyz/api/status |
+| Documentación Scalar | https://api.furbuddy.xyz/docs |
 
 ## Tecnologías
 
