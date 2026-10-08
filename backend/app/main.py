@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
+from app.frmLogin.router import router as router_login
+from app.frmUsuarios.router import router as router_usuarios
+
 app = FastAPI(title="Furbuddy API", docs_url=None)
 
 SCALAR_HTML = """<!doctype html>
@@ -24,6 +27,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(router_login)
+app.include_router(router_usuarios)
 
 
 @app.get("/docs", include_in_schema=False)

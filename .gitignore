@@ -1,5 +1,6 @@
 .env
 **/.env
+usuarios.txt
 .restore/
 **/.restore/
 *.wpress
