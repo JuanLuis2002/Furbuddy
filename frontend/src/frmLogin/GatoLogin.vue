@@ -45,8 +45,8 @@ onUnmounted(() => {
   width: 76%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle at 42% 41%, #ecf4ff 0%, #bcbeff 26%, #6368ea 48%, rgba(68, 73, 218, 0.15) 69%, transparent 72%);
-  filter: drop-shadow(0 0 28px rgba(184, 163, 255, 0.45));
+  background: radial-gradient(circle at 42% 41%, rgb(var(--v-theme-surface)) 0%, rgba(var(--v-theme-primary), 0.55) 26%, rgb(var(--v-theme-primary)) 48%, rgba(var(--v-theme-primary), 0.15) 69%, transparent 72%);
+  filter: drop-shadow(0 0 28px rgba(var(--v-theme-primary), 0.45));
   pointer-events: none;
 }
 

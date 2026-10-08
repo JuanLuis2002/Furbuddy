@@ -36,9 +36,17 @@ async function entrar() {
     <v-col cols="12" md="5" class="d-flex align-center pa-4 pa-md-10">
       <v-card class="mx-auto pa-2" max-width="440" width="100%" elevation="2">
         <v-card-text>
-          <p class="text-primary text-uppercase text-caption font-weight-bold mb-2">Furbuddy</p>
-          <h1 class="text-h4 mb-2">Entrar al panel</h1>
-          <p class="mb-6">Usa tu usuario de WordPress. WooCommerce lee esos mismos usuarios.</p>
+          <div class="d-flex align-center ga-3 mb-6">
+            <v-avatar color="primary" size="44">
+              <v-icon icon="mdi-paw" size="26" />
+            </v-avatar>
+            <div>
+              <div class="text-h6 font-weight-medium">Furbuddy</div>
+              <div class="text-body-2 text-medium-emphasis">Panel de la tienda</div>
+            </div>
+          </div>
+          <h1 class="text-h5 font-weight-medium mb-2">Entrar</h1>
+          <p class="text-body-1 text-medium-emphasis mb-6">Usa tu usuario de WordPress. WooCommerce lee esos mismos usuarios.</p>
           <v-form ref="forma" @submit.prevent="entrar">
             <v-text-field
               v-model="usuario"

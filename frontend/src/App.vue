@@ -75,15 +75,8 @@ onUnmounted(() => window.removeEventListener("furbuddy-sesion", refrescarSesion)
       </v-main>
       <v-footer app border color="surface" class="text-medium-emphasis">Furbuddy</v-footer>
     </template>
-    <v-main v-else class="fondo-login">
+    <v-main v-else class="bg-background">
       <router-view />
     </v-main>
   </v-app>
 </template>
-
-<style>
-.fondo-login {
-  background: #f6f3ee;
-  font-family: Georgia, "Times New Roman", serif;
-}
-</style>
