@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue"
 import { useRouter } from "vue-router"
+import GatoLogin from "./GatoLogin.vue"
 import { guardarSesion, iniciarSesion } from "./frmLogin.js"
 
 const router = useRouter()
@@ -8,8 +9,14 @@ const usuario = ref("")
 const password = ref("")
 const error = ref("")
 const enviando = ref(false)
+const forma = ref(null)
+const obligatorio = (valor) => !!String(valor || "").trim() || "Obligatorio"
 
 async function entrar() {
+  const resultado = await forma.value.validate()
+  if (!resultado.valid) {
+    return
+  }
   error.value = ""
   enviando.value = true
   try {
@@ -25,87 +32,43 @@ async function entrar() {
 </script>
 
 <template>
-  <main class="login">
-    <p class="marca">Furbuddy</p>
-    <h1>Entrar al panel</h1>
-    <p class="bajada">Usa tu usuario de WordPress. WooCommerce lee esos mismos usuarios.</p>
-    <form @submit.prevent="entrar">
-      <label>
-        Usuario o correo
-        <input v-model="usuario" name="usuario" autocomplete="username" required />
-      </label>
-      <label>
-        Contrasena
-        <input v-model="password" name="password" type="password" autocomplete="current-password" required />
-      </label>
-      <p v-if="error" class="error">{{ error }}</p>
-      <button type="submit" :disabled="enviando">{{ enviando ? "Entrando..." : "Entrar" }}</button>
-    </form>
-  </main>
+  <v-row no-gutters class="login-pagina align-center">
+    <v-col cols="12" md="5" class="d-flex align-center pa-4 pa-md-10">
+      <v-card class="mx-auto pa-2" max-width="440" width="100%" elevation="2">
+        <v-card-text>
+          <p class="text-primary text-uppercase text-caption font-weight-bold mb-2">Furbuddy</p>
+          <h1 class="text-h4 mb-2">Entrar al panel</h1>
+          <p class="mb-6">Usa tu usuario de WordPress. WooCommerce lee esos mismos usuarios.</p>
+          <v-form ref="forma" @submit.prevent="entrar">
+            <v-text-field
+              v-model="usuario"
+              label="Usuario o correo"
+              name="usuario"
+              autocomplete="username"
+              :rules="[obligatorio]"
+            />
+            <v-text-field
+              v-model="password"
+              label="Contrasena"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              :rules="[obligatorio]"
+            />
+            <v-alert v-if="error" type="error" variant="tonal" class="mb-4">{{ error }}</v-alert>
+            <v-btn color="primary" type="submit" block size="large" :loading="enviando">Entrar</v-btn>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-col>
+    <v-col cols="12" md="7" class="d-flex align-center pa-2 pa-md-6">
+      <GatoLogin />
+    </v-col>
+  </v-row>
 </template>
 
 <style scoped>
-.login {
-  max-width: 28rem;
-  margin: 0 auto;
-  padding: 4rem 1.5rem;
-}
-
-.marca {
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-family: "Segoe UI", sans-serif;
-  font-size: 0.8rem;
-  color: #9a3412;
-}
-
-h1 {
-  font-size: 2.4rem;
-  line-height: 1.05;
-  margin: 0.4rem 0 0.8rem;
-}
-
-.bajada {
-  margin-top: 0;
-}
-
-form {
-  display: grid;
-  gap: 0.9rem;
-  margin-top: 1.5rem;
-}
-
-label {
-  display: grid;
-  gap: 0.35rem;
-  font-family: "Segoe UI", sans-serif;
-  font-size: 0.92rem;
-}
-
-input {
-  border: 1px solid #d6d3d1;
-  border-radius: 10px;
-  padding: 0.7rem 0.8rem;
-  font: inherit;
-}
-
-button {
-  border: 0;
-  border-radius: 999px;
-  padding: 0.75rem 1rem;
-  background: #9a3412;
-  color: white;
-  font: 600 1rem "Segoe UI", sans-serif;
-  cursor: pointer;
-}
-
-button:disabled {
-  opacity: 0.7;
-}
-
-.error {
-  margin: 0;
-  color: #991b1b;
-  font-family: "Segoe UI", sans-serif;
+.login-pagina {
+  min-height: 100vh;
 }
 </style>

@@ -1,0 +1,289 @@
+<script setup>
+import { onMounted, onUnmounted, ref } from "vue"
+import { montarGato } from "./gato.js"
+
+const caja = ref(null)
+let detener = function () {}
+
+onMounted(() => {
+  detener = montarGato(caja.value) || detener
+})
+
+onUnmounted(() => {
+  detener()
+})
+</script>
+
+<template>
+  <div ref="caja" class="furbuddy-login-gato" aria-label="Gato de Furbuddy" />
+</template>
+
+<style>
+.furbuddy-login-gato {
+  position: relative;
+  width: min(100%, 640px);
+  height: min(88vh, 760px);
+  margin: 0 auto;
+}
+
+.furbuddy-hero-gato-host {
+  position: relative;
+  overflow: visible;
+}
+
+.furbuddy-hero-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: visible;
+}
+
+.furbuddy-portal {
+  position: absolute;
+  left: 12%;
+  top: 6%;
+  width: 76%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 41%, #ecf4ff 0%, #bcbeff 26%, #6368ea 48%, rgba(68, 73, 218, 0.15) 69%, transparent 72%);
+  filter: drop-shadow(0 0 28px rgba(184, 163, 255, 0.45));
+  pointer-events: none;
+}
+
+.furbuddy-ring {
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 50%;
+}
+
+.furbuddy-ring-one {
+  inset: -5%;
+  transform: rotate(-24deg) scaleY(0.73);
+}
+
+.furbuddy-ring-two {
+  inset: -12%;
+  transform: rotate(38deg) scaleY(0.65);
+  opacity: 0.5;
+}
+
+.furbuddy-portal-core {
+  position: absolute;
+  inset: 17%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.12) 60%, transparent 75%);
+  filter: blur(10px);
+}
+
+.furbuddy-orbit {
+  position: absolute;
+  z-index: 3;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 5px 18px rgba(5, 9, 50, 0.28);
+  animation: furbuddy-orbit-float 5s ease-in-out infinite;
+}
+
+.furbuddy-orbit-one {
+  left: 8%;
+  top: 10%;
+  color: #fbe46a;
+  font-size: clamp(28px, 8vw, 54px);
+  transform: rotate(17deg);
+}
+
+.furbuddy-orbit-two {
+  right: 6%;
+  top: 58%;
+  color: #ff8ad4;
+  font-size: clamp(22px, 6vw, 40px);
+  animation-delay: -2.3s;
+}
+
+.furbuddy-hero-cat,
+.furbuddy-hero-ball {
+  position: absolute;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.furbuddy-hero-cat {
+  left: 7%;
+  top: 4%;
+  z-index: 2;
+  width: 88%;
+  height: 92%;
+  object-position: 50% 50%;
+  cursor: pointer;
+  transition: transform 0.35s ease;
+}
+
+.furbuddy-eye-canvas {
+  position: absolute;
+  left: 7%;
+  top: 4%;
+  z-index: 3;
+  width: 88%;
+  height: 92%;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.furbuddy-hero-stage.has-eyes .furbuddy-eye-canvas.is-ready {
+  opacity: 1;
+}
+
+.furbuddy-hero-stage.has-eyes.is-leaping .furbuddy-eye-canvas,
+.furbuddy-hero-stage.has-eyes.is-asleep .furbuddy-eye-canvas {
+  opacity: 0;
+}
+
+.furbuddy-hero-stage.has-eyes:not(.is-leaping):not(.is-asleep) .furbuddy-hero-cat {
+  opacity: 0;
+}
+
+.furbuddy-hero-stage.is-leaping .furbuddy-hero-cat {
+  transform: translateY(-8%);
+}
+
+.furbuddy-hero-ball {
+  width: 24%;
+  height: auto;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  cursor: grab;
+  touch-action: none;
+}
+
+.furbuddy-hero-ball.is-dragging {
+  cursor: grabbing;
+}
+
+.furbuddy-thread {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.furbuddy-thread path {
+  fill: none;
+  stroke: #ffd1d5;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.furbuddy-thread-tip {
+  position: absolute;
+  z-index: 5;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #ffece8, #ff9aa8 56%, #d75a8e);
+  box-shadow: 0 4px 8px rgba(31, 16, 70, 0.26), inset 0 0 0 2px rgba(255, 235, 238, 0.8);
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  touch-action: none;
+}
+
+.furbuddy-thought {
+  position: absolute;
+  top: 8%;
+  right: 4%;
+  z-index: 6;
+  max-width: 46%;
+  padding: 8px 14px;
+  color: #19133b;
+  background: #fff8ee;
+  border: 1px solid rgba(25, 19, 59, 0.1);
+  border-radius: 22px 22px 22px 6px;
+  box-shadow: 0 9px 22px rgba(10, 8, 45, 0.2);
+  font: 700 clamp(12px, 2.4vw, 16px) "Segoe UI", sans-serif;
+  transform: rotate(6deg);
+  transition: opacity 0.25s, translate 0.25s;
+}
+
+.furbuddy-thought.is-hidden {
+  opacity: 0;
+  translate: 0 10px;
+}
+
+.furbuddy-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.furbuddy-particle {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  color: #fbe46a;
+  font: 900 clamp(18px, 4vw, 34px) "Segoe UI", sans-serif;
+  text-shadow: 0 6px 12px rgba(5, 7, 36, 0.25);
+  animation: furbuddy-particle-pop 0.82s ease-out forwards;
+}
+
+.furbuddy-hero-sound {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 6;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  background: rgba(255, 255, 255, 0.88);
+  color: #1d3b45;
+  font: 600 0.75rem/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+
+@keyframes furbuddy-orbit-float {
+  50% {
+    translate: 0 -12px;
+    rotate: 16deg;
+  }
+}
+
+@keyframes furbuddy-particle-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.05) rotate(var(--rotation));
+  }
+}
+
+@media (max-width: 959px) {
+  .furbuddy-login-gato {
+    height: 46vh;
+    min-height: 260px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .furbuddy-orbit,
+  .furbuddy-hero-cat {
+    animation: none;
+    transition: none;
+  }
+
+  .furbuddy-hero-stage.is-leaping .furbuddy-hero-cat {
+    transform: none;
+  }
+}
+</style>
