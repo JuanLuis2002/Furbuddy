@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, ref, watch } from "vue"
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import {
   eliminarProducto,
@@ -26,8 +26,11 @@ const modalAi = ref(false)
 const pasoAi = ref("tipo")
 const tipoAi = ref("simple")
 const fotosAi = ref([])
-const claveFotosAi = ref(0)
+const selectorFotos = ref(null)
+const videoCamara = ref(null)
+const camaraAbierta = ref(false)
 const analizando = ref(false)
+let streamCamara = null
 const errorAi = ref("")
 const desdeAi = ref(false)
 const editando = ref(false)
@@ -111,6 +114,14 @@ function reconstruir() {
   formulario.value.variaciones = nuevas
 }
 
+watch(modalAi, (abierto) => {
+  if (!abierto) {
+    cerrarCamara()
+    soltarFotosAi()
+  }
+})
+onBeforeUnmount(cerrarCamara)
+
 watch(() => formulario.value.atributos, reconstruir, { deep: true })
 watch(() => formulario.value.tipo, (tipo) => {
   if (silencio.value) {
@@ -169,10 +180,18 @@ function abrir() {
   preparar(false)
 }
 
+function soltarFotosAi() {
+  for (const foto of fotosAi.value) {
+    URL.revokeObjectURL(foto.vista)
+  }
+  fotosAi.value = []
+}
+
 function abrirAi() {
   pasoAi.value = "tipo"
   tipoAi.value = "simple"
-  fotosAi.value = []
+  soltarFotosAi()
+  cerrarCamara()
   errorAi.value = ""
   modalAi.value = true
 }
@@ -194,13 +213,74 @@ function agregarFotosAi(archivos) {
       errorAi.value = "Puedes enviar hasta 6 fotos"
       break
     }
-    fotosAi.value.push(archivo)
+    fotosAi.value.push({ archivo, vista: URL.createObjectURL(archivo) })
   }
-  claveFotosAi.value += 1
 }
 
 function quitarFotoAi(indice) {
-  fotosAi.value.splice(indice, 1)
+  const [foto] = fotosAi.value.splice(indice, 1)
+  if (foto) {
+    URL.revokeObjectURL(foto.vista)
+  }
+}
+
+function alElegirFotos(evento) {
+  agregarFotosAi([...evento.target.files])
+  evento.target.value = ""
+}
+
+async function abrirCamara() {
+  errorAi.value = ""
+  if (!navigator.mediaDevices?.getUserMedia) {
+    errorAi.value = "Este navegador no abre la camara."
+    return
+  }
+  try {
+    try {
+      streamCamara = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" } },
+        audio: false,
+      })
+    } catch {
+      streamCamara = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    }
+    camaraAbierta.value = true
+    await nextTick()
+    videoCamara.value.srcObject = streamCamara
+    await videoCamara.value.play()
+  } catch {
+    errorAi.value = "No se pudo abrir la camara. Permite el acceso en el navegador."
+  }
+}
+
+function capturarFoto() {
+  const video = videoCamara.value
+  if (!video?.videoWidth) {
+    return
+  }
+  const lienzo = document.createElement("canvas")
+  lienzo.width = video.videoWidth
+  lienzo.height = video.videoHeight
+  lienzo.getContext("2d").drawImage(video, 0, 0)
+  lienzo.toBlob((blob) => {
+    if (blob) {
+      agregarFotosAi([new File([blob], `foto-${Date.now()}.jpg`, { type: "image/jpeg" })])
+    }
+    cerrarCamara()
+  }, "image/jpeg", 0.92)
+}
+
+function cerrarCamara() {
+  camaraAbierta.value = false
+  if (streamCamara) {
+    for (const pista of streamCamara.getTracks()) {
+      pista.stop()
+    }
+    streamCamara = null
+  }
+  if (videoCamara.value) {
+    videoCamara.value.srcObject = null
+  }
 }
 
 async function analizarAi() {
@@ -211,7 +291,7 @@ async function analizarAi() {
   analizando.value = true
   errorAi.value = ""
   try {
-    const datos = await proponerProducto(tipoAi.value, fotosAi.value)
+    const datos = await proponerProducto(tipoAi.value, fotosAi.value.map((foto) => foto.archivo))
     silencio.value = true
     formulario.value = {
       ...vacio(),
@@ -669,39 +749,38 @@ async function confirmar() {
               Agrega una o varias fotos del producto {{ tipoAi === "variable" ? "variable" : "normal" }}.
               Puedes tomarlas o elegirlas. Cuando esten listas, pulsa Analizar.
             </p>
-            <v-file-input
-              :key="`tomar-${claveFotosAi}`"
-              label="Tomar foto"
-              prepend-icon="mdi-camera"
-              variant="outlined"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              capture="environment"
-              :disabled="analizando"
-              hide-details="auto"
-              class="mb-3"
-              @update:model-value="agregarFotosAi"
-            />
-            <v-file-input
-              :key="`elegir-${claveFotosAi}`"
-              label="Elegir fotos"
-              prepend-icon="mdi-image-multiple"
-              variant="outlined"
+            <input
+              ref="selectorFotos"
+              type="file"
               accept="image/jpeg,image/png,image/webp,image/gif"
               multiple
-              :disabled="analizando"
-              hide-details="auto"
-              @update:model-value="agregarFotosAi"
+              hidden
+              @change="alElegirFotos"
             />
-            <div v-if="fotosAi.length" class="d-flex flex-wrap ga-2 mt-4">
-              <v-chip
+            <div class="d-flex flex-wrap ga-2 mb-4">
+              <v-btn prepend-icon="mdi-camera" variant="outlined" :disabled="analizando" @click="abrirCamara">Camara</v-btn>
+              <v-btn prepend-icon="mdi-image-multiple" variant="outlined" :disabled="analizando" @click="selectorFotos.click()">Seleccionar imagenes</v-btn>
+            </div>
+            <div v-if="fotosAi.length" class="d-flex flex-wrap ga-3">
+              <v-sheet
                 v-for="(foto, indice) in fotosAi"
-                :key="`${foto.name}-${indice}`"
-                closable
-                :disabled="analizando"
-                @click:close="quitarFotoAi(indice)"
+                :key="foto.vista"
+                class="position-relative"
+                rounded="lg"
+                border
               >
-                {{ foto.name }}
-              </v-chip>
+                <v-img :src="foto.vista" width="88" height="88" cover />
+                <v-btn
+                  icon="mdi-close"
+                  size="x-small"
+                  color="error"
+                  class="position-absolute"
+                  style="top: 4px; right: 4px"
+                  aria-label="Quitar foto"
+                  :disabled="analizando"
+                  @click="quitarFotoAi(indice)"
+                />
+              </v-sheet>
             </div>
           </template>
         </v-card-text>
@@ -720,6 +799,21 @@ async function confirmar() {
           >
             Analizar
           </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog :model-value="camaraAbierta" max-width="640" @update:model-value="(abierto) => { if (!abierto) cerrarCamara() }">
+      <v-card>
+        <v-card-title class="text-h6">Camara</v-card-title>
+        <v-card-text>
+          <video ref="videoCamara" autoplay playsinline muted style="width: 100%; max-height: 360px; background: #111; border-radius: 8px; object-fit: cover" />
+          <p class="text-body-2 mt-3 mb-0">Al tomar la foto, se agrega a la lista y la camara se cierra. Para otra, pulsa Camara de nuevo.</p>
+        </v-card-text>
+        <v-divider />
+        <v-card-actions class="px-4 py-3">
+          <v-spacer />
+          <v-btn color="primary" prepend-icon="mdi-camera" @click="capturarFoto">Tomar foto</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
