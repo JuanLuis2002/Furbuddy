@@ -1,6 +1,6 @@
 import { leerSesion } from "../frmLogin/frmLogin.js"
 
-async function pedir(ruta, token, opciones, fetchImpl) {
+async function pedir(ruta, token, opciones, fetchImpl, avisoCaida) {
   const respuesta = await fetchImpl(ruta, {
     ...opciones,
     headers: {
@@ -13,7 +13,11 @@ async function pedir(ruta, token, opciones, fetchImpl) {
     throw new Error("La sesion vencio")
   }
   if (!respuesta.ok) {
-    throw new Error(datos.detail || "No se pudo completar la operacion")
+    const detalle = typeof datos.detail === "string" ? datos.detail : ""
+    if (!detalle && avisoCaida && (respuesta.status === 502 || respuesta.status === 504)) {
+      throw new Error(avisoCaida)
+    }
+    throw new Error(detalle || "No se pudo completar la operacion")
   }
   return datos
 }
@@ -55,7 +59,13 @@ export async function proponerProducto(tipo, archivos, fetchImpl = fetch) {
   for (const archivo of archivos) {
     cuerpo.append("archivos", archivo)
   }
-  return pedir("/api/productos/ai", sesion?.token, { method: "POST", body: cuerpo }, fetchImpl)
+  return pedir(
+    "/api/productos/ai",
+    sesion?.token,
+    { method: "POST", body: cuerpo },
+    fetchImpl,
+    "El analisis tardo demasiado. Pulsa Analizar otra vez.",
+  )
 }
 
 export async function subirFoto(archivo, fetchImpl = fetch) {

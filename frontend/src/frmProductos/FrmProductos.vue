@@ -232,6 +232,12 @@ function alElegirFotos(evento) {
   evento.target.value = ""
 }
 
+async function elegirImagenes() {
+  cerrarCamara()
+  await nextTick()
+  selectorFotos.value?.click()
+}
+
 function cuadroVacio(lienzo) {
   const pixeles = lienzo.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, lienzo.width, lienzo.height).data
   const paso = Math.max(4, Math.floor(Math.sqrt((lienzo.width * lienzo.height) / 4000)))
@@ -355,6 +361,7 @@ async function analizarAi() {
     errorAi.value = "Agrega al menos una foto"
     return
   }
+  cerrarCamara()
   analizando.value = true
   errorAi.value = ""
   try {
@@ -826,7 +833,7 @@ async function confirmar() {
             />
             <div class="d-flex flex-wrap ga-2 mb-4">
               <v-btn prepend-icon="mdi-camera" variant="outlined" :disabled="analizando" @click="abrirCamara">Camara</v-btn>
-              <v-btn prepend-icon="mdi-image-multiple" variant="outlined" :disabled="analizando" @click="selectorFotos.click()">Seleccionar imagenes</v-btn>
+              <v-btn prepend-icon="mdi-image-multiple" variant="outlined" :disabled="analizando" @click="elegirImagenes">Seleccionar imagenes</v-btn>
             </div>
             <div v-if="fotosAi.length" class="d-flex flex-wrap ga-3">
               <v-sheet
@@ -876,11 +883,12 @@ async function confirmar() {
         <v-card-text>
           <v-alert v-if="errorCamara" type="warning" variant="tonal" class="mb-3">{{ errorCamara }}</v-alert>
           <video ref="videoCamara" autoplay playsinline muted style="width: 100%; min-height: 220px; max-height: 360px; background: #111; border-radius: 8px; object-fit: cover" />
-          <p class="text-body-2 mt-3 mb-0">Espera a ver la imagen. Al tomar la foto, se agrega a la lista y la camara se cierra.</p>
+          <p class="text-body-2 mt-3 mb-0">Espera a ver la imagen. Al tomar la foto, se agrega a la lista y la camara se cierra. Si no vas a tomar la foto, pulsa Cerrar.</p>
         </v-card-text>
         <v-divider />
         <v-card-actions class="px-4 py-3">
           <v-spacer />
+          <v-btn variant="text" :disabled="capturando" @click="cerrarCamara">Cerrar</v-btn>
           <v-btn color="primary" prepend-icon="mdi-camera" :disabled="!camaraLista" :loading="capturando" @click="capturarFoto">Tomar foto</v-btn>
         </v-card-actions>
       </v-card>
