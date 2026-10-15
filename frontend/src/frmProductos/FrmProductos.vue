@@ -6,6 +6,7 @@ import {
   guardarProducto,
   leerProducto,
   listarProductos,
+  proponerProducto,
   subirFoto,
 } from "./frmProductos.js"
 
@@ -21,6 +22,12 @@ const cargando = ref(false)
 const guardando = ref(false)
 const subiendo = ref(false)
 const modal = ref(false)
+const modalAi = ref(false)
+const pasoAi = ref("tipo")
+const tipoAi = ref("simple")
+const analizando = ref(false)
+const errorAi = ref("")
+const desdeAi = ref(false)
 const editando = ref(false)
 const silencio = ref(false)
 const pendiente = ref(null)
@@ -154,12 +161,63 @@ function abrir() {
   silencio.value = true
   formulario.value = vacio()
   silencio.value = false
+  desdeAi.value = false
   aviso.value = ""
   error.value = ""
   preparar(false)
 }
 
+function abrirAi() {
+  pasoAi.value = "tipo"
+  tipoAi.value = "simple"
+  errorAi.value = ""
+  modalAi.value = true
+}
+
+function elegirTipoAi(tipo) {
+  tipoAi.value = tipo
+  pasoAi.value = "foto"
+  errorAi.value = ""
+}
+
+async function enviarFotoAi(archivos) {
+  const archivo = Array.isArray(archivos) ? archivos[0] : archivos
+  if (!archivo) {
+    return
+  }
+  analizando.value = true
+  errorAi.value = ""
+  try {
+    const datos = await proponerProducto(tipoAi.value, archivo)
+    silencio.value = true
+    formulario.value = {
+      ...vacio(),
+      nombre: datos.nombre,
+      tipo: datos.tipo,
+      descripcion: datos.descripcion,
+      precio: "",
+      existencia: 0,
+      fotos: datos.foto ? [datos.foto] : [],
+      atributos: datos.atributos?.length
+        ? datos.atributos
+        : datos.tipo === "variable"
+          ? [{ id: 0, nombre: "", opciones: [] }]
+          : [],
+    }
+    silencio.value = false
+    reconstruir()
+    desdeAi.value = true
+    modalAi.value = false
+    preparar(false)
+  } catch (err) {
+    errorAi.value = err.message
+  } finally {
+    analizando.value = false
+  }
+}
+
 async function abrirEdicion(item) {
+  desdeAi.value = false
   aviso.value = ""
   error.value = ""
   errorModal.value = ""
@@ -342,7 +400,10 @@ async function confirmar() {
         <v-card-title>Productos</v-card-title>
         <v-card-subtitle>Estos productos viven en la tienda de WooCommerce.</v-card-subtitle>
         <template #append>
-          <v-btn color="primary" prepend-icon="mdi-plus" @click="abrir">Agregar</v-btn>
+          <div class="d-flex flex-wrap justify-end ga-2">
+            <v-btn variant="tonal" prepend-icon="mdi-auto-fix" @click="abrirAi">Crear producto con AI</v-btn>
+            <v-btn color="primary" prepend-icon="mdi-plus" @click="abrir">Agregar</v-btn>
+          </div>
         </template>
       </v-card-item>
       <v-card-text>
@@ -393,6 +454,9 @@ async function confirmar() {
         </v-card-item>
         <v-form ref="forma" @submit.prevent="guardar">
           <v-card-text class="pt-2">
+            <v-alert v-if="desdeAi" type="info" variant="tonal" class="mb-4">
+              Revisa el nombre y la descripcion. Confirma el precio y la existencia. Al guardar, el producto se publica en la tienda.
+            </v-alert>
             <v-alert v-if="errorModal" type="error" variant="tonal" class="mb-4">{{ errorModal }}</v-alert>
             <v-row>
               <v-col cols="12" md="8">
@@ -557,6 +621,50 @@ async function confirmar() {
             <v-btn color="primary" variant="flat" type="submit" :loading="guardando">Guardar</v-btn>
           </v-card-actions>
         </v-form>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="modalAi" max-width="520">
+      <v-card>
+        <v-card-item>
+          <template #prepend>
+            <v-icon icon="mdi-auto-fix" size="28" />
+          </template>
+          <v-card-title class="text-h6">Crear producto con AI</v-card-title>
+        </v-card-item>
+        <v-card-text>
+          <v-alert v-if="errorAi" type="error" variant="tonal" class="mb-4">{{ errorAi }}</v-alert>
+          <template v-if="pasoAi === 'tipo'">
+            <p class="mb-4">Antes de la foto, elige si el producto es normal o variable.</p>
+            <div class="d-flex flex-wrap ga-2">
+              <v-btn variant="outlined" prepend-icon="mdi-package-variant" @click="elegirTipoAi('simple')">Normal</v-btn>
+              <v-btn variant="outlined" prepend-icon="mdi-shape" @click="elegirTipoAi('variable')">Variable</v-btn>
+            </div>
+          </template>
+          <template v-else>
+            <p class="mb-4">
+              Sube o toma la foto del producto {{ tipoAi === "variable" ? "variable" : "normal" }}.
+              Gemini va a proponer el nombre y la descripcion.
+            </p>
+            <v-file-input
+              label="Foto del producto"
+              prepend-icon="mdi-camera"
+              variant="outlined"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              capture="environment"
+              :loading="analizando"
+              :disabled="analizando"
+              hide-details="auto"
+              @update:model-value="enviarFotoAi"
+            />
+          </template>
+        </v-card-text>
+        <v-divider />
+        <v-card-actions class="px-4 py-3">
+          <v-btn v-if="pasoAi === 'foto'" variant="text" :disabled="analizando" @click="pasoAi = 'tipo'">Atras</v-btn>
+          <v-spacer />
+          <v-btn variant="text" :disabled="analizando" @click="modalAi = false">Cerrar</v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
 

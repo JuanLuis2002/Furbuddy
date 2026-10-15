@@ -1,6 +1,7 @@
+import json
 import re
 
-from app.configuracion import claves_woocommerce, url_tienda
+from app.configuracion import clave_gemini, claves_woocommerce, url_tienda
 from app.frmUsuarios.servicio import (
     TiendaError,
     TiendaNoConfigurada,
@@ -9,6 +10,11 @@ from app.frmUsuarios.servicio import (
 )
 
 MAXIMO_VARIACIONES = 50
+MODELO_GEMINI = "gemini-2.5-flash"
+
+
+class GeminiNoConfigurado(Exception):
+    pass
 
 
 def texto_plano(html: str) -> str:
@@ -279,6 +285,84 @@ def guardar_producto(datos: dict, producto_id: int | None = None, cliente=None) 
 def eliminar_producto(producto_id: int, cliente=None) -> None:
     api = cliente or cliente_woocommerce()
     exigir(api.delete(f"products/{producto_id}", params={"force": True}), ok=(200, 204))
+
+
+def interpretar_propuesta(texto: str, tipo: str) -> dict:
+    try:
+        datos = json.loads(texto)
+    except json.JSONDecodeError as error:
+        raise TiendaError("Gemini no devolvio datos del producto", 502) from error
+    if not isinstance(datos, dict):
+        raise TiendaError("Gemini no devolvio datos del producto", 502)
+    nombre = str(datos.get("nombre") or "").strip()[:120]
+    descripcion = str(datos.get("descripcion") or "").strip()[:500]
+    if not nombre:
+        raise TiendaError("Gemini no reconocio el producto", 502)
+    atributos = []
+    if tipo == "variable":
+        for item in datos.get("atributos") or []:
+            if not isinstance(item, dict):
+                continue
+            nombre_atributo = str(item.get("nombre") or "").strip()
+            opciones = []
+            for opcion in item.get("opciones") or []:
+                texto_opcion = str(opcion).strip()
+                if texto_opcion and texto_opcion not in opciones:
+                    opciones.append(texto_opcion)
+            if nombre_atributo and opciones:
+                atributos.append({"id": 0, "nombre": nombre_atributo, "opciones": opciones[:4]})
+            if len(atributos) == 2:
+                break
+    return {
+        "tipo": tipo,
+        "nombre": nombre,
+        "descripcion": descripcion,
+        "atributos": atributos,
+    }
+
+
+def analizar_foto(contenido: bytes, tipo_mime: str, tipo_producto: str) -> dict:
+    clave = clave_gemini()
+    if not clave:
+        raise GeminiNoConfigurado()
+    from google import genai
+    from google.genai import types
+
+    if tipo_producto == "variable":
+        pedido = (
+            "El usuario quiere un producto variable. Propone como maximo 2 caracteristicas "
+            "visibles en la foto, por ejemplo color o talla, con hasta 4 opciones cada una."
+        )
+    else:
+        pedido = "El usuario quiere un producto normal. Devuelve atributos como una lista vacia."
+    instruccion = (
+        "Eres el asistente de la tienda Furbuddy, de accesorios para mascotas. "
+        "Mira la foto y describe el producto en espanol. Responde solo JSON con las claves "
+        "nombre, descripcion y atributos. nombre es corto. descripcion son dos oraciones "
+        "para venderlo, sin HTML. atributos es una lista de objetos con nombre y opciones. "
+        "No inventes precio ni existencia. "
+        + pedido
+    )
+    try:
+        cliente = genai.Client(api_key=clave)
+        respuesta = cliente.models.generate_content(
+            model=MODELO_GEMINI,
+            contents=[
+                types.Part.from_bytes(data=contenido, mime_type=tipo_mime),
+                instruccion,
+            ],
+            config=types.GenerateContentConfig(response_mime_type="application/json"),
+        )
+        texto = respuesta.text or ""
+    except Exception as error:
+        raise TiendaError("Gemini no pudo analizar la foto", 502) from error
+    return interpretar_propuesta(texto, tipo_producto)
+
+
+def proponer_producto(nombre: str, contenido: bytes, tipo_mime: str, tipo_producto: str) -> dict:
+    propuesta = analizar_foto(contenido, tipo_mime, tipo_producto)
+    propuesta["foto"] = subir_foto(nombre, contenido, tipo_mime)
+    return propuesta
 
 
 def subir_foto(nombre: str, contenido: bytes, tipo: str) -> dict:

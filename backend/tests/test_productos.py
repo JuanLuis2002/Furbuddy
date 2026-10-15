@@ -146,6 +146,65 @@ def test_foto_rechaza_un_archivo_que_no_es_imagen(monkeypatch):
     assert respuesta.status_code == 400
 
 
+def test_interpreta_la_propuesta_variable():
+    from app.frmProductos.servicio import interpretar_propuesta
+
+    propuesta = interpretar_propuesta(
+        '{"nombre":"Gorra deportiva","descripcion":"Comoda para salir.","atributos":[{"nombre":"Color","opciones":["Rojo","Azul","Rojo"]}]}',
+        "variable",
+    )
+    assert propuesta["nombre"] == "Gorra deportiva"
+    assert propuesta["atributos"][0]["opciones"] == ["Rojo", "Azul"]
+
+
+def test_producto_normal_no_guarda_caracteristicas():
+    from app.frmProductos.servicio import interpretar_propuesta
+
+    propuesta = interpretar_propuesta(
+        '{"nombre":"Pelota","descripcion":"Rebota.","atributos":[{"nombre":"Color","opciones":["Rojo"]}]}',
+        "simple",
+    )
+    assert propuesta["tipo"] == "simple"
+    assert propuesta["atributos"] == []
+
+
+def test_ai_pide_el_tipo(monkeypatch):
+    preparar_sesion(monkeypatch)
+    respuesta = client.post(
+        "/api/productos/ai",
+        headers={"Authorization": f"Bearer {token()}"},
+        data={"tipo": "otro"},
+        files={"archivo": ("gorra.webp", b"abc", "image/webp")},
+    )
+    assert respuesta.status_code == 400
+
+
+def test_ai_devuelve_la_propuesta(monkeypatch):
+    preparar_sesion(monkeypatch)
+
+    def proponer(nombre, contenido, tipo_mime, tipo_producto):
+        assert tipo_producto == "variable"
+        assert contenido == b"abc"
+        return {
+            "tipo": "variable",
+            "nombre": "Gorra",
+            "descripcion": "Ligera.",
+            "atributos": [{"id": 0, "nombre": "Color", "opciones": ["Rojo"]}],
+            "foto": {"id": 3, "src": "https://furbuddy.xyz/gorra.webp"},
+        }
+
+    monkeypatch.setattr("app.frmProductos.router.proponer_producto", proponer)
+    respuesta = client.post(
+        "/api/productos/ai",
+        headers={"Authorization": f"Bearer {token()}"},
+        data={"tipo": "variable"},
+        files={"archivo": ("gorra.webp", b"abc", "image/webp")},
+    )
+    assert respuesta.status_code == 200
+    assert respuesta.json()["foto"]["id"] == 3
+    assert respuesta.json()["atributos"][0]["nombre"] == "Color"
+
+
 def test_servicio_sube_foto_a_wordpress(monkeypatch):
     from app.frmProductos.servicio import subir_foto
 

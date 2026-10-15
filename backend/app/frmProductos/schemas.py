@@ -87,6 +87,14 @@ class ProductoDetalle(ProductoResumen):
     variaciones: list[VariacionSalida]
 
 
+class PropuestaAi(BaseModel):
+    tipo: Literal["simple", "variable"]
+    nombre: str
+    descripcion: str
+    atributos: list[AtributoSalida]
+    foto: FotoSalida
+
+
 class PaginaProductos(BaseModel):
     productos: list[ProductoResumen]
     total: int

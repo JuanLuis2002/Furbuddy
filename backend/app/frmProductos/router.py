@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query, UploadFile
 
-from app.frmProductos.schemas import FotoSalida, PaginaProductos, ProductoDetalle, ProductoEntrada
+from app.frmProductos.schemas import FotoSalida, PaginaProductos, ProductoDetalle, ProductoEntrada, PropuestaAi
 from app.frmProductos.servicio import (
+    GeminiNoConfigurado,
     TiendaError,
     TiendaNoConfigurada,
     eliminar_producto,
     guardar_producto,
     leer_producto,
     listar_productos,
+    proponer_producto,
     subir_foto,
 )
 from app.sesion import leer_token
@@ -29,6 +31,8 @@ def sesion_actual(authorization: str = Header(default="")) -> dict:
 def responder(accion):
     try:
         return accion()
+    except GeminiNoConfigurado as error:
+        raise HTTPException(status_code=503, detail="Falta configurar Gemini") from error
     except TiendaNoConfigurada as error:
         raise HTTPException(status_code=503, detail="Falta configurar WooCommerce") from error
     except TiendaError as error:
@@ -42,6 +46,27 @@ def productos(
     sesion: dict = Depends(sesion_actual),
 ):
     return responder(lambda: listar_productos(pagina, por_pagina))
+
+
+@router.post("/productos/ai", response_model=PropuestaAi)
+async def producto_con_ai(
+    tipo: str = Form(),
+    archivo: UploadFile = File(),
+    sesion: dict = Depends(sesion_actual),
+):
+    if tipo not in ("simple", "variable"):
+        raise HTTPException(status_code=400, detail="Elige un producto normal o variable")
+    tipo_mime = archivo.content_type or ""
+    if tipo_mime not in TIPOS_FOTO:
+        raise HTTPException(status_code=400, detail="Usa JPG, PNG, WEBP o GIF")
+    contenido = await archivo.read()
+    if not contenido:
+        raise HTTPException(status_code=400, detail="La foto esta vacia")
+    if len(contenido) > PESO_MAXIMO:
+        raise HTTPException(status_code=400, detail="La foto pesa mas de 8 MB")
+    return responder(
+        lambda: proponer_producto(archivo.filename or "foto", contenido, tipo_mime, tipo)
+    )
 
 
 @router.post("/productos/fotos", response_model=FotoSalida)

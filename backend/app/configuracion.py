@@ -11,3 +11,7 @@ def claves_woocommerce() -> tuple[str, str]:
 
 def secreto_sesion() -> str:
     return os.environ.get("FURBUDDY_SESION_SECRETO", "")
+
+
+def clave_gemini() -> str:
+    return os.environ.get("GEMINI_API_KEY", "")

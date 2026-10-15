@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { guardarProducto, listarProductos, subirFoto } from "./frmProductos.js"
+import { guardarProducto, listarProductos, proponerProducto, subirFoto } from "./frmProductos.js"
 
 beforeEach(() => {
   const memoria = new Map()
@@ -34,6 +34,20 @@ describe("frmProductos", () => {
       return { ok: true, status: 200, json: async () => ({ id: 4 }) }
     })
     expect(JSON.parse(cuerpo).tipo).toBe("variable")
+  })
+
+  it("envia el tipo y la foto a la AI", async () => {
+    const archivo = new File(["foto"], "gorra.webp", { type: "image/webp" })
+    await proponerProducto("variable", archivo, async (ruta, opciones) => {
+      expect(ruta).toBe("/api/productos/ai")
+      expect(opciones.body).toBeInstanceOf(FormData)
+      expect(opciones.body.get("tipo")).toBe("variable")
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ nombre: "Gorra", tipo: "variable" }),
+      }
+    })
   })
 
   it("sube la foto como archivo", async () => {
