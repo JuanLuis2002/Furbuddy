@@ -4,6 +4,7 @@ from fastapi.responses import HTMLResponse
 
 from app.frmConfiguracion.router import router as router_configuracion
 from app.frmLogin.router import router as router_login
+from app.frmProductos.router import router as router_productos
 from app.frmUsuarios.router import router as router_usuarios
 
 app = FastAPI(title="Furbuddy API", docs_url=None)
@@ -31,6 +32,7 @@ app.add_middleware(
 
 app.include_router(router_login)
 app.include_router(router_usuarios)
+app.include_router(router_productos)
 app.include_router(router_configuracion)
 
 
