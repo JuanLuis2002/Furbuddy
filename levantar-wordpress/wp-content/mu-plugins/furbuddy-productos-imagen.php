@@ -111,9 +111,70 @@ ul.products li.product .ct-woo-card-actions .button {
 		transform: none;
 	}
 }
+
+.ct-posts-shortcode article.entry-card {
+	display: flex;
+	flex-direction: column;
+	background: #fff;
+	border: 1px solid #e4eef2;
+	border-radius: 16px;
+	overflow: hidden;
+	box-shadow: 0 8px 22px rgba(24, 52, 68, 0.06);
+	transition: box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.ct-posts-shortcode article.entry-card .ct-media-container {
+	position: relative;
+	display: block;
+	width: 100%;
+	aspect-ratio: 16 / 10;
+	overflow: hidden;
+	border-radius: 0;
+	background: #fff;
+}
+
+.ct-posts-shortcode article.entry-card .ct-media-container img,
+.ct-posts-shortcode .entries[data-hover="zoom-in"] > article:hover .has-hover-effect img,
+.ct-posts-shortcode .entries[data-hover="zoom-out"] > article .has-hover-effect img {
+	position: absolute !important;
+	inset: 0;
+	width: 100% !important;
+	height: 100% !important;
+	aspect-ratio: auto !important;
+	object-fit: cover !important;
+	object-position: center center !important;
+	transform: none !important;
+}
+
+.ct-posts-shortcode article.entry-card .entry-title {
+	margin: 16px 16px 8px;
+	line-height: 1.35;
+}
+
+.ct-posts-shortcode article.entry-card .entry-meta {
+	margin: 0 16px 16px;
+}
+
+.ct-posts-shortcode article.entry-card .meta-date {
+	color: #6b8490;
+	font-size: 0.82rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.ct-posts-shortcode article.entry-card:hover {
+		border-color: #b7d0da;
+		box-shadow: 0 14px 32px rgba(24, 52, 68, 0.12);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ct-posts-shortcode article.entry-card {
+		transition: none;
+	}
+}
 CSS;
 
-		wp_register_style( 'furbuddy-productos-imagen', false, array(), '3' );
+		wp_register_style( 'furbuddy-productos-imagen', false, array(), '4' );
 		wp_enqueue_style( 'furbuddy-productos-imagen' );
 		wp_add_inline_style( 'furbuddy-productos-imagen', $css );
 	}
