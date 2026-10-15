@@ -1,0 +1,10 @@
+---
+description: Antes de cambiar código, explicar archivos y esperar autorización
+alwaysApply: true
+---
+
+# Autorización antes de cambiar
+
+Antes de crear o editar código, di qué archivos vas a tocar y cómo lo vas a hacer. Espera la autorización. No empieces el cambio en el mismo mensaje en que pides permiso.
+
+Esto cubre el clon Furbuddy, `scriptVPS` y la VPS. Leer para verificar sí se puede. Commit y push los hace el usuario.

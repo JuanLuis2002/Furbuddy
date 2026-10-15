@@ -1,0 +1,24 @@
+---
+description: Estructura frmNombre para la API Python y la vista Vue de Furbuddy
+alwaysApply: true
+---
+
+# API Python y vista Vue
+
+Cada pantalla nueva de Furbuddy lleva el mismo nombre en la API y en Vue. El nombre es `frm` más el nombre de la vista, por ejemplo `frmLogin`.
+
+Esto cubre `Furbuddy/backend` y `Furbuddy/frontend`. WordPress queda fuera.
+
+```
+backend/app/frmLogin/
+  router.py      endpoints de esa vista
+  schemas.py     datos que entran y salen
+
+frontend/src/frmLogin/
+  FrmLogin.vue   la pantalla
+  frmLogin.js    llamadas solo a esos endpoints
+```
+
+`main.py` solo registra el router. `App.vue` solo muestra la vista. El endpoint de una vista no se escribe dentro de `main.py`.
+
+Si piden otra pantalla, se repite el patrón: `frmNombre` en `backend/app` y `frmNombre` en `frontend/src`.

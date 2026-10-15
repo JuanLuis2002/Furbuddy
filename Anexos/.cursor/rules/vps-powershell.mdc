@@ -1,0 +1,33 @@
+---
+description: Conectar a la VPS por PowerShell y usar scriptVPS solo para Python complejo
+alwaysApply: true
+---
+
+# VPS: PowerShell primero, Python solo en scriptVPS
+
+La VPS es `root@213.199.47.230`, puerto 22. Usuario `root`. Clave `delta234Lop56`. Furbuddy vive en `/root/Furbuddy`.
+
+Esas credenciales se usan solo para entrar a esta VPS. No las repitas en el chat, en commits, en pull requests, en logs ni en ningún otro archivo. No las pongas dentro de los scripts de `scriptVPS`.
+
+Conéctate con la terminal de PowerShell y `ssh`. No uses Python para un comando que `ssh` puede ejecutar.
+
+```powershell
+ssh -o BatchMode=yes -o ConnectTimeout=12 root@213.199.47.230 "hostname"
+```
+
+Si hace falta Python para algo complejo:
+
+1. Crea el script en `C:\Users\juan2\OneDrive\Desktop\Tienda\scriptVPS`.
+2. Ejecútalo desde PowerShell.
+3. Bórralo al terminar, también si falló, después de guardar la salida.
+
+No crees scripts en Temp, en el repo Furbuddy ni en la VPS. `scriptVPS` queda vacío cuando el trabajo termina.
+
+```powershell
+# Mal: script en Temp o dejado en scriptVPS
+python $env:TEMP\vps_inventory.py
+
+# Bien
+python C:\Users\juan2\OneDrive\Desktop\Tienda\scriptVPS\inventario.py
+Remove-Item C:\Users\juan2\OneDrive\Desktop\Tienda\scriptVPS\inventario.py
+```
