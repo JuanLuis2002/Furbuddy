@@ -43,6 +43,19 @@ add_action(
 	'wp_enqueue_scripts',
 	static function () {
 		$css = <<<'CSS'
+ul.products li.product {
+	background: #fff;
+	border: 1px solid #efe8e1;
+	border-radius: 20px;
+	padding: 14px;
+	box-shadow: 0 10px 28px rgba(55, 35, 20, 0.05);
+	transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+ul.products li.product figure {
+	margin: 0;
+}
+
 ul.products li.product a.ct-media-container {
 	position: relative;
 	display: block;
@@ -50,9 +63,12 @@ ul.products li.product a.ct-media-container {
 	aspect-ratio: 1 / 1;
 	background: #fff;
 	overflow: hidden;
+	border-radius: 14px;
 }
 
-ul.products li.product a.ct-media-container img {
+ul.products li.product a.ct-media-container img,
+ul.products[data-hover="zoom-in"] > li.product:hover .has-hover-effect img,
+ul.products[data-hover="zoom-out"] > li.product .has-hover-effect img {
 	position: absolute !important;
 	inset: 0;
 	width: 100% !important;
@@ -60,10 +76,44 @@ ul.products li.product a.ct-media-container img {
 	aspect-ratio: auto !important;
 	object-fit: contain !important;
 	object-position: center center !important;
+	transform: none !important;
+}
+
+ul.products li.product .woocommerce-loop-product__title {
+	margin-top: 14px;
+	line-height: 1.35;
+}
+
+ul.products li.product .ct-woo-card-actions .button {
+	border-radius: 12px;
+	transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	ul.products li.product:hover {
+		transform: translateY(-8px);
+		border-color: #e7d9cc;
+		box-shadow: 0 18px 40px rgba(55, 35, 20, 0.12);
+	}
+
+	ul.products li.product:hover .ct-woo-card-actions .button {
+		box-shadow: 0 8px 18px rgba(55, 35, 20, 0.12);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	ul.products li.product,
+	ul.products li.product .ct-woo-card-actions .button {
+		transition: none;
+	}
+
+	ul.products li.product:hover {
+		transform: none;
+	}
 }
 CSS;
 
-		wp_register_style( 'furbuddy-productos-imagen', false, array(), '1' );
+		wp_register_style( 'furbuddy-productos-imagen', false, array(), '3' );
 		wp_enqueue_style( 'furbuddy-productos-imagen' );
 		wp_add_inline_style( 'furbuddy-productos-imagen', $css );
 	}
