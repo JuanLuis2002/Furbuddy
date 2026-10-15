@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query, UploadFile
 
 from app.frmProductos.schemas import FotoSalida, PaginaProductos, ProductoDetalle, ProductoEntrada, PropuestaAi
@@ -78,7 +80,7 @@ async def producto_con_ai(
         if len(contenido) > PESO_MAXIMO:
             raise HTTPException(status_code=400, detail="La foto pesa mas de 8 MB")
         fotos.append((archivo.filename or "foto", contenido, tipo_mime))
-    return responder(lambda: proponer_producto(fotos, tipo))
+    return await asyncio.to_thread(responder, lambda: proponer_producto(fotos, tipo))
 
 
 @router.post("/productos/fotos", response_model=FotoSalida)

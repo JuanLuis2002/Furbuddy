@@ -211,6 +211,37 @@ def test_ai_devuelve_la_propuesta(monkeypatch):
     assert respuesta.json()["atributos"][0]["nombre"] == "Color"
 
 
+def test_reintenta_si_gemini_falla_una_vez(monkeypatch):
+    from app.frmProductos.servicio import analizar_fotos
+
+    llamadas = {"n": 0}
+
+    class Respuesta:
+        text = '{"nombre":"Pelota","descripcion":"Rebota suave.","atributos":[]}'
+
+    class Modelos:
+        @staticmethod
+        def generate_content(**kwargs):
+            llamadas["n"] += 1
+            if llamadas["n"] == 1:
+                raise RuntimeError("Cannot send a request, as the client has been closed.")
+            return Respuesta()
+
+    class Cliente:
+        def __init__(self, api_key):
+            self.models = Modelos()
+
+        def close(self):
+            return None
+
+    monkeypatch.setenv("GEMINI_API_KEY", "AQ.prueba")
+    monkeypatch.setattr("google.genai.Client", Cliente)
+    monkeypatch.setattr("app.frmProductos.servicio.time.sleep", lambda segundos: None)
+    propuesta = analizar_fotos([(b"abc", "image/webp")], "simple")
+    assert llamadas["n"] == 2
+    assert propuesta["nombre"] == "Pelota"
+
+
 def test_ai_rechaza_mas_de_seis_fotos(monkeypatch):
     preparar_sesion(monkeypatch)
     respuesta = client.post(

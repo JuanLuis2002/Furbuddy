@@ -1,5 +1,6 @@
 import json
 import re
+import time
 
 from app.configuracion import clave_gemini, claves_woocommerce, url_tienda
 from app.frmUsuarios.servicio import (
@@ -16,6 +17,13 @@ MAXIMO_FOTOS_AI = 6
 
 class GeminiNoConfigurado(Exception):
     pass
+
+
+def fallo_pasajero(error: Exception) -> bool:
+    codigo = getattr(error, "code", None)
+    if codigo in (400, 401, 403, 404):
+        return False
+    return True
 
 
 def texto_plano(html: str) -> str:
@@ -357,18 +365,23 @@ def analizar_fotos(fotos: list[tuple[bytes, str]], tipo_producto: str) -> dict:
         for contenido, tipo_mime in fotos
     ]
     partes.append(instruccion)
-    cliente = genai.Client(api_key=clave)
-    try:
-        respuesta = cliente.models.generate_content(
-            model=MODELO_GEMINI,
-            contents=partes,
-            config=types.GenerateContentConfig(response_mime_type="application/json"),
-        )
-        texto = (respuesta.text or "").strip()
-    except Exception as error:
-        raise TiendaError("Gemini no pudo analizar las fotos", 502) from error
-    finally:
-        cliente.close()
+    texto = ""
+    for intento in range(3):
+        cliente = genai.Client(api_key=clave)
+        try:
+            respuesta = cliente.models.generate_content(
+                model=MODELO_GEMINI,
+                contents=partes,
+                config=types.GenerateContentConfig(response_mime_type="application/json"),
+            )
+            texto = (respuesta.text or "").strip()
+            break
+        except Exception as error:
+            if not fallo_pasajero(error) or intento == 2:
+                raise TiendaError("Gemini no pudo analizar las fotos", 502) from error
+            time.sleep(0.4 * (intento + 1))
+        finally:
+            cliente.close()
     if texto.startswith("```"):
         texto = texto.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
     return interpretar_propuesta(texto, tipo_producto)
