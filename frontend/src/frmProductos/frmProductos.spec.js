@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { guardarProducto, listarProductos, proponerProducto, subirFoto } from "./frmProductos.js"
+import { crearCategoria, guardarProducto, listarCategorias, listarProductos, proponerProducto, subirFoto } from "./frmProductos.js"
 
 beforeEach(() => {
   const memoria = new Map()
@@ -50,6 +50,23 @@ describe("frmProductos", () => {
         json: async () => ({ nombre: "Gorra", tipo: "variable" }),
       }
     })
+  })
+
+  it("crea una categoria y lista las existentes", async () => {
+    const lista = await listarCategorias(async (ruta) => {
+      expect(ruta).toBe("/api/productos/categorias")
+      return { ok: true, status: 200, json: async () => [{ id: 4, nombre: "Juguetes" }] }
+    })
+    expect(lista[0].nombre).toBe("Juguetes")
+    let cuerpo = ""
+    const creada = await crearCategoria("Camas", async (ruta, opciones) => {
+      cuerpo = opciones.body
+      expect(ruta).toBe("/api/productos/categorias")
+      expect(opciones.method).toBe("POST")
+      return { ok: true, status: 201, json: async () => ({ id: 9, nombre: "Camas" }) }
+    })
+    expect(JSON.parse(cuerpo).nombre).toBe("Camas")
+    expect(creada.id).toBe(9)
   })
 
   it("sube la foto como archivo", async () => {

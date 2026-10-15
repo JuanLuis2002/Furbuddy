@@ -22,6 +22,25 @@ async function pedir(ruta, token, opciones, fetchImpl, avisoCaida) {
   return datos
 }
 
+export async function listarCategorias(fetchImpl = fetch) {
+  const sesion = leerSesion()
+  return pedir("/api/productos/categorias", sesion?.token, { method: "GET" }, fetchImpl)
+}
+
+export async function crearCategoria(nombre, fetchImpl = fetch) {
+  const sesion = leerSesion()
+  return pedir(
+    "/api/productos/categorias",
+    sesion?.token,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombre }),
+    },
+    fetchImpl,
+  )
+}
+
 export async function listarProductos(pagina, porPagina, fetchImpl = fetch) {
   const sesion = leerSesion()
   const ruta = `/api/productos?pagina=${pagina}&por_pagina=${porPagina}`

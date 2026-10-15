@@ -102,6 +102,11 @@ def detalle_producto(item: dict, variaciones: list[dict] | None = None) -> dict:
             "descripcion": descripcion,
             "publicado": item.get("status") == "publish",
             "fotos": fotos,
+            "categorias": [
+                {"id": categoria["id"], "nombre": categoria.get("name") or ""}
+                for categoria in item.get("categories") or []
+                if categoria.get("id")
+            ],
             "atributos": atributos,
             "variaciones": salida,
         }
@@ -110,6 +115,8 @@ def detalle_producto(item: dict, variaciones: list[dict] | None = None) -> dict:
 
 
 def validar_producto(datos: dict) -> None:
+    if not datos.get("categorias"):
+        raise TiendaError("Elige o crea una categoria", 400)
     if datos["tipo"] == "simple":
         if not str(datos.get("precio") or "").strip():
             raise TiendaError("El producto simple necesita un precio", 400)
@@ -144,6 +151,7 @@ def cuerpo_producto(datos: dict, incluir_descripcion_larga: bool) -> dict:
         "short_description": datos.get("descripcion") or "",
         "status": "publish" if datos.get("publicado", True) else "draft",
         "images": [{"id": foto_id} for foto_id in datos.get("fotos") or []],
+        "categories": [{"id": int(categoria_id)} for categoria_id in datos.get("categorias") or []],
     }
     if incluir_descripcion_larga:
         cuerpo["description"] = datos.get("descripcion") or ""
@@ -289,6 +297,39 @@ def guardar_producto(datos: dict, producto_id: int | None = None, cliente=None) 
         producto = exigir(api.get(f"products/{producto_id}"))
         return detalle_producto(producto, listar_variaciones(producto_id, api))
     return detalle_producto(producto, [])
+
+
+def listar_categorias(cliente=None) -> list[dict]:
+    api = cliente or cliente_woocommerce()
+    pagina = 1
+    acumulado = []
+    while pagina <= 5:
+        respuesta = api.get(
+            "products/categories",
+            params={"per_page": 100, "page": pagina, "orderby": "name", "order": "asc"},
+        )
+        lote = exigir(respuesta)
+        if not isinstance(lote, list) or not lote:
+            break
+        acumulado.extend(lote)
+        total = int(respuesta.headers.get("X-WP-Total") or len(acumulado))
+        if len(lote) < 100 or len(acumulado) >= total:
+            break
+        pagina += 1
+    return [
+        {"id": item["id"], "nombre": item.get("name") or ""}
+        for item in acumulado
+        if item.get("id")
+    ]
+
+
+def crear_categoria(nombre: str, cliente=None) -> dict:
+    nombre = nombre.strip()
+    if not nombre:
+        raise TiendaError("Escribe el nombre de la categoria", 400)
+    api = cliente or cliente_woocommerce()
+    creada = exigir(api.post("products/categories", {"name": nombre}))
+    return {"id": creada["id"], "nombre": creada.get("name") or nombre}
 
 
 def eliminar_producto(producto_id: int, cliente=None) -> None:

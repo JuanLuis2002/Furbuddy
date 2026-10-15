@@ -2,15 +2,25 @@ import asyncio
 
 from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query, UploadFile
 
-from app.frmProductos.schemas import FotoSalida, PaginaProductos, ProductoDetalle, ProductoEntrada, PropuestaAi
+from app.frmProductos.schemas import (
+    CategoriaEntrada,
+    CategoriaSalida,
+    FotoSalida,
+    PaginaProductos,
+    ProductoDetalle,
+    ProductoEntrada,
+    PropuestaAi,
+)
 from app.frmProductos.servicio import (
     MAXIMO_FOTOS_AI,
     GeminiNoConfigurado,
     TiendaError,
     TiendaNoConfigurada,
+    crear_categoria,
     eliminar_producto,
     guardar_producto,
     leer_producto,
+    listar_categorias,
     listar_productos,
     proponer_producto,
     subir_foto,
@@ -55,6 +65,16 @@ def tipo_de_foto(tipo_mime: str) -> str:
     if tipo_mime == "image/jpg":
         return "image/jpeg"
     return tipo_mime
+
+
+@router.get("/productos/categorias", response_model=list[CategoriaSalida])
+def categorias(sesion: dict = Depends(sesion_actual)):
+    return responder(listar_categorias)
+
+
+@router.post("/productos/categorias", response_model=CategoriaSalida, status_code=201)
+def nueva_categoria(datos: CategoriaEntrada, sesion: dict = Depends(sesion_actual)):
+    return responder(lambda: crear_categoria(datos.nombre))
 
 
 @router.post("/productos/ai", response_model=PropuestaAi)

@@ -61,6 +61,7 @@ def test_servicio_crea_producto_simple():
             "sku": "PEL-1",
             "publicado": True,
             "fotos": [3],
+            "categorias": [12],
             "atributos": [],
             "variaciones": [],
         },
@@ -70,6 +71,7 @@ def test_servicio_crea_producto_simple():
     assert endpoint == ("post", "products")
     assert cuerpo["regular_price"] == "8.50"
     assert cuerpo["images"] == [{"id": 3}]
+    assert cuerpo["categories"] == [{"id": 12}]
     assert cuerpo["description"] == "Suave"
     assert creado["nombre"] == "Pelota"
     assert creado["variaciones"] == []
@@ -89,6 +91,7 @@ def test_servicio_crea_variaciones():
             "sku": "",
             "publicado": True,
             "fotos": [1],
+            "categorias": [12],
             "atributos": [{"id": 0, "nombre": "Color", "opciones": ["Rojo", "Azul"]}],
             "variaciones": [
                 {"id": None, "atributos": {"Color": "Rojo"}, "precio": "10", "existencia": 2, "sku": "", "foto_id": None},
@@ -121,6 +124,7 @@ def test_servicio_borra_variacion_que_ya_no_esta():
             "sku": "",
             "publicado": False,
             "fotos": [],
+            "categorias": [12],
             "atributos": [{"id": 2, "nombre": "Color", "opciones": ["Rojo"]}],
             "variaciones": [
                 {"id": 9, "atributos": {"Color": "Rojo"}, "precio": "10", "existencia": 2, "sku": "", "foto_id": None},
@@ -134,6 +138,38 @@ def test_servicio_borra_variacion_que_ya_no_esta():
     assert cuerpo["attributes"][0]["id"] == 2
     assert ("put", "products/5/variations/9") in [item[0] for item in cliente.enviados]
     assert ("delete", "products/5/variations/10") in [item[0] for item in cliente.enviados]
+
+
+def test_servicio_lista_y_crea_categoria():
+    from app.frmProductos.servicio import crear_categoria, listar_categorias
+
+    class Api:
+        def get(self, endpoint, params=None):
+            assert endpoint == "products/categories"
+            return Respuesta(200, [{"id": 4, "name": "Juguetes"}], {"X-WP-Total": "1"})
+
+        def post(self, endpoint, data):
+            assert endpoint == "products/categories"
+            assert data["name"] == "Camas"
+            return Respuesta(201, {"id": 9, "name": "Camas"})
+
+    api = Api()
+    assert listar_categorias(cliente=api) == [{"id": 4, "nombre": "Juguetes"}]
+    assert crear_categoria("Camas", cliente=api) == {"id": 9, "nombre": "Camas"}
+
+
+def test_categorias_lista(monkeypatch):
+    preparar_sesion(monkeypatch)
+    monkeypatch.setattr(
+        "app.frmProductos.router.listar_categorias",
+        lambda: [{"id": 4, "nombre": "Juguetes"}],
+    )
+    respuesta = client.get(
+        "/api/productos/categorias",
+        headers={"Authorization": f"Bearer {token()}"},
+    )
+    assert respuesta.status_code == 200
+    assert respuesta.json() == [{"id": 4, "nombre": "Juguetes"}]
 
 
 def test_foto_rechaza_un_archivo_que_no_es_imagen(monkeypatch):

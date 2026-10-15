@@ -2,9 +2,11 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import {
+  crearCategoria,
   eliminarProducto,
   guardarProducto,
   leerProducto,
+  listarCategorias,
   listarProductos,
   proponerProducto,
   subirFoto,
@@ -41,6 +43,9 @@ const silencio = ref(false)
 const pendiente = ref(null)
 const forma = ref(null)
 const formulario = ref(vacio())
+const categorias = ref([])
+const nombreCategoria = ref("")
+const creandoCategoria = ref(false)
 const columnas = [
   { title: "", key: "foto", sortable: false, width: 72 },
   { title: "Nombre", key: "nombre" },
@@ -68,6 +73,7 @@ function vacio() {
     sku: "",
     publicado: true,
     fotos: [],
+    categorias: [],
     atributos: [],
     variaciones: [],
   }
@@ -171,6 +177,45 @@ async function preparar(edicion) {
   modal.value = true
   await nextTick()
   forma.value?.resetValidation()
+  cargarCategorias()
+}
+
+async function cargarCategorias() {
+  try {
+    const lista = await listarCategorias()
+    const porId = new Map(categorias.value.map((item) => [item.id, item]))
+    for (const item of lista) {
+      porId.set(item.id, item)
+    }
+    categorias.value = [...porId.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
+  } catch (err) {
+    errorModal.value = err.message
+  }
+}
+
+async function agregarCategoria() {
+  const nombre = nombreCategoria.value.trim()
+  if (!nombre) {
+    errorModal.value = "Escribe el nombre de la categoria"
+    return
+  }
+  creandoCategoria.value = true
+  errorModal.value = ""
+  try {
+    const creada = await crearCategoria(nombre)
+    if (!categorias.value.some((item) => item.id === creada.id)) {
+      categorias.value.push(creada)
+      categorias.value.sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
+    }
+    if (!formulario.value.categorias.includes(creada.id)) {
+      formulario.value.categorias.push(creada.id)
+    }
+    nombreCategoria.value = ""
+  } catch (err) {
+    errorModal.value = err.message
+  } finally {
+    creandoCategoria.value = false
+  }
 }
 
 function abrir() {
@@ -375,6 +420,7 @@ async function analizarAi() {
       precio: "",
       existencia: 0,
       fotos: datos.fotos || [],
+      categorias: [],
       atributos: datos.atributos?.length
         ? datos.atributos
         : datos.tipo === "variable"
@@ -411,6 +457,7 @@ async function abrirEdicion(item) {
       sku: datos.sku,
       publicado: datos.publicado,
       fotos: datos.fotos,
+      categorias: (datos.categorias || []).map((categoria) => categoria.id),
       atributos: datos.atributos.map((atributo) => ({ ...atributo, opciones: [...atributo.opciones] })),
       variaciones: datos.variaciones.map((variacion) => ({
         id: variacion.id,
@@ -423,6 +470,7 @@ async function abrirEdicion(item) {
       })),
     }
     silencio.value = false
+    categorias.value = datos.categorias || []
     preparar(true)
   } catch (err) {
     error.value = err.message
@@ -487,6 +535,7 @@ function datosParaGuardar() {
     sku: formulario.value.sku,
     publicado: formulario.value.publicado,
     fotos: formulario.value.fotos.map((foto) => foto.id),
+    categorias: formulario.value.categorias,
     atributos: [],
     variaciones: [],
   }
@@ -512,6 +561,10 @@ function datosParaGuardar() {
 async function guardar() {
   const resultado = await forma.value.validate()
   if (!resultado.valid || exceso.value) {
+    return
+  }
+  if (!formulario.value.categorias.length) {
+    errorModal.value = "Elige o crea una categoria"
     return
   }
   if (formulario.value.tipo === "variable" && formulario.value.variaciones.some((variacion) => !/^\d+(\.\d{1,2})?$/.test(String(variacion.precio || "")))) {
@@ -632,7 +685,7 @@ async function confirmar() {
         <v-form ref="forma" @submit.prevent="guardar">
           <v-card-text class="pt-2">
             <v-alert v-if="desdeAi" type="info" variant="tonal" class="mb-4">
-              Revisa el nombre y la descripcion. Confirma el precio y la existencia. Al guardar, el producto se publica en la tienda.
+              Revisa el nombre, la descripcion y la categoria. Confirma el precio y la existencia. Al guardar, el producto se publica en la tienda.
             </v-alert>
             <v-alert v-if="errorModal" type="error" variant="tonal" class="mb-4">{{ errorModal }}</v-alert>
             <v-row>
@@ -655,6 +708,35 @@ async function confirmar() {
                   variant="outlined"
                   hide-details="auto"
                 />
+              </v-col>
+              <v-col cols="12" md="7">
+                <v-select
+                  v-model="formulario.categorias"
+                  :items="categorias"
+                  item-title="nombre"
+                  item-value="id"
+                  label="Categorias*"
+                  prepend-inner-icon="mdi-shape-outline"
+                  variant="outlined"
+                  multiple
+                  chips
+                  closable-chips
+                  hide-details="auto"
+                  :rules="[(valor) => (valor && valor.length > 0) || 'Elige o crea una categoria']"
+                />
+              </v-col>
+              <v-col cols="12" md="5">
+                <div class="d-flex ga-2">
+                  <v-text-field
+                    v-model="nombreCategoria"
+                    label="Nueva categoria"
+                    prepend-inner-icon="mdi-plus"
+                    variant="outlined"
+                    hide-details="auto"
+                    @keydown.enter.prevent="agregarCategoria"
+                  />
+                  <v-btn variant="outlined" class="align-self-start" :loading="creandoCategoria" type="button" @click="agregarCategoria">Crear</v-btn>
+                </div>
               </v-col>
               <v-col cols="12">
                 <v-textarea

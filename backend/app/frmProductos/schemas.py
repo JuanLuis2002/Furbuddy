@@ -15,6 +15,15 @@ class FotoSalida(BaseModel):
     src: str
 
 
+class CategoriaSalida(BaseModel):
+    id: int
+    nombre: str
+
+
+class CategoriaEntrada(BaseModel):
+    nombre: str = Field(min_length=1, max_length=80)
+
+
 class AtributoEntrada(BaseModel):
     id: int = 0
     nombre: str = Field(min_length=1)
@@ -60,6 +69,7 @@ class ProductoEntrada(BaseModel):
     sku: str = ""
     publicado: bool = True
     fotos: list[int] = []
+    categorias: list[int] = Field(min_length=1)
     atributos: list[AtributoEntrada] = []
     variaciones: list[VariacionEntrada] = []
 
@@ -83,6 +93,7 @@ class ProductoDetalle(ProductoResumen):
     descripcion: str
     publicado: bool
     fotos: list[FotoSalida]
+    categorias: list[CategoriaSalida]
     atributos: list[AtributoSalida]
     variaciones: list[VariacionSalida]
 
