@@ -6,6 +6,7 @@ import { es } from "vuetify/locale"
 import App from "./App.vue"
 import FrmConfiguracion from "./frmConfiguracion/FrmConfiguracion.vue"
 import FrmLogin from "./frmLogin/FrmLogin.vue"
+import FrmProductos from "./frmProductos/FrmProductos.vue"
 import FrmUsuarios from "./frmUsuarios/FrmUsuarios.vue"
 import { haySesion } from "./frmLogin/frmLogin.js"
 import { temasIniciales } from "./tema.js"
@@ -17,6 +18,7 @@ const router = createRouter({
   routes: [
     { path: "/", component: FrmLogin },
     { path: "/usuarios", component: FrmUsuarios, meta: { panel: true } },
+    { path: "/productos", component: FrmProductos, meta: { panel: true } },
     { path: "/configuracion", component: FrmConfiguracion, meta: { panel: true } },
   ],
 })
