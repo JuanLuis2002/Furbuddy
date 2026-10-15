@@ -48,11 +48,13 @@ export async function eliminarProducto(id, fetchImpl = fetch) {
   return pedir(`/api/productos/${id}`, sesion?.token, { method: "DELETE" }, fetchImpl)
 }
 
-export async function proponerProducto(tipo, archivo, fetchImpl = fetch) {
+export async function proponerProducto(tipo, archivos, fetchImpl = fetch) {
   const sesion = leerSesion()
   const cuerpo = new FormData()
   cuerpo.append("tipo", tipo)
-  cuerpo.append("archivo", archivo)
+  for (const archivo of archivos) {
+    cuerpo.append("archivos", archivo)
+  }
   return pedir("/api/productos/ai", sesion?.token, { method: "POST", body: cuerpo }, fetchImpl)
 }
 

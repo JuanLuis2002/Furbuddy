@@ -174,7 +174,7 @@ def test_ai_pide_el_tipo(monkeypatch):
         "/api/productos/ai",
         headers={"Authorization": f"Bearer {token()}"},
         data={"tipo": "otro"},
-        files={"archivo": ("gorra.webp", b"abc", "image/webp")},
+        files=[("archivos", ("gorra.webp", b"abc", "image/webp"))],
     )
     assert respuesta.status_code == 400
 
@@ -182,15 +182,18 @@ def test_ai_pide_el_tipo(monkeypatch):
 def test_ai_devuelve_la_propuesta(monkeypatch):
     preparar_sesion(monkeypatch)
 
-    def proponer(nombre, contenido, tipo_mime, tipo_producto):
+    def proponer(fotos, tipo_producto):
         assert tipo_producto == "variable"
-        assert contenido == b"abc"
+        assert [foto[1] for foto in fotos] == [b"abc", b"def"]
         return {
             "tipo": "variable",
             "nombre": "Gorra",
             "descripcion": "Ligera.",
             "atributos": [{"id": 0, "nombre": "Color", "opciones": ["Rojo"]}],
-            "foto": {"id": 3, "src": "https://furbuddy.xyz/gorra.webp"},
+            "fotos": [
+                {"id": 3, "src": "https://furbuddy.xyz/gorra.webp"},
+                {"id": 4, "src": "https://furbuddy.xyz/gorra-2.webp"},
+            ],
         }
 
     monkeypatch.setattr("app.frmProductos.router.proponer_producto", proponer)
@@ -198,11 +201,25 @@ def test_ai_devuelve_la_propuesta(monkeypatch):
         "/api/productos/ai",
         headers={"Authorization": f"Bearer {token()}"},
         data={"tipo": "variable"},
-        files={"archivo": ("gorra.webp", b"abc", "image/webp")},
+        files=[
+            ("archivos", ("gorra.webp", b"abc", "image/webp")),
+            ("archivos", ("detalle.jpg", b"def", "image/jpg")),
+        ],
     )
     assert respuesta.status_code == 200
-    assert respuesta.json()["foto"]["id"] == 3
+    assert [foto["id"] for foto in respuesta.json()["fotos"]] == [3, 4]
     assert respuesta.json()["atributos"][0]["nombre"] == "Color"
+
+
+def test_ai_rechaza_mas_de_seis_fotos(monkeypatch):
+    preparar_sesion(monkeypatch)
+    respuesta = client.post(
+        "/api/productos/ai",
+        headers={"Authorization": f"Bearer {token()}"},
+        data={"tipo": "simple"},
+        files=[("archivos", (f"{indice}.webp", b"abc", "image/webp")) for indice in range(7)],
+    )
+    assert respuesta.status_code == 400
 
 
 def test_servicio_sube_foto_a_wordpress(monkeypatch):

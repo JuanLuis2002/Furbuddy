@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query
 
 from app.frmProductos.schemas import FotoSalida, PaginaProductos, ProductoDetalle, ProductoEntrada, PropuestaAi
 from app.frmProductos.servicio import (
+    MAXIMO_FOTOS_AI,
     GeminiNoConfigurado,
     TiendaError,
     TiendaNoConfigurada,
@@ -15,7 +16,7 @@ from app.frmProductos.servicio import (
 from app.sesion import leer_token
 
 router = APIRouter(prefix="/api", tags=["frmProductos"])
-TIPOS_FOTO = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+TIPOS_FOTO = {"image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"}
 PESO_MAXIMO = 8 * 1024 * 1024
 
 
@@ -48,30 +49,41 @@ def productos(
     return responder(lambda: listar_productos(pagina, por_pagina))
 
 
+def tipo_de_foto(tipo_mime: str) -> str:
+    if tipo_mime == "image/jpg":
+        return "image/jpeg"
+    return tipo_mime
+
+
 @router.post("/productos/ai", response_model=PropuestaAi)
 async def producto_con_ai(
     tipo: str = Form(),
-    archivo: UploadFile = File(),
+    archivos: list[UploadFile] = File(),
     sesion: dict = Depends(sesion_actual),
 ):
     if tipo not in ("simple", "variable"):
         raise HTTPException(status_code=400, detail="Elige un producto normal o variable")
-    tipo_mime = archivo.content_type or ""
-    if tipo_mime not in TIPOS_FOTO:
-        raise HTTPException(status_code=400, detail="Usa JPG, PNG, WEBP o GIF")
-    contenido = await archivo.read()
-    if not contenido:
-        raise HTTPException(status_code=400, detail="La foto esta vacia")
-    if len(contenido) > PESO_MAXIMO:
-        raise HTTPException(status_code=400, detail="La foto pesa mas de 8 MB")
-    return responder(
-        lambda: proponer_producto(archivo.filename or "foto", contenido, tipo_mime, tipo)
-    )
+    if not archivos:
+        raise HTTPException(status_code=400, detail="Agrega al menos una foto")
+    if len(archivos) > MAXIMO_FOTOS_AI:
+        raise HTTPException(status_code=400, detail="Puedes enviar hasta 6 fotos")
+    fotos = []
+    for archivo in archivos:
+        tipo_mime = tipo_de_foto(archivo.content_type or "")
+        if tipo_mime not in TIPOS_FOTO:
+            raise HTTPException(status_code=400, detail="Usa JPG, PNG, WEBP o GIF")
+        contenido = await archivo.read()
+        if not contenido:
+            raise HTTPException(status_code=400, detail="La foto esta vacia")
+        if len(contenido) > PESO_MAXIMO:
+            raise HTTPException(status_code=400, detail="La foto pesa mas de 8 MB")
+        fotos.append((archivo.filename or "foto", contenido, tipo_mime))
+    return responder(lambda: proponer_producto(fotos, tipo))
 
 
 @router.post("/productos/fotos", response_model=FotoSalida)
 async def nueva_foto(archivo: UploadFile = File(), sesion: dict = Depends(sesion_actual)):
-    tipo = archivo.content_type or ""
+    tipo = tipo_de_foto(archivo.content_type or "")
     if tipo not in TIPOS_FOTO:
         raise HTTPException(status_code=400, detail="Usa JPG, PNG, WEBP o GIF")
     contenido = await archivo.read()

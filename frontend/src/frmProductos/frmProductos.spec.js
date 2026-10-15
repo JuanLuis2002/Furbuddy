@@ -36,12 +36,14 @@ describe("frmProductos", () => {
     expect(JSON.parse(cuerpo).tipo).toBe("variable")
   })
 
-  it("envia el tipo y la foto a la AI", async () => {
-    const archivo = new File(["foto"], "gorra.webp", { type: "image/webp" })
-    await proponerProducto("variable", archivo, async (ruta, opciones) => {
+  it("envia el tipo y las fotos a la AI", async () => {
+    const primera = new File(["foto"], "gorra.webp", { type: "image/webp" })
+    const segunda = new File(["detalle"], "detalle.jpg", { type: "image/jpeg" })
+    await proponerProducto("variable", [primera, segunda], async (ruta, opciones) => {
       expect(ruta).toBe("/api/productos/ai")
       expect(opciones.body).toBeInstanceOf(FormData)
       expect(opciones.body.get("tipo")).toBe("variable")
+      expect(opciones.body.getAll("archivos")).toHaveLength(2)
       return {
         ok: true,
         status: 200,

@@ -10,7 +10,8 @@ from app.frmUsuarios.servicio import (
 )
 
 MAXIMO_VARIACIONES = 50
-MODELO_GEMINI = "gemini-2.5-flash"
+MODELO_GEMINI = "gemini-3.8-flash"
+MAXIMO_FOTOS_AI = 6
 
 
 class GeminiNoConfigurado(Exception):
@@ -321,7 +322,11 @@ def interpretar_propuesta(texto: str, tipo: str) -> dict:
     }
 
 
-def analizar_foto(contenido: bytes, tipo_mime: str, tipo_producto: str) -> dict:
+def analizar_fotos(fotos: list[tuple[bytes, str]], tipo_producto: str) -> dict:
+    if not fotos:
+        raise TiendaError("Agrega al menos una foto", 400)
+    if len(fotos) > MAXIMO_FOTOS_AI:
+        raise TiendaError("Puedes enviar hasta 6 fotos", 400)
     clave = clave_gemini()
     if not clave:
         raise GeminiNoConfigurado()
@@ -331,37 +336,47 @@ def analizar_foto(contenido: bytes, tipo_mime: str, tipo_producto: str) -> dict:
     if tipo_producto == "variable":
         pedido = (
             "El usuario quiere un producto variable. Propone como maximo 2 caracteristicas "
-            "visibles en la foto, por ejemplo color o talla, con hasta 4 opciones cada una."
+            "visibles en las fotos, por ejemplo color o talla, con hasta 4 opciones cada una."
         )
     else:
         pedido = "El usuario quiere un producto normal. Devuelve atributos como una lista vacia."
     instruccion = (
         "Eres el asistente de la tienda Furbuddy, de accesorios para mascotas. "
-        "Mira la foto y describe el producto en espanol. Responde solo JSON con las claves "
-        "nombre, descripcion y atributos. nombre es corto. descripcion son dos oraciones "
-        "para venderlo, sin HTML. atributos es una lista de objetos con nombre y opciones. "
+        "Mira todas las fotos: son del mismo producto. Describelo en espanol. "
+        "Responde solo JSON con las claves nombre, descripcion y atributos. "
+        "nombre es corto. descripcion son dos oraciones para venderlo, sin HTML. "
+        "atributos es una lista de objetos con nombre y opciones. "
         "No inventes precio ni existencia. "
         + pedido
     )
+    partes = [
+        types.Part.from_bytes(data=contenido, mime_type=tipo_mime)
+        for contenido, tipo_mime in fotos
+    ]
+    partes.append(instruccion)
+    cliente = genai.Client(api_key=clave)
     try:
-        cliente = genai.Client(api_key=clave)
         respuesta = cliente.models.generate_content(
             model=MODELO_GEMINI,
-            contents=[
-                types.Part.from_bytes(data=contenido, mime_type=tipo_mime),
-                instruccion,
-            ],
+            contents=partes,
             config=types.GenerateContentConfig(response_mime_type="application/json"),
         )
-        texto = respuesta.text or ""
+        texto = (respuesta.text or "").strip()
     except Exception as error:
-        raise TiendaError("Gemini no pudo analizar la foto", 502) from error
+        raise TiendaError("Gemini no pudo analizar las fotos", 502) from error
+    finally:
+        cliente.close()
+    if texto.startswith("```"):
+        texto = texto.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
     return interpretar_propuesta(texto, tipo_producto)
 
 
-def proponer_producto(nombre: str, contenido: bytes, tipo_mime: str, tipo_producto: str) -> dict:
-    propuesta = analizar_foto(contenido, tipo_mime, tipo_producto)
-    propuesta["foto"] = subir_foto(nombre, contenido, tipo_mime)
+def proponer_producto(fotos: list[tuple[str, bytes, str]], tipo_producto: str) -> dict:
+    propuesta = analizar_fotos([(contenido, tipo_mime) for _, contenido, tipo_mime in fotos], tipo_producto)
+    propuesta["fotos"] = [
+        subir_foto(nombre, contenido, tipo_mime)
+        for nombre, contenido, tipo_mime in fotos
+    ]
     return propuesta
 
 

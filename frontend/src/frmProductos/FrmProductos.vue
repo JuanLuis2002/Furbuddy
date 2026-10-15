@@ -25,6 +25,8 @@ const modal = ref(false)
 const modalAi = ref(false)
 const pasoAi = ref("tipo")
 const tipoAi = ref("simple")
+const fotosAi = ref([])
+const claveFotosAi = ref(0)
 const analizando = ref(false)
 const errorAi = ref("")
 const desdeAi = ref(false)
@@ -170,6 +172,7 @@ function abrir() {
 function abrirAi() {
   pasoAi.value = "tipo"
   tipoAi.value = "simple"
+  fotosAi.value = []
   errorAi.value = ""
   modalAi.value = true
 }
@@ -180,15 +183,35 @@ function elegirTipoAi(tipo) {
   errorAi.value = ""
 }
 
-async function enviarFotoAi(archivos) {
-  const archivo = Array.isArray(archivos) ? archivos[0] : archivos
-  if (!archivo) {
+function agregarFotosAi(archivos) {
+  const lista = Array.isArray(archivos) ? archivos : archivos ? [archivos] : []
+  if (!lista.length) {
+    return
+  }
+  errorAi.value = ""
+  for (const archivo of lista) {
+    if (fotosAi.value.length >= 6) {
+      errorAi.value = "Puedes enviar hasta 6 fotos"
+      break
+    }
+    fotosAi.value.push(archivo)
+  }
+  claveFotosAi.value += 1
+}
+
+function quitarFotoAi(indice) {
+  fotosAi.value.splice(indice, 1)
+}
+
+async function analizarAi() {
+  if (!fotosAi.value.length) {
+    errorAi.value = "Agrega al menos una foto"
     return
   }
   analizando.value = true
   errorAi.value = ""
   try {
-    const datos = await proponerProducto(tipoAi.value, archivo)
+    const datos = await proponerProducto(tipoAi.value, fotosAi.value)
     silencio.value = true
     formulario.value = {
       ...vacio(),
@@ -197,7 +220,7 @@ async function enviarFotoAi(archivos) {
       descripcion: datos.descripcion,
       precio: "",
       existencia: 0,
-      fotos: datos.foto ? [datos.foto] : [],
+      fotos: datos.fotos || [],
       atributos: datos.atributos?.length
         ? datos.atributos
         : datos.tipo === "variable"
@@ -643,20 +666,43 @@ async function confirmar() {
           </template>
           <template v-else>
             <p class="mb-4">
-              Sube o toma la foto del producto {{ tipoAi === "variable" ? "variable" : "normal" }}.
-              Gemini va a proponer el nombre y la descripcion.
+              Agrega una o varias fotos del producto {{ tipoAi === "variable" ? "variable" : "normal" }}.
+              Puedes tomarlas o elegirlas. Cuando esten listas, pulsa Analizar.
             </p>
             <v-file-input
-              label="Foto del producto"
+              :key="`tomar-${claveFotosAi}`"
+              label="Tomar foto"
               prepend-icon="mdi-camera"
               variant="outlined"
               accept="image/jpeg,image/png,image/webp,image/gif"
               capture="environment"
-              :loading="analizando"
               :disabled="analizando"
               hide-details="auto"
-              @update:model-value="enviarFotoAi"
+              class="mb-3"
+              @update:model-value="agregarFotosAi"
             />
+            <v-file-input
+              :key="`elegir-${claveFotosAi}`"
+              label="Elegir fotos"
+              prepend-icon="mdi-image-multiple"
+              variant="outlined"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              multiple
+              :disabled="analizando"
+              hide-details="auto"
+              @update:model-value="agregarFotosAi"
+            />
+            <div v-if="fotosAi.length" class="d-flex flex-wrap ga-2 mt-4">
+              <v-chip
+                v-for="(foto, indice) in fotosAi"
+                :key="`${foto.name}-${indice}`"
+                closable
+                :disabled="analizando"
+                @click:close="quitarFotoAi(indice)"
+              >
+                {{ foto.name }}
+              </v-chip>
+            </div>
           </template>
         </v-card-text>
         <v-divider />
@@ -664,6 +710,16 @@ async function confirmar() {
           <v-btn v-if="pasoAi === 'foto'" variant="text" :disabled="analizando" @click="pasoAi = 'tipo'">Atras</v-btn>
           <v-spacer />
           <v-btn variant="text" :disabled="analizando" @click="modalAi = false">Cerrar</v-btn>
+          <v-btn
+            v-if="pasoAi === 'foto'"
+            color="primary"
+            variant="flat"
+            :loading="analizando"
+            :disabled="!fotosAi.length"
+            @click="analizarAi"
+          >
+            Analizar
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

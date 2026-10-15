@@ -92,7 +92,7 @@ class PropuestaAi(BaseModel):
     nombre: str
     descripcion: str
     atributos: list[AtributoSalida]
-    foto: FotoSalida
+    fotos: list[FotoSalida]
 
 
 class PaginaProductos(BaseModel):
