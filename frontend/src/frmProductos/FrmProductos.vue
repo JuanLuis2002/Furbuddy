@@ -29,6 +29,9 @@ const fotosAi = ref([])
 const selectorFotos = ref(null)
 const videoCamara = ref(null)
 const camaraAbierta = ref(false)
+const camaraLista = ref(false)
+const capturando = ref(false)
+const errorCamara = ref("")
 const analizando = ref(false)
 let streamCamara = null
 const errorAi = ref("")
@@ -229,8 +232,33 @@ function alElegirFotos(evento) {
   evento.target.value = ""
 }
 
+function cuadroVacio(lienzo) {
+  const pixeles = lienzo.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, lienzo.width, lienzo.height).data
+  const paso = Math.max(4, Math.floor(Math.sqrt((lienzo.width * lienzo.height) / 4000)))
+  let suma = 0
+  let sumaCuadrada = 0
+  let cuenta = 0
+  for (let y = 0; y < lienzo.height; y += paso) {
+    for (let x = 0; x < lienzo.width; x += paso) {
+      const indice = (y * lienzo.width + x) * 4
+      const luz = (pixeles[indice] + pixeles[indice + 1] + pixeles[indice + 2]) / 3
+      suma += luz
+      sumaCuadrada += luz * luz
+      cuenta += 1
+    }
+  }
+  if (!cuenta) {
+    return true
+  }
+  const media = suma / cuenta
+  const varianza = sumaCuadrada / cuenta - media * media
+  return media < 12 && varianza < 30
+}
+
 async function abrirCamara() {
   errorAi.value = ""
+  errorCamara.value = ""
+  camaraLista.value = false
   if (!navigator.mediaDevices?.getUserMedia) {
     errorAi.value = "Este navegador no abre la camara."
     return
@@ -246,23 +274,60 @@ async function abrirCamara() {
     }
     camaraAbierta.value = true
     await nextTick()
-    videoCamara.value.srcObject = streamCamara
-    await videoCamara.value.play()
+    const video = videoCamara.value
+    video.srcObject = streamCamara
+    const vigilarCuadro = () => {
+      if (video.videoWidth > 0) {
+        camaraLista.value = true
+        return
+      }
+      video.requestVideoFrameCallback?.(vigilarCuadro)
+    }
+    video.onloadeddata = vigilarCuadro
+    video.requestVideoFrameCallback?.(vigilarCuadro)
+    await video.play()
   } catch {
     errorAi.value = "No se pudo abrir la camara. Permite el acceso en el navegador."
   }
 }
 
-function capturarFoto() {
+async function capturarFoto() {
   const video = videoCamara.value
-  if (!video?.videoWidth) {
+  const pista = streamCamara?.getVideoTracks?.()[0]
+  if (!video?.videoWidth && !pista) {
     return
   }
-  const lienzo = document.createElement("canvas")
-  lienzo.width = video.videoWidth
-  lienzo.height = video.videoHeight
-  lienzo.getContext("2d").drawImage(video, 0, 0)
+  capturando.value = true
+  errorCamara.value = ""
+  const candidatos = []
+  const copiar = (origen, ancho, alto) => {
+    if (!ancho || !alto) {
+      return
+    }
+    const lienzo = document.createElement("canvas")
+    lienzo.width = ancho
+    lienzo.height = alto
+    lienzo.getContext("2d").drawImage(origen, 0, 0)
+    candidatos.push(lienzo)
+  }
+  if (pista && typeof ImageCapture === "function") {
+    try {
+      const mapa = await new ImageCapture(pista).grabFrame()
+      copiar(mapa, mapa.width, mapa.height)
+      mapa.close()
+    } catch {
+      /* El navegador sigue con el cuadro del video. */
+    }
+  }
+  copiar(video, video?.videoWidth, video?.videoHeight)
+  const lienzo = candidatos.find((item) => !cuadroVacio(item))
+  if (!lienzo) {
+    capturando.value = false
+    errorCamara.value = "La foto salio negra. Espera a ver la imagen en la camara y toma otra."
+    return
+  }
   lienzo.toBlob((blob) => {
+    capturando.value = false
     if (blob) {
       agregarFotosAi([new File([blob], `foto-${Date.now()}.jpg`, { type: "image/jpeg" })])
     }
@@ -272,6 +337,8 @@ function capturarFoto() {
 
 function cerrarCamara() {
   camaraAbierta.value = false
+  camaraLista.value = false
+  capturando.value = false
   if (streamCamara) {
     for (const pista of streamCamara.getTracks()) {
       pista.stop()
@@ -807,13 +874,14 @@ async function confirmar() {
       <v-card>
         <v-card-title class="text-h6">Camara</v-card-title>
         <v-card-text>
-          <video ref="videoCamara" autoplay playsinline muted style="width: 100%; max-height: 360px; background: #111; border-radius: 8px; object-fit: cover" />
-          <p class="text-body-2 mt-3 mb-0">Al tomar la foto, se agrega a la lista y la camara se cierra. Para otra, pulsa Camara de nuevo.</p>
+          <v-alert v-if="errorCamara" type="warning" variant="tonal" class="mb-3">{{ errorCamara }}</v-alert>
+          <video ref="videoCamara" autoplay playsinline muted style="width: 100%; min-height: 220px; max-height: 360px; background: #111; border-radius: 8px; object-fit: cover" />
+          <p class="text-body-2 mt-3 mb-0">Espera a ver la imagen. Al tomar la foto, se agrega a la lista y la camara se cierra.</p>
         </v-card-text>
         <v-divider />
         <v-card-actions class="px-4 py-3">
           <v-spacer />
-          <v-btn color="primary" prepend-icon="mdi-camera" @click="capturarFoto">Tomar foto</v-btn>
+          <v-btn color="primary" prepend-icon="mdi-camera" :disabled="!camaraLista" :loading="capturando" @click="capturarFoto">Tomar foto</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

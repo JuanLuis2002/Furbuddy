@@ -342,9 +342,12 @@ def analizar_fotos(fotos: list[tuple[bytes, str]], tipo_producto: str) -> dict:
         pedido = "El usuario quiere un producto normal. Devuelve atributos como una lista vacia."
     instruccion = (
         "Eres el asistente de la tienda Furbuddy, de accesorios para mascotas. "
-        "Mira todas las fotos: son del mismo producto. Describelo en espanol. "
+        "Mira todas las fotos: son del mismo producto. Describe solo lo que se ve. "
+        "Si la foto esta negra, borrosa o no muestra un producto, devuelve nombre vacio. "
+        "No inventes un collar, una cama ni otro accesorio si no aparece en la foto. "
         "Responde solo JSON con las claves nombre, descripcion y atributos. "
-        "nombre es corto. descripcion son dos oraciones para venderlo, sin HTML. "
+        "nombre es corto e incluye el color si se ve. "
+        "descripcion son dos oraciones sobre el objeto visible: forma, material o uso, sin HTML. "
         "atributos es una lista de objetos con nombre y opciones. "
         "No inventes precio ni existencia. "
         + pedido
