@@ -9,15 +9,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_filter(
-	'woocommerce_thumbnail_size',
-	static function ( $size ) {
-		if ( 'woocommerce_archive_thumbnail' === $size ) {
-			return 'large';
+	'wp_get_attachment_image_src',
+	static function ( $image, $attachment_id, $size ) {
+		if ( 'woocommerce_archive_thumbnail' !== $size ) {
+			return $image;
 		}
 
-		return $size;
+		$completa = wp_get_attachment_image_src( $attachment_id, 'large' );
+		if ( ! $completa ) {
+			$completa = wp_get_attachment_image_src( $attachment_id, 'full' );
+		}
+
+		return $completa ? $completa : $image;
 	},
-	20
+	20,
+	3
+);
+
+add_filter(
+	'wp_get_attachment_image_attributes',
+	static function ( $attr, $attachment, $size ) {
+		if ( 'woocommerce_archive_thumbnail' === $size ) {
+			unset( $attr['srcset'], $attr['sizes'] );
+		}
+
+		return $attr;
+	},
+	20,
+	3
 );
 
 add_action(
