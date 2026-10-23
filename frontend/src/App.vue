@@ -61,6 +61,7 @@ onUnmounted(() => window.removeEventListener("furbuddy-sesion", refrescarSesion)
           <v-list-subheader>Panel</v-list-subheader>
           <v-list-item to="/usuarios" prepend-icon="mdi-account-group" title="Usuarios" rounded="lg" />
           <v-list-item to="/productos" prepend-icon="mdi-package-variant" title="Productos" rounded="lg" />
+          <v-list-item to="/categorias" prepend-icon="mdi-shape-outline" title="Categorias" rounded="lg" />
         </v-list>
         <template #append>
           <v-list nav density="compact">

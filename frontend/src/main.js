@@ -4,6 +4,7 @@ import { createVuetify } from "vuetify"
 import { aliases, mdi } from "vuetify/iconsets/mdi"
 import { es } from "vuetify/locale"
 import App from "./App.vue"
+import FrmCategorias from "./frmCategorias/FrmCategorias.vue"
 import FrmConfiguracion from "./frmConfiguracion/FrmConfiguracion.vue"
 import FrmLogin from "./frmLogin/FrmLogin.vue"
 import FrmProductos from "./frmProductos/FrmProductos.vue"
@@ -19,6 +20,7 @@ const router = createRouter({
     { path: "/", component: FrmLogin },
     { path: "/usuarios", component: FrmUsuarios, meta: { panel: true } },
     { path: "/productos", component: FrmProductos, meta: { panel: true } },
+    { path: "/categorias", component: FrmCategorias, meta: { panel: true } },
     { path: "/configuracion", component: FrmConfiguracion, meta: { panel: true } },
   ],
 })
