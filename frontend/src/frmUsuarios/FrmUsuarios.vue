@@ -174,7 +174,7 @@ async function confirmar() {
 
     <v-card>
       <v-card-item>
-        <v-card-title>Usuarios</v-card-title>
+        <v-card-title>Usuarios de la plataforma</v-card-title>
         <v-card-subtitle>Estos usuarios viven en WordPress y WooCommerce los administra.</v-card-subtitle>
         <template #append>
           <v-btn color="primary" prepend-icon="mdi-account-plus" @click="abrir">Agregar</v-btn>
