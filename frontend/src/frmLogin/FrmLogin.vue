@@ -41,7 +41,7 @@ async function entrar() {
               <v-icon icon="mdi-paw" size="26" />
             </v-avatar>
             <div>
-              <div class="text-h6 font-weight-medium">Furbuddy</div>
+              <div class="text-h6 font-weight-medium">Furbuddy Panel</div>
               <div class="text-body-2 text-medium-emphasis">Panel de la tienda</div>
             </div>
           </div>
