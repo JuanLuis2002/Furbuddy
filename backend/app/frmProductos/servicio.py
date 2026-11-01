@@ -13,7 +13,7 @@ from app.frmUsuarios.servicio import (
 
 MAXIMO_VARIACIONES = 50
 MODELO_GEMINI = "gemini-3.8-flash"
-MODELO_GROQ = "meta-llama/llama-4-scout-17b-16e-instruct"
+MODELO_GROQ = "qwen/qwen3.8-27b"
 MAXIMO_FOTOS_AI = 6
 MAXIMO_FOTOS_GROQ = 3
 
