@@ -15,3 +15,7 @@ def secreto_sesion() -> str:
 
 def clave_gemini() -> str:
     return os.environ.get("GEMINI_API_KEY", "")
+
+
+def clave_groq() -> str:
+    return os.environ.get("GROQ_API_KEY", "")
