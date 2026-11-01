@@ -1,6 +1,7 @@
 import json
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 from app.configuracion import clave_gemini, claves_woocommerce, url_tienda
 from app.frmUsuarios.servicio import (
@@ -470,38 +471,46 @@ def analizar_fotos(fotos: list[tuple[bytes, str]], tipo_producto: str) -> dict:
     ]
     partes.append(instrucciones_gemini(tipo_producto))
     texto = ""
-    for intento in range(3):
-        cliente = genai.Client(api_key=clave)
-        try:
-            respuesta = cliente.models.generate_content(
-                model=MODELO_GEMINI,
-                contents=partes,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    response_schema=ESQUEMA_PROPUESTA_AI,
-                ),
-            )
-            texto = (respuesta.text or "").strip()
-            if not texto:
-                raise TiendaError("Gemini no devolvio datos del producto en JSON", 502)
-            break
-        except TiendaError:
-            raise
-        except Exception as error:
-            if not fallo_pasajero(error) or intento == 2:
-                raise TiendaError("Gemini no pudo analizar las fotos", 502) from error
-            time.sleep(0.4 * (intento + 1))
-        finally:
-            cliente.close()
+    cliente = genai.Client(api_key=clave)
+    try:
+        for intento in range(3):
+            try:
+                respuesta = cliente.models.generate_content(
+                    model=MODELO_GEMINI,
+                    contents=partes,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        response_schema=ESQUEMA_PROPUESTA_AI,
+                    ),
+                )
+                texto = (respuesta.text or "").strip()
+                if not texto:
+                    raise TiendaError("Gemini no devolvio datos del producto en JSON", 502)
+                break
+            except TiendaError:
+                raise
+            except Exception as error:
+                if not fallo_pasajero(error) or intento == 2:
+                    raise TiendaError("Gemini no pudo analizar las fotos", 502) from error
+                time.sleep(0.4 * (intento + 1))
+    finally:
+        cliente.close()
     return interpretar_propuesta(texto, tipo_producto)
 
 
 def proponer_producto(fotos: list[tuple[str, bytes, str]], tipo_producto: str) -> dict:
     propuesta = analizar_fotos([(contenido, tipo_mime) for _, contenido, tipo_mime in fotos], tipo_producto)
-    propuesta["fotos"] = [
-        subir_foto(nombre, contenido, tipo_mime)
-        for nombre, contenido, tipo_mime in fotos
-    ]
+    if len(fotos) == 1:
+        nombre, contenido, tipo_mime = fotos[0]
+        propuesta["fotos"] = [subir_foto(nombre, contenido, tipo_mime)]
+        return propuesta
+    with ThreadPoolExecutor(max_workers=min(MAXIMO_FOTOS_AI, len(fotos))) as pool:
+        propuesta["fotos"] = list(
+            pool.map(
+                lambda foto: subir_foto(foto[0], foto[1], foto[2]),
+                fotos,
+            )
+        )
     return propuesta
 
 

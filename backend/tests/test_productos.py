@@ -301,12 +301,42 @@ def test_reintenta_si_gemini_falla_una_vez(monkeypatch):
         def close(self):
             return None
 
+    creados = {"n": 0}
+
+    class ClienteContado(Cliente):
+        def __init__(self, api_key):
+            creados["n"] += 1
+            super().__init__(api_key)
+
     monkeypatch.setenv("GEMINI_API_KEY", "AQ.prueba")
-    monkeypatch.setattr("google.genai.Client", Cliente)
+    monkeypatch.setattr("google.genai.Client", ClienteContado)
     monkeypatch.setattr("app.frmProductos.servicio.time.sleep", lambda segundos: None)
     propuesta = analizar_fotos([(b"abc", "image/webp")], "simple")
     assert llamadas["n"] == 2
+    assert creados["n"] == 1
     assert propuesta["nombre"] == "Pelota"
+
+
+def test_proponer_sube_fotos_en_paralelo(monkeypatch):
+    from app.frmProductos.servicio import proponer_producto
+
+    orden = []
+
+    def analizar(fotos, tipo_producto):
+        return {"tipo": tipo_producto, "nombre": "Gorra", "descripcion": "Ligera.", "atributos": []}
+
+    def subir(nombre, contenido, tipo):
+        orden.append(nombre)
+        return {"id": len(orden), "src": f"https://furbuddy.xyz/{nombre}"}
+
+    monkeypatch.setattr("app.frmProductos.servicio.analizar_fotos", analizar)
+    monkeypatch.setattr("app.frmProductos.servicio.subir_foto", subir)
+    propuesta = proponer_producto(
+        [("a.webp", b"1", "image/webp"), ("b.webp", b"2", "image/webp"), ("c.webp", b"3", "image/webp")],
+        "simple",
+    )
+    assert [foto["id"] for foto in propuesta["fotos"]] == [1, 2, 3]
+    assert set(orden) == {"a.webp", "b.webp", "c.webp"}
 
 
 def test_ai_rechaza_mas_de_seis_fotos(monkeypatch):
