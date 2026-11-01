@@ -186,7 +186,7 @@ def test_interpreta_la_propuesta_variable():
     from app.frmProductos.servicio import interpretar_propuesta
 
     propuesta = interpretar_propuesta(
-        '{"nombre":"Gorra deportiva","descripcion":"Comoda para salir.","atributos":[{"nombre":"Color","opciones":["Rojo","Azul","Rojo"]}]}',
+        '{"detectado":true,"aviso":"","nombre":"Gorra deportiva","descripcion":"Comoda para salir.","atributos":[{"nombre":"Color","opciones":["Rojo","Azul","Rojo"]}]}',
         "variable",
     )
     assert propuesta["nombre"] == "Gorra deportiva"
@@ -197,11 +197,42 @@ def test_producto_normal_no_guarda_caracteristicas():
     from app.frmProductos.servicio import interpretar_propuesta
 
     propuesta = interpretar_propuesta(
-        '{"nombre":"Pelota","descripcion":"Rebota.","atributos":[{"nombre":"Color","opciones":["Rojo"]}]}',
+        '{"detectado":true,"aviso":"","nombre":"Pelota","descripcion":"Rebota.","atributos":[{"nombre":"Color","opciones":["Rojo"]}]}',
         "simple",
     )
     assert propuesta["tipo"] == "simple"
     assert propuesta["atributos"] == []
+
+
+def test_aviso_si_no_detecta_la_imagen():
+    from app.frmProductos.servicio import TiendaError, interpretar_propuesta
+
+    try:
+        interpretar_propuesta(
+            '{"detectado":false,"aviso":"La foto esta negra y no se ve el producto","nombre":"","descripcion":"","atributos":[]}',
+            "simple",
+        )
+    except TiendaError as error:
+        assert error.codigo == 422
+        assert "No se pudo detectar la imagen" in error.mensaje
+        assert "negra" in error.mensaje
+    else:
+        raise AssertionError("Debia avisar que no detecto la imagen")
+
+
+def test_variable_sin_caracteristicas_avisa():
+    from app.frmProductos.servicio import TiendaError, interpretar_propuesta
+
+    try:
+        interpretar_propuesta(
+            '{"detectado":true,"aviso":"","nombre":"Cama","descripcion":"Suave.","atributos":[]}',
+            "variable",
+        )
+    except TiendaError as error:
+        assert error.codigo == 422
+        assert "No se pudo detectar la imagen" in error.mensaje
+    else:
+        raise AssertionError("Debia avisar que faltan caracteristicas")
 
 
 def test_ai_pide_el_tipo(monkeypatch):
@@ -253,7 +284,7 @@ def test_reintenta_si_gemini_falla_una_vez(monkeypatch):
     llamadas = {"n": 0}
 
     class Respuesta:
-        text = '{"nombre":"Pelota","descripcion":"Rebota suave.","atributos":[]}'
+        text = '{"detectado":true,"aviso":"","nombre":"Pelota","descripcion":"Rebota suave.","atributos":[]}'
 
     class Modelos:
         @staticmethod
@@ -270,12 +301,42 @@ def test_reintenta_si_gemini_falla_una_vez(monkeypatch):
         def close(self):
             return None
 
+    creados = {"n": 0}
+
+    class ClienteContado(Cliente):
+        def __init__(self, api_key):
+            creados["n"] += 1
+            super().__init__(api_key)
+
     monkeypatch.setenv("GEMINI_API_KEY", "AQ.prueba")
-    monkeypatch.setattr("google.genai.Client", Cliente)
+    monkeypatch.setattr("google.genai.Client", ClienteContado)
     monkeypatch.setattr("app.frmProductos.servicio.time.sleep", lambda segundos: None)
     propuesta = analizar_fotos([(b"abc", "image/webp")], "simple")
     assert llamadas["n"] == 2
+    assert creados["n"] == 1
     assert propuesta["nombre"] == "Pelota"
+
+
+def test_proponer_sube_fotos_en_paralelo(monkeypatch):
+    from app.frmProductos.servicio import proponer_producto
+
+    orden = []
+
+    def analizar(fotos, tipo_producto):
+        return {"tipo": tipo_producto, "nombre": "Gorra", "descripcion": "Ligera.", "atributos": []}
+
+    def subir(nombre, contenido, tipo):
+        orden.append(nombre)
+        return {"id": len(orden), "src": f"https://furbuddy.xyz/{nombre}"}
+
+    monkeypatch.setattr("app.frmProductos.servicio.analizar_fotos", analizar)
+    monkeypatch.setattr("app.frmProductos.servicio.subir_foto", subir)
+    propuesta = proponer_producto(
+        [("a.webp", b"1", "image/webp"), ("b.webp", b"2", "image/webp"), ("c.webp", b"3", "image/webp")],
+        "simple",
+    )
+    assert [foto["id"] for foto in propuesta["fotos"]] == [1, 2, 3]
+    assert set(orden) == {"a.webp", "b.webp", "c.webp"}
 
 
 def test_ai_rechaza_mas_de_seis_fotos(monkeypatch):

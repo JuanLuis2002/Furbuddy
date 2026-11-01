@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { crearCategoria, guardarProducto, listarCategorias, listarProductos, proponerProducto, subirFoto } from "./frmProductos.js"
+import { aligerarFoto, crearCategoria, guardarProducto, listarCategorias, listarProductos, proponerProducto, subirFoto } from "./frmProductos.js"
 
 beforeEach(() => {
   const memoria = new Map()
@@ -50,6 +50,12 @@ describe("frmProductos", () => {
         json: async () => ({ nombre: "Gorra", tipo: "variable" }),
       }
     })
+  })
+
+  it("deja pasar el gif sin comprimirlo", async () => {
+    const gif = new File(["gif"], "muestra.gif", { type: "image/gif" })
+    const mismo = await aligerarFoto(gif)
+    expect(mismo).toBe(gif)
   })
 
   it("crea una categoria y lista las existentes", async () => {

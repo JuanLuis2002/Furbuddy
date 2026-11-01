@@ -1,6 +1,7 @@
 import json
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 from app.configuracion import clave_gemini, claves_woocommerce, url_tienda
 from app.frmUsuarios.servicio import (
@@ -337,32 +338,57 @@ def eliminar_producto(producto_id: int, cliente=None) -> None:
     exigir(api.delete(f"products/{producto_id}", params={"force": True}), ok=(200, 204))
 
 
+def limpiar_json(texto: str) -> str:
+    texto = (texto or "").strip()
+    if texto.startswith("```"):
+        texto = texto.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+    inicio = texto.find("{")
+    fin = texto.rfind("}")
+    if inicio >= 0 and fin > inicio:
+        return texto[inicio : fin + 1]
+    return texto
+
+
+def aviso_sin_producto(aviso: str) -> str:
+    causa = (aviso or "").strip() or "No se ve un producto claro en la foto"
+    return f"No se pudo detectar la imagen: {causa}"
+
+
 def interpretar_propuesta(texto: str, tipo: str) -> dict:
     try:
-        datos = json.loads(texto)
+        datos = json.loads(limpiar_json(texto))
     except json.JSONDecodeError as error:
-        raise TiendaError("Gemini no devolvio datos del producto", 502) from error
+        raise TiendaError("Gemini no devolvio datos del producto en JSON", 502) from error
     if not isinstance(datos, dict):
-        raise TiendaError("Gemini no devolvio datos del producto", 502)
+        raise TiendaError("Gemini no devolvio datos del producto en JSON", 502)
     nombre = str(datos.get("nombre") or "").strip()[:120]
     descripcion = str(datos.get("descripcion") or "").strip()[:500]
-    if not nombre:
-        raise TiendaError("Gemini no reconocio el producto", 502)
+    aviso = str(datos.get("aviso") or "").strip()[:240]
+    detectado = datos.get("detectado")
+    if detectado is False or not nombre:
+        raise TiendaError(aviso_sin_producto(aviso), 422)
     atributos = []
     if tipo == "variable":
         for item in datos.get("atributos") or []:
             if not isinstance(item, dict):
                 continue
-            nombre_atributo = str(item.get("nombre") or "").strip()
+            nombre_atributo = str(item.get("nombre") or "").strip()[:40]
             opciones = []
             for opcion in item.get("opciones") or []:
-                texto_opcion = str(opcion).strip()
+                texto_opcion = str(opcion).strip()[:40]
                 if texto_opcion and texto_opcion not in opciones:
                     opciones.append(texto_opcion)
             if nombre_atributo and opciones:
                 atributos.append({"id": 0, "nombre": nombre_atributo, "opciones": opciones[:4]})
             if len(atributos) == 2:
                 break
+        if not atributos:
+            raise TiendaError(
+                aviso_sin_producto(
+                    aviso or "En la foto no se ven caracteristicas para un producto variable"
+                ),
+                422,
+            )
     return {
         "tipo": tipo,
         "nombre": nombre,
@@ -371,69 +397,120 @@ def interpretar_propuesta(texto: str, tipo: str) -> dict:
     }
 
 
+def instrucciones_gemini(tipo_producto: str) -> str:
+    if tipo_producto == "variable":
+        regla_tipo = (
+            "El tipo pedido es variable. En atributos pon como maximo 2 caracteristicas "
+            "visibles en las fotos (por ejemplo Color o Talla), cada una con hasta 4 opciones. "
+            "Solo opciones que se vean o se deduzcan de las fotos. Si no hay caracteristicas "
+            "claras, detectado debe ser false y aviso debe explicar por que."
+        )
+    else:
+        regla_tipo = (
+            "El tipo pedido es normal (simple). atributos debe ser siempre una lista vacia []."
+        )
+    return (
+        "Eres el asistente de la tienda Furbuddy, de accesorios y productos para mascotas. "
+        "Recibes una o varias fotos del mismo producto. Analiza las imagenes con cuidado. "
+        "Describe solo lo que se ve. No inventes un collar, una cama, un juguete ni otro "
+        "accesorio si no aparece. No inventes precio, existencia, categorias ni sku. "
+        "Responde SOLO un JSON valido con estas claves exactas:\n"
+        '- "detectado": true si las fotos muestran un producto usable para la tienda; '
+        "false si la foto esta negra, vacia, borrosa, cortada, es texto, una persona, "
+        "o no se reconoce un producto.\n"
+        '- "aviso": si detectado es false, explica la causa en espanol en una frase corta. '
+        'Si detectado es true, usa "".\n'
+        '- "nombre": titulo corto del producto visible, con color si se ve. Max 120 caracteres. '
+        'Vacio "" si detectado es false.\n'
+        '- "descripcion": dos oraciones sobre forma, material o uso visible, sin HTML. '
+        'Max 500 caracteres. Vacia "" si detectado es false.\n'
+        '- "atributos": lista de objetos {"nombre": string, "opciones": [string, ...]}.\n'
+        + regla_tipo
+    )
+
+
+ESQUEMA_PROPUESTA_AI = {
+    "type": "object",
+    "properties": {
+        "detectado": {"type": "boolean"},
+        "aviso": {"type": "string"},
+        "nombre": {"type": "string"},
+        "descripcion": {"type": "string"},
+        "atributos": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "nombre": {"type": "string"},
+                    "opciones": {"type": "array", "items": {"type": "string"}},
+                },
+                "required": ["nombre", "opciones"],
+            },
+        },
+    },
+    "required": ["detectado", "aviso", "nombre", "descripcion", "atributos"],
+}
+
+
 def analizar_fotos(fotos: list[tuple[bytes, str]], tipo_producto: str) -> dict:
     if not fotos:
         raise TiendaError("Agrega al menos una foto", 400)
     if len(fotos) > MAXIMO_FOTOS_AI:
         raise TiendaError("Puedes enviar hasta 6 fotos", 400)
+    if tipo_producto not in ("simple", "variable"):
+        raise TiendaError("Elige un producto normal o variable", 400)
     clave = clave_gemini()
     if not clave:
         raise GeminiNoConfigurado()
     from google import genai
     from google.genai import types
 
-    if tipo_producto == "variable":
-        pedido = (
-            "El usuario quiere un producto variable. Propone como maximo 2 caracteristicas "
-            "visibles en las fotos, por ejemplo color o talla, con hasta 4 opciones cada una."
-        )
-    else:
-        pedido = "El usuario quiere un producto normal. Devuelve atributos como una lista vacia."
-    instruccion = (
-        "Eres el asistente de la tienda Furbuddy, de accesorios para mascotas. "
-        "Mira todas las fotos: son del mismo producto. Describe solo lo que se ve. "
-        "Si la foto esta negra, borrosa o no muestra un producto, devuelve nombre vacio. "
-        "No inventes un collar, una cama ni otro accesorio si no aparece en la foto. "
-        "Responde solo JSON con las claves nombre, descripcion y atributos. "
-        "nombre es corto e incluye el color si se ve. "
-        "descripcion son dos oraciones sobre el objeto visible: forma, material o uso, sin HTML. "
-        "atributos es una lista de objetos con nombre y opciones. "
-        "No inventes precio ni existencia. "
-        + pedido
-    )
     partes = [
         types.Part.from_bytes(data=contenido, mime_type=tipo_mime)
         for contenido, tipo_mime in fotos
     ]
-    partes.append(instruccion)
+    partes.append(instrucciones_gemini(tipo_producto))
     texto = ""
-    for intento in range(3):
-        cliente = genai.Client(api_key=clave)
-        try:
-            respuesta = cliente.models.generate_content(
-                model=MODELO_GEMINI,
-                contents=partes,
-                config=types.GenerateContentConfig(response_mime_type="application/json"),
-            )
-            texto = (respuesta.text or "").strip()
-            break
-        except Exception as error:
-            if not fallo_pasajero(error) or intento == 2:
-                raise TiendaError("Gemini no pudo analizar las fotos", 502) from error
-            time.sleep(0.4 * (intento + 1))
-        finally:
-            cliente.close()
-    if texto.startswith("```"):
-        texto = texto.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+    cliente = genai.Client(api_key=clave)
+    try:
+        for intento in range(3):
+            try:
+                respuesta = cliente.models.generate_content(
+                    model=MODELO_GEMINI,
+                    contents=partes,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        response_schema=ESQUEMA_PROPUESTA_AI,
+                    ),
+                )
+                texto = (respuesta.text or "").strip()
+                if not texto:
+                    raise TiendaError("Gemini no devolvio datos del producto en JSON", 502)
+                break
+            except TiendaError:
+                raise
+            except Exception as error:
+                if not fallo_pasajero(error) or intento == 2:
+                    raise TiendaError("Gemini no pudo analizar las fotos", 502) from error
+                time.sleep(0.4 * (intento + 1))
+    finally:
+        cliente.close()
     return interpretar_propuesta(texto, tipo_producto)
 
 
 def proponer_producto(fotos: list[tuple[str, bytes, str]], tipo_producto: str) -> dict:
     propuesta = analizar_fotos([(contenido, tipo_mime) for _, contenido, tipo_mime in fotos], tipo_producto)
-    propuesta["fotos"] = [
-        subir_foto(nombre, contenido, tipo_mime)
-        for nombre, contenido, tipo_mime in fotos
-    ]
+    if len(fotos) == 1:
+        nombre, contenido, tipo_mime = fotos[0]
+        propuesta["fotos"] = [subir_foto(nombre, contenido, tipo_mime)]
+        return propuesta
+    with ThreadPoolExecutor(max_workers=min(MAXIMO_FOTOS_AI, len(fotos))) as pool:
+        propuesta["fotos"] = list(
+            pool.map(
+                lambda foto: subir_foto(foto[0], foto[1], foto[2]),
+                fotos,
+            )
+        )
     return propuesta
 
 
