@@ -308,12 +308,50 @@ def test_reintenta_si_gemini_falla_una_vez(monkeypatch):
             creados["n"] += 1
             super().__init__(api_key)
 
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
     monkeypatch.setenv("GEMINI_API_KEY", "AQ.prueba")
     monkeypatch.setattr("google.genai.Client", ClienteContado)
     monkeypatch.setattr("app.frmProductos.servicio.time.sleep", lambda segundos: None)
     propuesta = analizar_fotos([(b"abc", "image/webp")], "simple")
     assert llamadas["n"] == 2
     assert creados["n"] == 1
+    assert propuesta["nombre"] == "Pelota"
+
+
+def test_usa_groq_antes_que_gemini(monkeypatch):
+    from app.frmProductos.servicio import analizar_fotos
+
+    monkeypatch.setenv("GROQ_API_KEY", "gsk_prueba")
+    monkeypatch.setenv("GEMINI_API_KEY", "AQ.prueba")
+
+    def groq(fotos, tipo_producto):
+        assert len(fotos) == 1
+        return '{"detectado":true,"aviso":"","nombre":"Collar","descripcion":"De tela.","atributos":[]}'
+
+    def gemini(fotos, tipo_producto):
+        raise AssertionError("No debia llamar a Gemini")
+
+    monkeypatch.setattr("app.frmProductos.servicio.texto_groq", groq)
+    monkeypatch.setattr("app.frmProductos.servicio.texto_gemini", gemini)
+    propuesta = analizar_fotos([(b"abc", "image/webp")], "simple")
+    assert propuesta["nombre"] == "Collar"
+
+
+def test_si_groq_falla_usa_gemini(monkeypatch):
+    from app.frmProductos.servicio import analizar_fotos
+
+    monkeypatch.setenv("GROQ_API_KEY", "gsk_prueba")
+    monkeypatch.setenv("GEMINI_API_KEY", "AQ.prueba")
+
+    def groq(fotos, tipo_producto):
+        raise RuntimeError("rate limit")
+
+    def gemini(fotos, tipo_producto):
+        return '{"detectado":true,"aviso":"","nombre":"Pelota","descripcion":"Rebota.","atributos":[]}'
+
+    monkeypatch.setattr("app.frmProductos.servicio.texto_groq", groq)
+    monkeypatch.setattr("app.frmProductos.servicio.texto_gemini", gemini)
+    propuesta = analizar_fotos([(b"abc", "image/webp")], "simple")
     assert propuesta["nombre"] == "Pelota"
 
 

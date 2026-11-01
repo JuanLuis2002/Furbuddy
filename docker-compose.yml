@@ -12,6 +12,7 @@ services:
       WOOCOMMERCE_SECRET: ${WOOCOMMERCE_SECRET:-}
       FURBUDDY_SESION_SECRETO: ${FURBUDDY_SESION_SECRETO:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
     networks:
       - app
 

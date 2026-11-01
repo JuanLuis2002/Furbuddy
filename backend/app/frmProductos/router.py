@@ -45,7 +45,7 @@ def responder(accion):
     try:
         return accion()
     except GeminiNoConfigurado as error:
-        raise HTTPException(status_code=503, detail="Falta configurar Gemini") from error
+        raise HTTPException(status_code=503, detail="Falta configurar Groq o Gemini") from error
     except TiendaNoConfigurada as error:
         raise HTTPException(status_code=503, detail="Falta configurar WooCommerce") from error
     except TiendaError as error:
