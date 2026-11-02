@@ -66,15 +66,10 @@
 		var thread = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 		thread.setAttribute("class", "furbuddy-thread");
 		thread.setAttribute("aria-hidden", "true");
+		// Igual que Vue en coordenadas; en WP el stage no es cuadrado y sin esto el lazo y el punto se desfasaban.
 		thread.setAttribute("preserveAspectRatio", "none");
 		var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-		var tipDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-		tipDot.setAttribute("r", "9");
-		tipDot.setAttribute("fill", "#ff9aa8");
-		tipDot.setAttribute("stroke", "rgba(255,235,238,0.9)");
-		tipDot.setAttribute("stroke-width", "2");
 		thread.appendChild(path);
-		thread.appendChild(tipDot);
 
 		var ball = document.createElement("img");
 		ball.className = "furbuddy-hero-ball";
@@ -86,8 +81,6 @@
 		tip.type = "button";
 		tip.className = "furbuddy-thread-tip";
 		tip.setAttribute("aria-label", "Jala el lazo de la pelota");
-		// El punto visible vive en el SVG (misma escala que el lazo); este boton solo recibe el arrastre.
-		tip.style.opacity = "0";
 
 		var sound = document.createElement("button");
 		sound.type = "button";
@@ -293,14 +286,6 @@
 			};
 		}
 
-		function tipHome() {
-			var attach = ballAttachment();
-			return {
-				x: attach.x - 43,
-				y: attach.y - 27
-			};
-		}
-
 		function pointerOnStage(event) {
 			var box = stage.getBoundingClientRect();
 			var w = Math.max(1, stage.clientWidth);
@@ -325,18 +310,9 @@
 			}
 			thread.setAttribute("viewBox", "0 0 " + width + " " + height);
 			var attach = ballAttachment();
-			var dist = Math.hypot(tipX - attach.x, tipY - attach.y);
-			var d;
-			if (dist < 36) {
-				d = "M " + attach.x.toFixed(1) + " " + attach.y.toFixed(1) + " L " + tipX.toFixed(1) + " " + tipY.toFixed(1);
-			} else {
-				var cx = (attach.x + tipX) / 2;
-				var cy = (attach.y + tipY) / 2 + Math.min(18, dist * 0.05);
-				d = "M " + attach.x.toFixed(1) + " " + attach.y.toFixed(1) + " Q " + cx.toFixed(1) + " " + cy.toFixed(1) + " " + tipX.toFixed(1) + " " + tipY.toFixed(1);
-			}
-			path.setAttribute("d", d);
-			tipDot.setAttribute("cx", tipX.toFixed(1));
-			tipDot.setAttribute("cy", tipY.toFixed(1));
+			var cx = (attach.x + tipX) / 2;
+			var cy = (attach.y + tipY) / 2 + Math.min(28, 7 + Math.abs(tipX - attach.x) * 0.06);
+			path.setAttribute("d", "M " + attach.x.toFixed(1) + " " + attach.y.toFixed(1) + " Q " + cx.toFixed(1) + " " + cy.toFixed(1) + " " + tipX.toFixed(1) + " " + tipY.toFixed(1));
 			tip.style.left = tipX + "px";
 			tip.style.top = tipY + "px";
 		}
@@ -353,9 +329,9 @@
 			toy.angle = 0;
 			toy.angleV = 0;
 			toy.ready = true;
-			var home = tipHome();
-			tipX = home.x;
-			tipY = home.y;
+			var attach = ballAttachment();
+			tipX = attach.x - 43;
+			tipY = attach.y - 27;
 			tipVx = 0;
 			tipVy = 0;
 			positionBall();
@@ -395,25 +371,13 @@
 				positionBall();
 			}
 			if (!draggingTip) {
-				var home = tipHome();
-				// Pegado al extremo del lazo; sin retraso al mover la pelota.
-				if (draggingBall || reduced) {
-					tipX = home.x;
-					tipY = home.y;
-					tipVx = 0;
-					tipVy = 0;
-				} else {
-					tipVx = (tipVx + (home.x - tipX) * 160 * dt) * Math.exp(-26 * dt);
-					tipVy = (tipVy + (home.y - tipY) * 160 * dt) * Math.exp(-26 * dt);
-					tipX += tipVx * dt;
-					tipY += tipVy * dt;
-					if (Math.hypot(home.x - tipX, home.y - tipY) < 1.2 && Math.hypot(tipVx, tipVy) < 28) {
-						tipX = home.x;
-						tipY = home.y;
-						tipVx = 0;
-						tipVy = 0;
-					}
-				}
+				var attach = ballAttachment();
+				var targetX = attach.x - 43;
+				var targetY = attach.y - 27;
+				tipVx = (tipVx + (targetX - tipX) * 75 * dt) * Math.exp(-12 * dt);
+				tipVy = (tipVy + (targetY - tipY) * 75 * dt) * Math.exp(-12 * dt);
+				tipX += tipVx * dt;
+				tipY += tipVy * dt;
 			}
 			placeThread();
 		}
@@ -492,13 +456,6 @@
 			toy.y = y;
 			toy.lastAt = now;
 			positionBall();
-			if (!draggingTip) {
-				var home = tipHome();
-				tipX = home.x;
-				tipY = home.y;
-				tipVx = 0;
-				tipVy = 0;
-			}
 			placeThread();
 			event.stopPropagation();
 		});
