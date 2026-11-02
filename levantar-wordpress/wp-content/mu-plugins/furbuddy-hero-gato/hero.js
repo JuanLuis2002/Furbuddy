@@ -66,6 +66,7 @@
 		var thread = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 		thread.setAttribute("class", "furbuddy-thread");
 		thread.setAttribute("aria-hidden", "true");
+		thread.setAttribute("preserveAspectRatio", "none");
 		var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
 		thread.appendChild(path);
 
@@ -284,6 +285,14 @@
 			};
 		}
 
+		function tipHome() {
+			var attach = ballAttachment();
+			return {
+				x: attach.x - 43,
+				y: attach.y - 27
+			};
+		}
+
 		function positionBall() {
 			ball.style.left = toy.x + "px";
 			ball.style.top = toy.y + "px";
@@ -298,9 +307,16 @@
 			}
 			thread.setAttribute("viewBox", "0 0 " + width + " " + height);
 			var attach = ballAttachment();
-			var cx = (attach.x + tipX) / 2;
-			var cy = (attach.y + tipY) / 2 + Math.min(28, 7 + Math.abs(tipX - attach.x) * 0.06);
-			path.setAttribute("d", "M " + attach.x.toFixed(1) + " " + attach.y.toFixed(1) + " Q " + cx.toFixed(1) + " " + cy.toFixed(1) + " " + tipX.toFixed(1) + " " + tipY.toFixed(1));
+			var dist = Math.hypot(tipX - attach.x, tipY - attach.y);
+			var d;
+			if (dist < 36) {
+				d = "M " + attach.x.toFixed(1) + " " + attach.y.toFixed(1) + " L " + tipX.toFixed(1) + " " + tipY.toFixed(1);
+			} else {
+				var cx = (attach.x + tipX) / 2;
+				var cy = (attach.y + tipY) / 2 + Math.min(18, dist * 0.05);
+				d = "M " + attach.x.toFixed(1) + " " + attach.y.toFixed(1) + " Q " + cx.toFixed(1) + " " + cy.toFixed(1) + " " + tipX.toFixed(1) + " " + tipY.toFixed(1);
+			}
+			path.setAttribute("d", d);
 			tip.style.left = tipX + "px";
 			tip.style.top = tipY + "px";
 		}
@@ -317,9 +333,9 @@
 			toy.angle = 0;
 			toy.angleV = 0;
 			toy.ready = true;
-			var attach = ballAttachment();
-			tipX = attach.x - 43;
-			tipY = attach.y - 27;
+			var home = tipHome();
+			tipX = home.x;
+			tipY = home.y;
 			tipVx = 0;
 			tipVy = 0;
 			positionBall();
@@ -359,13 +375,25 @@
 				positionBall();
 			}
 			if (!draggingTip) {
-				var attach = ballAttachment();
-				var targetX = attach.x - 43;
-				var targetY = attach.y - 27;
-				tipVx = (tipVx + (targetX - tipX) * 75 * dt) * Math.exp(-12 * dt);
-				tipVy = (tipVy + (targetY - tipY) * 75 * dt) * Math.exp(-12 * dt);
-				tipX += tipVx * dt;
-				tipY += tipVy * dt;
+				var home = tipHome();
+				// Pegado al extremo del lazo; sin retraso al mover la pelota.
+				if (draggingBall || reduced) {
+					tipX = home.x;
+					tipY = home.y;
+					tipVx = 0;
+					tipVy = 0;
+				} else {
+					tipVx = (tipVx + (home.x - tipX) * 160 * dt) * Math.exp(-26 * dt);
+					tipVy = (tipVy + (home.y - tipY) * 160 * dt) * Math.exp(-26 * dt);
+					tipX += tipVx * dt;
+					tipY += tipVy * dt;
+					if (Math.hypot(home.x - tipX, home.y - tipY) < 1.2 && Math.hypot(tipVx, tipVy) < 28) {
+						tipX = home.x;
+						tipY = home.y;
+						tipVx = 0;
+						tipVy = 0;
+					}
+				}
 			}
 			placeThread();
 		}
@@ -444,6 +472,13 @@
 			toy.y = y;
 			toy.lastAt = now;
 			positionBall();
+			if (!draggingTip) {
+				var home = tipHome();
+				tipX = home.x;
+				tipY = home.y;
+				tipVx = 0;
+				tipVy = 0;
+			}
 			placeThread();
 			event.stopPropagation();
 		});
