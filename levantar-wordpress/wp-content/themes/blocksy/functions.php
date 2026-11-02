@@ -53,6 +53,3 @@ add_filter( 'gettext', function( $translated_text, $text, $domain ) {
 	}
 	return $translated_text;
 }, 20, 3 );
-
-// 5. Modulo Navideno Completo (Logo, Favicon, Comfortaa, Banner, Iconos, Productos y Musica)
-require_once get_template_directory() . '/furbuddy-navidad.php';
