@@ -611,7 +611,46 @@ add_action( 'wp_footer', function() {
 add_action( 'wp_head', function() {
 	?>
 	<style id="furbuddy-faq-accordions">
-		/* 1. Contenedor principal: Estilo Acento Furbuddy */
+		/* =========================================================
+		   1. TITULO PREGUNTAS FRECUENTES ESTILO PILDORA (PORTADA)
+		   ========================================================= */
+		.stk-93afa3a,
+		[data-block-id="93afa3a"] {
+			text-align: center !important;
+			margin-bottom: 30px !important;
+		}
+
+		.stk-93afa3a .stk-block-heading__text,
+		[data-block-id="93afa3a"] .stk-block-heading__text {
+			display: inline-block !important;
+			color: #ffffff !important;
+			font-size: 1.15rem !important;
+			font-weight: 700 !important;
+			letter-spacing: 2px !important;
+			text-transform: uppercase !important;
+			background: rgba(0, 0, 0, 0.22) !important;
+			border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
+			border-radius: 50px !important;
+			padding: 10px 32px !important;
+			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 0 12px rgba(255, 255, 255, 0.06) !important;
+			text-shadow: 0 0 12px rgba(100, 181, 246, 0.45), 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+			backdrop-filter: blur(8px) !important;
+			-webkit-backdrop-filter: blur(8px) !important;
+			transition: all 0.3s ease !important;
+		}
+
+		.stk-93afa3a .stk-block-heading__text:hover,
+		[data-block-id="93afa3a"] .stk-block-heading__text:hover {
+			border-color: #ffd700 !important;
+			color: #ffd700 !important;
+			box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3) !important;
+			transform: translateY(-2px) !important;
+		}
+
+		/* =========================================================
+		   2. TARJETA UNICA Y ELIMINACION DE TARJETA INTERNA ANIDADA
+		   ========================================================= */
+		/* Contenedor exterior: La UNICA tarjeta visible */
 		.stk-e839a25 .stk-block-accordion,
 		.stk-block-accordion {
 			background: #ffffff !important;
@@ -624,41 +663,56 @@ add_action( 'wp_head', function() {
 			border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
 			transition: transform 0.25s ease, box-shadow 0.25s ease, border-left-color 0.25s ease !important;
 			overflow: hidden !important;
+			padding: 0 !important;
 		}
 
-		/* Efecto hover al pasar el cursor */
+		/* Hover en la tarjeta */
 		.stk-e839a25 .stk-block-accordion:hover,
 		.stk-block-accordion:hover {
 			transform: translateY(-3px) !important;
-			box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14) !important;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14) !important;
 			border-left-color: #0b7336 !important;
 		}
 
-		/* Estado abierto */
+		/* Tarjeta abierta */
 		.stk-block-accordion[open] {
 			border-left-color: #0E8A42 !important;
 			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
 		}
 
-		/* 2. Cabecera (Pregunta): Altura uniforme y alineacion vertical */
-		.stk-e839a25 .stk-block-accordion__heading,
-		.stk-block-accordion > summary {
+		/* ELIMINAR LA SEGUNDA TARJETA INTERNA: reset completo de contenedores hijos */
+		.stk-block-accordion .stk-column-wrapper,
+		.stk-block-accordion .stk-container,
+		.stk-block-accordion .stk-block-column,
+		.stk-block-accordion .stk-block-column__content,
+		.stk-block-accordion .stk-hover-parent,
+		.stk-block-accordion .stk-block-accordion__heading {
+			background: transparent !important;
+			border: none !important;
+			box-shadow: none !important;
+			border-radius: 0 !important;
+			padding: 0 !important;
+			margin: 0 !important;
+		}
+
+		/* 3. Cabecera (Summary): Altura uniforme y alineacion vertical limpia */
+		.stk-block-accordion > summary,
+		.stk-e839a25 .stk-block-accordion > summary {
 			min-height: 68px !important;
 			display: flex !important;
 			align-items: center !important;
-			padding: 12px 20px !important;
+			justify-content: space-between !important;
+			padding: 14px 20px !important;
 			cursor: pointer !important;
 			background: transparent !important;
 			list-style: none !important;
+			border: none !important;
+			box-shadow: none !important;
+			outline: none !important;
 		}
 
 		.stk-block-accordion > summary::-webkit-details-marker {
 			display: none !important;
-		}
-
-		.stk-block-accordion .stk-column-wrapper {
-			width: 100% !important;
-			background: transparent !important;
 		}
 
 		.stk-block-accordion .stk-block-icon-label .stk-row {
@@ -675,9 +729,10 @@ add_action( 'wp_head', function() {
 			font-weight: 700 !important;
 			line-height: 1.35 !important;
 			color: #14171A !important;
+			margin: 0 !important;
 		}
 
-		/* 3. Icono / Flecha: Rotacion suave SIN cambio de color */
+		/* 4. Icono / Flecha: Capsula circular con rotacion fluida y color neutro permanente */
 		.stk-block-accordion .stk-block-icon {
 			width: 32px !important;
 			height: 32px !important;
@@ -692,7 +747,7 @@ add_action( 'wp_head', function() {
 		}
 
 		.stk-block-accordion[open] .stk-block-icon {
-			background: #f0f4f6 !important; /* Mantiene su color neutro */
+			background: #f0f4f6 !important;
 			transform: rotate(180deg) !important;
 		}
 
@@ -700,16 +755,17 @@ add_action( 'wp_head', function() {
 		.stk-block-accordion[open] .stk-block-icon svg {
 			width: 12px !important;
 			height: 12px !important;
-			fill: #365b6c !important; /* Color consistente permanente */
+			fill: #365b6c !important;
 		}
 
-		/* 4. Cuerpo de la respuesta al desplegar */
+		/* 5. Cuerpo de la respuesta al desplegar */
 		.stk-block-accordion .stk-block-accordion__content {
-			padding: 8px 22px 18px 22px !important;
+			padding: 10px 22px 20px 22px !important;
 			color: #4a5568 !important;
 			font-size: 0.92rem !important;
 			line-height: 1.55 !important;
 			border-top: 1px solid #f0f0f0 !important;
+			background: #ffffff !important;
 		}</style>
 	<?php
 }, 999 );
