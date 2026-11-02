@@ -206,8 +206,7 @@ add_action( 'wp_head', function() {
 		.stk-dcb23ef-container,
 		.stk-7154f94-container,
 		.stk-4652df5-container,
-		.stk-cf8053e-container,
-		.wp-block-stackable-column.stk-block-column .stk-hover-parent {
+		.stk-cf8053e-container {
 			background: #ffffff !important;
 			background-color: #ffffff !important;
 			border-radius: 20px !important;
@@ -222,8 +221,7 @@ add_action( 'wp_head', function() {
 		.stk-dcb23ef-container:hover,
 		.stk-7154f94-container:hover,
 		.stk-4652df5-container:hover,
-		.stk-cf8053e-container:hover,
-		.wp-block-stackable-column.stk-block-column .stk-hover-parent:hover {
+		.stk-cf8053e-container:hover {
 			background: #ffffff !important;
 			background-color: #ffffff !important;
 			border-color: #FFB800 !important;
@@ -243,9 +241,11 @@ add_action( 'wp_head', function() {
 			background-color: transparent !important;
 		}
 
-		/* Sin envoltorios circulares que deformen o reduzcan los iconos */
-		.stk-block-column .stk--svg-wrapper,
-		.stk-hover-parent .stk--svg-wrapper {
+		/* Sin envoltorios circulares que deformen o reduzcan los iconos de categorias */
+		.stk-dcb23ef .stk--svg-wrapper,
+		.stk-7154f94 .stk--svg-wrapper,
+		.stk-4652df5 .stk--svg-wrapper,
+		.stk-cf8053e .stk--svg-wrapper {
 			width: auto !important;
 			height: auto !important;
 			margin: 0 auto 12px auto !important;
@@ -258,26 +258,24 @@ add_action( 'wp_head', function() {
 			box-shadow: none !important;
 		}
 
-		.stk-block-column:hover .stk--svg-wrapper,
-		.stk-hover-parent:hover .stk--svg-wrapper {
+		.stk-dcb23ef:hover .stk--svg-wrapper,
+		.stk-7154f94:hover .stk--svg-wrapper,
+		.stk-4652df5:hover .stk--svg-wrapper,
+		.stk-cf8053e:hover .stk--svg-wrapper {
 			background: transparent !important;
 			border: none !important;
 			box-shadow: none !important;
 		}
 
-		/* Asegurar que NINGUN icono se vuelva blanco o invisible en reposo ni en hover */
-		.stk-block-column svg,
-		.stk-block-column svg path,
-		.stk-block-icon svg,
-		.stk-block-icon svg path,
-		.wp-block-stackable-icon svg,
-		.wp-block-stackable-icon svg path,
-		:where(.stk-hover-parent) svg,
-		:where(.stk-hover-parent) svg path,
-		:where(.stk-hover-parent:hover) svg,
-		:where(.stk-hover-parent:hover) svg path,
-		:where(.stk-hover-parent.stk--is-hovered) svg,
-		:where(.stk-hover-parent.stk--is-hovered) svg path {
+		/* Asegurar que los iconos de categorias sean rojos y dorados en hover */
+		.stk-dcb23ef svg,
+		.stk-dcb23ef svg path,
+		.stk-7154f94 svg,
+		.stk-7154f94 svg path,
+		.stk-4652df5 svg,
+		.stk-4652df5 svg path,
+		.stk-cf8053e svg,
+		.stk-cf8053e svg path {
 			fill: #E50914 !important;
 			width: 52px !important;
 			height: 52px !important;
@@ -286,16 +284,23 @@ add_action( 'wp_head', function() {
 			transition: all 0.3s ease !important;
 		}
 
-		.stk-block-column:hover svg,
-		.stk-block-column:hover svg path,
-		.stk-hover-parent:hover svg,
-		.stk-hover-parent:hover svg path {
+		.stk-dcb23ef:hover svg,
+		.stk-dcb23ef:hover svg path,
+		.stk-7154f94:hover svg,
+		.stk-7154f94:hover svg path,
+		.stk-4652df5:hover svg,
+		.stk-4652df5:hover svg path,
+		.stk-cf8053e:hover svg,
+		.stk-cf8053e:hover svg path {
 			fill: #FFB800 !important;
 			transform: scale(1.08) !important;
 		}
 
 		/* Textos de Categorias (Juguetes, Ropa, Camas, Portadoras) */
-		.stk-block-column .stk-block-heading__text {
+		.stk-dcb23ef .stk-block-heading__text,
+		.stk-7154f94 .stk-block-heading__text,
+		.stk-4652df5 .stk-block-heading__text,
+		.stk-cf8053e .stk-block-heading__text {
 			color: #1e293b !important;
 			font-size: 1.15rem !important;
 			font-weight: 700 !important;
@@ -303,8 +308,10 @@ add_action( 'wp_head', function() {
 			transition: color 0.3s ease !important;
 		}
 
-		.stk-block-column:hover .stk-block-heading__text,
-		.stk-hover-parent:hover .stk-block-heading__text {
+		.stk-dcb23ef:hover .stk-block-heading__text,
+		.stk-7154f94:hover .stk-block-heading__text,
+		.stk-4652df5:hover .stk-block-heading__text,
+		.stk-cf8053e:hover .stk-block-heading__text {
 			color: #FFB800 !important;
 		}
 
@@ -612,19 +619,19 @@ add_action( 'wp_head', function() {
 	?>
 	<style id="furbuddy-faq-accordions">
 		/* =========================================================
-		   1. TITULO PREGUNTAS FRECUENTES ESTILO PILDORA (PORTADA)
+		   1. TITULO PREGUNTAS FRECUENTES: PILDORA MODERNA (PORTADA)
 		   ========================================================= */
 		.stk-93afa3a,
 		[data-block-id="93afa3a"] {
 			text-align: center !important;
-			margin-bottom: 30px !important;
+			margin-bottom: 32px !important;
 		}
 
 		.stk-93afa3a .stk-block-heading__text,
 		[data-block-id="93afa3a"] .stk-block-heading__text {
 			display: inline-block !important;
 			color: #ffffff !important;
-			font-size: 1.15rem !important;
+			font-size: 1.1rem !important;
 			font-weight: 700 !important;
 			letter-spacing: 2px !important;
 			text-transform: uppercase !important;
@@ -648,93 +655,130 @@ add_action( 'wp_head', function() {
 		}
 
 		/* =========================================================
-		   2. TARJETA UNICA (ELIMINAR DEFINITIVAMENTE TARJETA INTERNA)
+		   2. TARJETA UNICA ACENTO FURBUDDY (SIN TARJETA INTERNA)
 		   ========================================================= */
-		/* Contenedor exterior: La UNICA tarjeta visible */
 		.stk-e839a25 .stk-block-accordion,
 		.stk-block-accordion {
 			background: #ffffff !important;
+			background-color: #ffffff !important;
 			border-radius: 14px !important;
 			margin-bottom: 14px !important;
 			box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+			border: none !important;
 			border-left: 5px solid #0E8A42 !important;
-			border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
-			border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-			border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
 			transition: transform 0.25s ease, box-shadow 0.25s ease, border-left-color 0.25s ease !important;
 			overflow: hidden !important;
 			padding: 0 !important;
 		}
 
-		/* Hover en la tarjeta */
 		.stk-e839a25 .stk-block-accordion:hover,
 		.stk-block-accordion:hover {
-			transform: translateY(-3px) !important;
-			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14) !important;
+			transform: translateY(-2px) !important;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
 			border-left-color: #0b7336 !important;
 		}
 
-		/* Tarjeta abierta */
 		.stk-block-accordion[open] {
 			border-left-color: #0E8A42 !important;
 			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
 		}
 
-		/* ANULAR COMPLETAMENTE CUALQUIER BORDE O FONDO INTERNO DE STACKABLE */
+		/* ELIMINAR CUALQUIER RECUADRO O BORDE ANIDADO INTERNO */
 		.stk-block-accordion summary,
 		.stk-block-accordion summary *,
 		.stk-block-accordion summary *:before,
 		.stk-block-accordion summary *:after {
+			border: none !important;
 			border-color: transparent !important;
-			border-width: 0 !important;
-			border-style: none !important;
 			box-shadow: none !important;
 			outline: none !important;
-			background-color: transparent !important;
+			border-radius: 0 !important;
 		}
 
-		/* 3. Cabecera (Summary): Altura uniforme y alineacion vertical limpia */
+		.stk-block-accordion summary .stk-column-wrapper,
+		.stk-block-accordion summary .stk-container,
+		.stk-block-accordion summary .stk-hover-parent,
+		.stk-block-accordion summary .stk-block-content,
+		.stk-block-accordion summary .stk-block-icon-label {
+			background: transparent !important;
+			background-color: transparent !important;
+			border: none !important;
+			box-shadow: none !important;
+			border-radius: 0 !important;
+			padding: 0 !important;
+			margin: 0 !important;
+			transform: none !important;
+			text-align: left !important;
+		}
+
+		.stk-block-accordion summary .stk-hover-parent:hover,
+		.stk-block-accordion summary:hover .stk-hover-parent {
+			background: transparent !important;
+			border: none !important;
+			box-shadow: none !important;
+			transform: none !important;
+		}
+
+		/* =========================================================
+		   3. CABECERA (SUMMARY): ALINEACION VERTICAL PERFECTA
+		   ========================================================= */
 		.stk-block-accordion > summary,
 		.stk-e839a25 .stk-block-accordion > summary {
-			min-height: 68px !important;
 			display: flex !important;
 			align-items: center !important;
 			justify-content: space-between !important;
-			padding: 14px 22px !important;
+			padding: 16px 20px !important;
 			cursor: pointer !important;
 			background: transparent !important;
 			list-style: none !important;
 			border: none !important;
 			outline: none !important;
+			box-sizing: border-box !important;
+			width: 100% !important;
+			min-height: 64px !important;
 		}
 
 		.stk-block-accordion > summary::-webkit-details-marker {
 			display: none !important;
 		}
 
-		.stk-block-accordion .stk-row {
+		.stk-block-accordion summary .stk-block-content,
+		.stk-block-accordion summary .stk-block-icon-label,
+		.stk-block-accordion summary .stk-row {
 			display: flex !important;
 			align-items: center !important;
 			justify-content: space-between !important;
 			width: 100% !important;
+			margin: 0 !important;
+			padding: 0 !important;
 		}
 
-		/* Tipografia de la pregunta */
-		.stk-block-accordion .stk-block-heading__text,
-		.stk-block-accordion .stk-highlight,
-		.stk-block-accordion h3 {
+		/* Texto de la pregunta: Perfectamente centrado verticalmente */
+		.stk-block-accordion summary .stk-block-heading {
+			margin: 0 !important;
+			padding: 0 !important;
+			flex: 1 1 auto !important;
+			display: flex !important;
+			align-items: center !important;
+			text-align: left !important;
+		}
+
+		.stk-block-accordion summary .stk-block-heading__text,
+		.stk-block-accordion summary h3 {
 			font-size: 0.98rem !important;
 			font-weight: 700 !important;
-			line-height: 1.35 !important;
+			line-height: 1.4 !important;
 			color: #14171A !important;
 			margin: 0 !important;
+			padding: 0 !important;
+			text-align: left !important;
 		}
 
 		/* =========================================================
-		   4. FLECHA / CHEVRON: CIRCULO PERFECTO (NUNCA OVALO)
+		   4. FLECHA / CHEVRON: CIRCULO PERFECTO Y COLOR NEUTRO
 		   ========================================================= */
-		.stk-block-accordion .stk-block-icon,
-		.stk-e839a25 .stk-block-icon {
+		.stk-block-accordion summary .stk-block-icon,
+		.stk-e839a25 summary .stk-block-icon {
 			width: 34px !important;
 			height: 34px !important;
 			min-width: 34px !important;
@@ -745,23 +789,25 @@ add_action( 'wp_head', function() {
 			aspect-ratio: 1 / 1 !important;
 			border-radius: 50% !important;
 			background: #f0f4f6 !important;
+			border: none !important;
+			box-shadow: none !important;
 			align-self: center !important;
 			flex: 0 0 34px !important;
 			display: flex !important;
 			align-items: center !important;
 			justify-content: center !important;
-			margin: 0 0 0 14px !important;
+			margin: 0 0 0 16px !important;
 			padding: 0 !important;
 			transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 		}
 
-		.stk-block-accordion[open] .stk-block-icon {
+		.stk-block-accordion[open] summary .stk-block-icon {
 			background: #f0f4f6 !important;
 			transform: rotate(180deg) !important;
 		}
 
-		.stk-block-accordion .stk-block-icon .stk--svg-wrapper,
-		.stk-block-accordion .stk-block-icon .stk--inner-svg {
+		.stk-block-accordion summary .stk-block-icon .stk--svg-wrapper,
+		.stk-block-accordion summary .stk-block-icon .stk--inner-svg {
 			display: flex !important;
 			align-items: center !important;
 			justify-content: center !important;
@@ -769,10 +815,18 @@ add_action( 'wp_head', function() {
 			height: 100% !important;
 			margin: 0 !important;
 			padding: 0 !important;
+			background: transparent !important;
+			border: none !important;
+			box-shadow: none !important;
+			border-radius: 0 !important;
 		}
 
-		.stk-block-accordion .stk-block-icon svg,
-		.stk-block-accordion[open] .stk-block-icon svg {
+		.stk-block-accordion summary .stk-block-icon svg,
+		.stk-block-accordion summary .stk-block-icon svg path,
+		.stk-block-accordion[open] summary .stk-block-icon svg,
+		.stk-block-accordion[open] summary .stk-block-icon svg path,
+		.stk-block-accordion:hover summary .stk-block-icon svg,
+		.stk-block-accordion:hover summary .stk-block-icon svg path {
 			width: 12px !important;
 			height: 12px !important;
 			min-width: 12px !important;
@@ -783,18 +837,31 @@ add_action( 'wp_head', function() {
 			color: #365b6c !important;
 			display: block !important;
 			margin: auto !important;
+			transform: none !important;
 			transition: none !important;
 		}
 
-		/* 5. Cuerpo de la respuesta al desplegar */
-		.stk-block-accordion .stk-block-accordion__content {
-			padding: 10px 22px 20px 22px !important;
-			color: #4a5568 !important;
-			font-size: 0.92rem !important;
-			line-height: 1.55 !important;
-			border-top: 1px solid #f0f0f0 !important;
-			background: #ffffff !important;
-		}</style>
+		/* =========================================================
+		   5. CONTENIDO DE LA RESPUESTA
+		   ========================================================= */
+		.stk-block-accordion .stk-block-accordion__content,
+		.stk-block-accordion > :not(summary) {
+			padding: 0 20px 18px 20px !important;
+			margin: 0 !important;
+			color: #4b5563 !important;
+			font-size: 0.94rem !important;
+			line-height: 1.6 !important;
+			background: transparent !important;
+			border: none !important;
+		}
+
+		.stk-block-accordion .stk-block-accordion__content p,
+		.stk-block-accordion > :not(summary) p {
+			color: #4b5563 !important;
+			font-size: 0.94rem !important;
+			line-height: 1.6 !important;
+			margin: 0 !important;
+		}
+	</style>
 	<?php
 }, 999 );
-
