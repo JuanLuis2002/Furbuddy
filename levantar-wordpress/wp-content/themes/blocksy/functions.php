@@ -72,7 +72,16 @@ add_action( 'wp_head', function() {
 			font-family: 'Comfortaa', cursive, sans-serif !important;
 		}
 
-		/* 2. Banner Verde Pino Festivo Animado con destellos y estrellas */
+		/* 2. Paleta Global y Hero Verde Pino Navideno */
+		:root {
+			--theme-palette-color-4: #0d3820 !important;
+			--theme-button-background-color: #E50914 !important;
+			--theme-button-hover-background-color: #9E1B22 !important;
+		}
+
+		.stk-5cc302c,
+		.stk-block-background.stk--has-background-overlay,
+		.stk-block-columns.stk--has-background-overlay,
 		#section-01, #section-02, #section-03,
 		.ct-header-hero, .hero-section,
 		[data-id*="hero"], [data-id*="banner"] {
@@ -88,39 +97,65 @@ add_action( 'wp_head', function() {
 			100% { background-position: 0% 50%; }
 		}
 
+		.stk-5cc302c:before,
+		.stk-block-background.stk--has-background-overlay:before,
 		#section-01::before, #section-02::before, #section-03::before {
 			content: '' !important;
 			position: absolute !important;
 			top: 0; left: 0; right: 0; bottom: 0 !important;
+			background: transparent !important;
 			background-image: 
 				radial-gradient(2px 2px at 20px 30px, #ffd700, rgba(0,0,0,0)),
 				radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
 				radial-gradient(1px 1px at 90px 40px, #ffe082, rgba(0,0,0,0)),
 				radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0)),
 				radial-gradient(2px 2px at 230px 60px, #ffd700, rgba(0,0,0,0)),
-				radial-gradient(1.5px 1.5px at 310px 150px, #ffffff, rgba(0,0,0,0));
+				radial-gradient(1.5px 1.5px at 310px 150px, #ffffff, rgba(0,0,0,0)) !important;
 			background-repeat: repeat !important;
 			background-size: 350px 200px !important;
-			opacity: 0.35 !important;
+			opacity: 0.45 !important;
 			pointer-events: none !important;
 			z-index: 1 !important;
 		}
 
-		/* 3. Iconos de Categorias (Juguetes, Ropa, Camas, Portadoras) */
-		.home .wp-block-columns .wp-block-column img,
-		.ct-category-card img,
-		.product-category img {
-			filter: invert(18%) sepia(85%) saturate(5400%) hue-rotate(350deg) brightness(90%) contrast(105%) !important;
-			transition: all 0.35s ease !important;
+		/* 3. Iconos de Categorias (SVGs Vectoriales de Stackable) */
+		.wp-block-stackable-icon svg,
+		.wp-block-stackable-icon svg path,
+		.stk-block-icon svg,
+		.stk-block-icon svg path,
+		.home .wp-block-columns .wp-block-column svg,
+		.home .wp-block-columns .wp-block-column svg path {
+			fill: #E50914 !important;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 		}
-		.home .wp-block-columns .wp-block-column:hover img,
-		.ct-category-card:hover img,
-		.product-category:hover img {
-			filter: invert(75%) sepia(80%) saturate(1200%) hue-rotate(5deg) brightness(105%) contrast(102%) !important;
-			transform: scale(1.1) rotate(-3deg) !important;
+
+		.stk-block-column:hover .wp-block-stackable-icon svg,
+		.stk-block-column:hover .wp-block-stackable-icon svg path,
+		.wp-block-stackable-icon:hover svg,
+		.wp-block-stackable-icon:hover svg path,
+		.home .wp-block-columns .wp-block-column:hover svg,
+		.home .wp-block-columns .wp-block-column:hover svg path {
+			fill: #FFB800 !important;
+			transform: scale(1.14) rotate(-4deg) !important;
+		}
+
+		.stk-block-column .stk-block-heading__text {
+			font-weight: 700 !important;
+			transition: color 0.3s ease !important;
+		}
+		.stk-block-column:hover .stk-block-heading__text {
+			color: #E50914 !important;
 		}
 
 		/* 4. Suavizado del tono Rojo en Botones Hover a Granate Elegante */
+		button, input[type="submit"], .button, .btn, .ct-button,
+		.woocommerce a.button, .woocommerce button.button, .stk-button {
+			background-color: #E50914 !important;
+			border-color: #E50914 !important;
+			color: #ffffff !important;
+			border-radius: 50px !important;
+			transition: all 0.3s ease !important;
+		}
 		button:hover,
 		input[type="submit"]:hover,
 		.button:hover,
@@ -130,12 +165,13 @@ add_action( 'wp_head', function() {
 		.ct-button:hover,
 		a.button:hover,
 		.woocommerce a.button:hover,
-		.woocommerce button.button:hover {
+		.woocommerce button.button:hover,
+		.stk-button:hover {
 			background-color: #9E1B22 !important;
 			border-color: #9E1B22 !important;
 			color: #ffffff !important;
 			box-shadow: 0 6px 18px rgba(158, 27, 34, 0.35) !important;
-			transition: all 0.3s ease !important;
+			transform: translateY(-2px) !important;
 		}
 
 		/* 5. Migas de pan (Breadcrumbs) en Preguntas Frecuentes y paginas secundarias */
@@ -149,64 +185,71 @@ add_action( 'wp_head', function() {
 			color: #ffd700 !important;
 		}
 
-		/* 6. Tarjetas de Productos en el Home */
-		.products .product,
-		ul.products li.product {
-			padding: 26px 22px 28px 22px !important;
-			border-radius: 22px !important;
+		/* 6. Tarjetas de Productos en el Home y Tienda */
+		html body [data-products] .product,
+		html body ul.products li.product,
+		html body .products .product {
+			padding: 26px 20px 28px 20px !important;
+			border-radius: 24px !important;
 			background: #ffffff !important;
-			border: 1px solid #f0f0f0 !important;
-			box-shadow: 0 4px 18px rgba(0,0,0,0.04) !important;
-			transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+			border: 1.5px solid #edf2f7 !important;
+			box-shadow: 0 4px 18px rgba(0,0,0,0.06) !important;
+			transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
 		}
-		.products .product:hover,
-		ul.products li.product:hover {
-			transform: translateY(-6px) !important;
-			box-shadow: 0 12px 28px rgba(21, 87, 52, 0.12) !important;
-			border-color: rgba(21, 87, 52, 0.2) !important;
+		html body [data-products] .product:hover,
+		html body ul.products li.product:hover,
+		html body .products .product:hover {
+			transform: translateY(-8px) !important;
+			box-shadow: 0 16px 36px rgba(13, 56, 32, 0.15) !important;
+			border-color: #155734 !important;
 		}
-		.products .product .woocommerce-loop-product__title {
+		html body .products .product .woocommerce-loop-product__title {
 			margin: 14px 0 8px 0 !important;
 			font-size: 1.05rem !important;
 			font-weight: 600 !important;
 			color: #1e293b !important;
 			text-align: center !important;
 		}
-		.products .product .price {
+		html body .products .product .price,
+		html body .products .product .price * {
 			color: #155734 !important;
-			font-size: 1.15rem !important;
+			font-size: 1.2rem !important;
 			font-weight: 700 !important;
 			text-align: center !important;
 			margin-bottom: 14px !important;
 		}
-		.products .product .button.add_to_cart_button {
+		html body .products .product .button.add_to_cart_button {
 			border-radius: 50px !important;
-			padding: 10px 20px !important;
-			font-weight: 600 !important;
-			background: #155734 !important;
+			padding: 10px 24px !important;
+			font-weight: 700 !important;
+			background: #E50914 !important;
 			color: #ffffff !important;
+			border: none !important;
 			text-transform: none !important;
 			display: block !important;
 			text-align: center !important;
 			margin: 0 auto !important;
 		}
-		.products .product .button.add_to_cart_button:hover {
+		html body .products .product .button.add_to_cart_button:hover {
 			background: #9E1B22 !important;
 		}
 
-		/* 7. Carrusel Final centrado */
+		/* 7. Carrusel Stackable Centrado */
+		.wp-block-stackable-carousel .stk-block-card__content,
+		.wp-block-stackable-carousel .stk-block-content,
+		.wp-block-stackable-carousel .stk-block-heading,
+		.wp-block-stackable-carousel .stk-block-text,
+		.wp-block-stackable-carousel .stk-button-group,
 		.ct-carousel .entry-content,
 		.ct-carousel .content-container,
 		[data-id*="carousel"] {
 			text-align: center !important;
-		}
-		.ct-carousel h2, .ct-carousel p, .ct-carousel .ct-button {
-			text-align: center !important;
+			justify-content: center !important;
 			margin-left: auto !important;
 			margin-right: auto !important;
 		}
 
-		/* 8. Nieve Navidena Multitono */
+		/* 8. Nieve Navidena Multitono de Alto Contraste */
 		#furbuddy-snow-layer {
 			position: fixed;
 			top: 0; left: 0; width: 100%; height: 100%;
@@ -220,11 +263,12 @@ add_action( 'wp_head', function() {
 			animation: furbuddyFall linear infinite;
 			user-select: none;
 			will-change: transform;
+			text-shadow: 0 0 5px rgba(0, 180, 216, 0.8), 0 0 10px rgba(255, 215, 0, 0.4);
 		}
 		@keyframes furbuddyFall {
 			0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
-			10% { opacity: 0.9; }
-			90% { opacity: 0.8; }
+			15% { opacity: 0.95; }
+			85% { opacity: 0.9; }
 			100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
 		}
 
@@ -268,52 +312,55 @@ add_action( 'wp_head', function() {
 
 add_action( 'wp_footer', function() {
 	?>
-	<!-- Capa de Nieve Multitono -->
+	<!-- Capa de Nieve Multitono de Alto Contraste -->
 	<div id="furbuddy-snow-layer"></div>
 
-	<!-- Widget de Musica Navidena -->
-	<div id="furbuddy-music-widget" onclick="toggleFurbuddyMusic()" title="Activar / Pausar Musica Navidena">
+	<!-- Widget Flotante de Musica Navidena Suave -->
+	<div id="furbuddy-music-widget" onclick="toggleFurbuddyMusic()" title="Activar / Pausar Musica Navidena Suave">
 		<span>&#128276;</span>
 		<span>M&uacute;sica Navide&ntilde;a</span>
 		<span id="furbuddy-music-status">&#9654;</span>
 	</div>
 
 	<script id="furbuddy-navidad-scripts">
-		// Generador de copos de nieve
+		// Generador de copos de nieve con destello de alto contraste
 		(function() {
 			var container = document.getElementById('furbuddy-snow-layer');
 			if (!container) return;
-			var flakeChars = ['\u2744', '\u2745', '\u2746', '\u2022', '\u2726'];
-			var flakeColors = ['#d0f0fd', '#ffffff', '#ffe082', '#e1f5fe'];
-			var flakeCount = 38;
+			var flakeChars = ['\u2744', '\u2745', '\u2746', '\u2022', '\u2726', '\u2727'];
+			var flakeColors = ['#00b4d8', '#ffd700', '#ffffff', '#90e0ef', '#ffea79'];
+			var flakeCount = 42;
 
 			for (var i = 0; i < flakeCount; i++) {
 				var f = document.createElement('span');
 				f.className = 'furbuddy-flake';
 				f.textContent = flakeChars[Math.floor(Math.random() * flakeChars.length)];
 				f.style.left = (Math.random() * 100) + 'vw';
-				f.style.fontSize = (10 + Math.random() * 18) + 'px';
+				f.style.fontSize = (11 + Math.random() * 19) + 'px';
 				f.style.color = flakeColors[Math.floor(Math.random() * flakeColors.length)];
-				f.style.animationDuration = (5 + Math.random() * 7) + 's';
+				f.style.animationDuration = (5.5 + Math.random() * 7) + 's';
 				f.style.animationDelay = (Math.random() * 8) + 's';
 				container.appendChild(f);
 			}
 		})();
 
-		// Sintetizador Web Audio de Campanas Navidenas
+		// Caja de Musica Navidena Suave (Sweet Celesta / Music Box)
 		(function() {
 			var audioCtx = null;
 			var isPlaying = false;
 			var timerId = null;
 			var step = 0;
 
+			// Melodia suave armonizada de Jingle Bells & Noche de Paz
 			var notes = [
-				[329.63, 0.28, 0.12], [329.63, 0.28, 0.12], [329.63, 0.58, 0.22],
-				[329.63, 0.28, 0.12], [329.63, 0.28, 0.12], [329.63, 0.58, 0.22],
-				[329.63, 0.28, 0.12], [392.00, 0.28, 0.12], [261.63, 0.42, 0.12], [293.66, 0.28, 0.12], [329.63, 0.85, 0.45],
-				[349.23, 0.28, 0.12], [349.23, 0.28, 0.12], [349.23, 0.42, 0.12], [349.23, 0.28, 0.12],
-				[349.23, 0.28, 0.12], [329.63, 0.28, 0.12], [329.63, 0.28, 0.12],
-				[392.00, 0.28, 0.12], [349.23, 0.28, 0.12], [293.66, 0.28, 0.12], [261.63, 0.85, 0.80]
+				[659.25, 0.22, 0.10], [659.25, 0.22, 0.10], [659.25, 0.44, 0.20],
+				[659.25, 0.22, 0.10], [659.25, 0.22, 0.10], [659.25, 0.44, 0.20],
+				[659.25, 0.22, 0.10], [783.99, 0.22, 0.10], [523.25, 0.32, 0.10], [587.33, 0.20, 0.10],
+				[659.25, 0.70, 0.35],
+				[698.46, 0.22, 0.10], [698.46, 0.22, 0.10], [698.46, 0.35, 0.10], [698.46, 0.20, 0.10],
+				[698.46, 0.22, 0.10], [659.25, 0.22, 0.10], [659.25, 0.22, 0.10], [659.25, 0.18, 0.10],
+				[659.25, 0.22, 0.10], [587.33, 0.22, 0.10], [587.33, 0.22, 0.10], [659.25, 0.22, 0.10],
+				[587.33, 0.45, 0.20], [783.99, 0.45, 0.35]
 			];
 
 			function getAudioContext() {
@@ -329,31 +376,47 @@ add_action( 'wp_footer', function() {
 				return audioCtx;
 			}
 
-			function playBell(freq, duration) {
+			function playCelestaNote(freq, duration) {
 				var ctx = getAudioContext();
 				if (!ctx) return;
 				var now = ctx.currentTime;
-				var osc = ctx.createOscillator();
-				var gain = ctx.createGain();
 
-				osc.type = 'sine';
-				osc.frequency.setValueAtTime(freq, now);
+				// Oscilador 1: Tono fundamental suave (sine)
+				var osc1 = ctx.createOscillator();
+				var gain1 = ctx.createGain();
+				osc1.type = 'sine';
+				osc1.frequency.setValueAtTime(freq, now);
 
-				gain.gain.setValueAtTime(0.001, now);
-				gain.gain.exponentialRampToValueAtTime(0.09, now + 0.02);
-				gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+				// Oscilador 2: Armonico superior de campanilla de cristal (sine afinado a la octava superior)
+				var osc2 = ctx.createOscillator();
+				var gain2 = ctx.createGain();
+				osc2.type = 'sine';
+				osc2.frequency.setValueAtTime(freq * 2.0, now);
 
-				osc.connect(gain);
-				gain.connect(ctx.destination);
+				// Volumen muy sutil y suave (estilo caja de musica de salon)
+				gain1.gain.setValueAtTime(0.0001, now);
+				gain1.gain.linearRampToValueAtTime(0.045, now + 0.015);
+				gain1.gain.exponentialRampToValueAtTime(0.0001, now + duration + 0.15);
 
-				osc.start(now);
-				osc.stop(now + duration + 0.05);
+				gain2.gain.setValueAtTime(0.0001, now);
+				gain2.gain.linearRampToValueAtTime(0.012, now + 0.01);
+				gain2.gain.exponentialRampToValueAtTime(0.0001, now + (duration * 0.7) + 0.05);
+
+				osc1.connect(gain1);
+				gain1.connect(ctx.destination);
+				osc2.connect(gain2);
+				gain2.connect(ctx.destination);
+
+				osc1.start(now);
+				osc2.start(now);
+				osc1.stop(now + duration + 0.2);
+				osc2.stop(now + duration + 0.2);
 			}
 
 			function playNextNote() {
 				if (!isPlaying) return;
 				var n = notes[step];
-				playBell(n[0], n[1]);
+				playCelestaNote(n[0], n[1]);
 				var waitMs = (n[1] + n[2]) * 1000;
 				step = (step + 1) % notes.length;
 				timerId = setTimeout(playNextNote, waitMs);
