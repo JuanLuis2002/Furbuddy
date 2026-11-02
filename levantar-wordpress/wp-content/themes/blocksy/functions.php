@@ -655,46 +655,72 @@ add_action( 'wp_head', function() {
 		}
 
 		/* =========================================================
-		   2. TARJETA UNICA ACENTO FURBUDDY (SIN TARJETA INTERNA)
+		   2. ELIMINACION TOTAL DE LA TARJETA EXTERIOR
+		      (Para evitar a 100% que existan dos tarjetas)
 		   ========================================================= */
 		.stk-e839a25 .stk-block-accordion,
 		.stk-block-accordion {
+			background: transparent !important;
+			background-color: transparent !important;
+			border: none !important;
+			box-shadow: none !important;
+			border-radius: 0 !important;
+			padding: 0 !important;
+			margin: 0 0 16px 0 !important;
+			overflow: visible !important;
+		}
+
+		/* =========================================================
+		   3. LA TARJETA UNICA ES LA CABECERA (SUMMARY)
+		      Acento Furbuddy verde, limpia y moderna
+		   ========================================================= */
+		.stk-block-accordion > summary,
+		.stk-e839a25 .stk-block-accordion > summary {
 			background: #ffffff !important;
 			background-color: #ffffff !important;
 			border-radius: 14px !important;
-			margin-bottom: 14px !important;
-			box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
 			border: none !important;
 			border-left: 5px solid #0E8A42 !important;
+			box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+			padding: 16px 20px !important;
+			cursor: pointer !important;
+			list-style: none !important;
+			outline: none !important;
+			box-sizing: border-box !important;
+			width: 100% !important;
+			min-height: 58px !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: space-between !important;
 			transition: transform 0.25s ease, box-shadow 0.25s ease, border-left-color 0.25s ease !important;
-			overflow: hidden !important;
-			padding: 0 !important;
+			position: relative !important;
 		}
 
-		.stk-e839a25 .stk-block-accordion:hover,
-		.stk-block-accordion:hover {
+		.stk-block-accordion > summary:hover,
+		.stk-e839a25 .stk-block-accordion > summary:hover {
 			transform: translateY(-2px) !important;
 			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
 			border-left-color: #0b7336 !important;
 		}
 
-		.stk-block-accordion[open] {
+		/* Al estar abierto, redondear solo arriba para conectar con la respuesta */
+		.stk-block-accordion[open] > summary {
+			border-radius: 14px 14px 0 0 !important;
 			border-left-color: #0E8A42 !important;
-			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
+			box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
 		}
 
-		/* ELIMINAR CUALQUIER RECUADRO O BORDE ANIDADO INTERNO */
-		.stk-block-accordion summary,
+		.stk-block-accordion > summary::-webkit-details-marker {
+			display: none !important;
+		}
+
+		/* =========================================================
+		   4. ANULAR CUALQUIER BORDE, FONDO O PADDING INTERNO
+		      (Garantiza que no haya bordes amarillos ni cajas flotantes)
+		   ========================================================= */
 		.stk-block-accordion summary *,
 		.stk-block-accordion summary *:before,
-		.stk-block-accordion summary *:after {
-			border: none !important;
-			border-color: transparent !important;
-			box-shadow: none !important;
-			outline: none !important;
-			border-radius: 0 !important;
-		}
-
+		.stk-block-accordion summary *:after,
 		.stk-block-accordion summary .stk-column-wrapper,
 		.stk-block-accordion summary .stk-container,
 		.stk-block-accordion summary .stk-hover-parent,
@@ -703,45 +729,28 @@ add_action( 'wp_head', function() {
 			background: transparent !important;
 			background-color: transparent !important;
 			border: none !important;
+			border-color: transparent !important;
 			box-shadow: none !important;
 			border-radius: 0 !important;
 			padding: 0 !important;
 			margin: 0 !important;
 			transform: none !important;
-			text-align: left !important;
+			outline: none !important;
 		}
 
-		.stk-block-accordion summary .stk-hover-parent:hover,
-		.stk-block-accordion summary:hover .stk-hover-parent {
+		.stk-block-accordion summary:hover *,
+		.stk-block-accordion summary *:hover {
 			background: transparent !important;
 			border: none !important;
+			border-color: transparent !important;
 			box-shadow: none !important;
 			transform: none !important;
 		}
 
 		/* =========================================================
-		   3. CABECERA (SUMMARY): ALINEACION VERTICAL PERFECTA
+		   5. ALINEACION VERTICAL PERFECTA (TEXTO Y FLECHA)
 		   ========================================================= */
-		.stk-block-accordion > summary,
-		.stk-e839a25 .stk-block-accordion > summary {
-			display: flex !important;
-			align-items: center !important;
-			justify-content: space-between !important;
-			padding: 16px 20px !important;
-			cursor: pointer !important;
-			background: transparent !important;
-			list-style: none !important;
-			border: none !important;
-			outline: none !important;
-			box-sizing: border-box !important;
-			width: 100% !important;
-			min-height: 64px !important;
-		}
-
-		.stk-block-accordion > summary::-webkit-details-marker {
-			display: none !important;
-		}
-
+		.stk-block-accordion summary .stk-column-wrapper,
 		.stk-block-accordion summary .stk-block-content,
 		.stk-block-accordion summary .stk-block-icon-label,
 		.stk-block-accordion summary .stk-row {
@@ -753,7 +762,7 @@ add_action( 'wp_head', function() {
 			padding: 0 !important;
 		}
 
-		/* Texto de la pregunta: Perfectamente centrado verticalmente */
+		/* Pregunta centrada verticalmente */
 		.stk-block-accordion summary .stk-block-heading {
 			margin: 0 !important;
 			padding: 0 !important;
@@ -764,7 +773,8 @@ add_action( 'wp_head', function() {
 		}
 
 		.stk-block-accordion summary .stk-block-heading__text,
-		.stk-block-accordion summary h3 {
+		.stk-block-accordion summary h3,
+		.stk-block-accordion summary .stk-highlight {
 			font-size: 0.98rem !important;
 			font-weight: 700 !important;
 			line-height: 1.4 !important;
@@ -775,7 +785,7 @@ add_action( 'wp_head', function() {
 		}
 
 		/* =========================================================
-		   4. FLECHA / CHEVRON: CIRCULO PERFECTO Y COLOR NEUTRO
+		   6. FLECHA / CHEVRON: CIRCULO PERFECTO Y CENTRADO
 		   ========================================================= */
 		.stk-block-accordion summary .stk-block-icon,
 		.stk-e839a25 summary .stk-block-icon {
@@ -825,8 +835,8 @@ add_action( 'wp_head', function() {
 		.stk-block-accordion summary .stk-block-icon svg path,
 		.stk-block-accordion[open] summary .stk-block-icon svg,
 		.stk-block-accordion[open] summary .stk-block-icon svg path,
-		.stk-block-accordion:hover summary .stk-block-icon svg,
-		.stk-block-accordion:hover summary .stk-block-icon svg path {
+		.stk-block-accordion summary:hover .stk-block-icon svg,
+		.stk-block-accordion summary:hover .stk-block-icon svg path {
 			width: 12px !important;
 			height: 12px !important;
 			min-width: 12px !important;
@@ -842,17 +852,21 @@ add_action( 'wp_head', function() {
 		}
 
 		/* =========================================================
-		   5. CONTENIDO DE LA RESPUESTA
+		   7. CONTENIDO DE LA RESPUESTA AL DESPLEGAR
 		   ========================================================= */
 		.stk-block-accordion .stk-block-accordion__content,
 		.stk-block-accordion > :not(summary) {
-			padding: 0 20px 18px 20px !important;
+			background: #ffffff !important;
+			background-color: #ffffff !important;
+			border-radius: 0 0 14px 14px !important;
+			border: none !important;
+			border-left: 5px solid #0E8A42 !important;
+			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08) !important;
+			padding: 10px 20px 18px 20px !important;
 			margin: 0 !important;
 			color: #4b5563 !important;
 			font-size: 0.94rem !important;
 			line-height: 1.6 !important;
-			background: transparent !important;
-			border: none !important;
 		}
 
 		.stk-block-accordion .stk-block-accordion__content p,
@@ -864,4 +878,4 @@ add_action( 'wp_head', function() {
 		}
 	</style>
 	<?php
-}, 999 );
+}, 99999 );
