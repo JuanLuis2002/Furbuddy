@@ -862,19 +862,33 @@ add_action( 'wp_head', function() {
 			border: none !important;
 			border-left: 5px solid #0E8A42 !important;
 			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08) !important;
-			padding: 10px 20px 18px 20px !important;
+			padding: 12px 20px 20px 20px !important;
 			margin: 0 !important;
-			color: #4b5563 !important;
-			font-size: 0.94rem !important;
-			line-height: 1.6 !important;
+			display: block !important;
 		}
 
+		/* Forzar visibilidad y color oscuro legible (anula texto blanco inline) */
+		.stk-block-accordion .stk-block-accordion__content *,
 		.stk-block-accordion .stk-block-accordion__content p,
-		.stk-block-accordion > :not(summary) p {
-			color: #4b5563 !important;
+		.stk-block-accordion .stk-block-accordion__content span,
+		.stk-block-accordion .stk-block-accordion__content strong,
+		.stk-block-accordion .stk-block-accordion__content .stk-highlight,
+		.stk-block-accordion > :not(summary) *,
+		.stk-block-accordion > :not(summary) p,
+		.stk-block-accordion > :not(summary) span,
+		.stk-block-accordion > :not(summary) strong,
+		.stk-block-accordion > :not(summary) .stk-highlight {
+			color: #334155 !important;
 			font-size: 0.94rem !important;
-			line-height: 1.6 !important;
-			margin: 0 !important;
+			line-height: 1.65 !important;
+			opacity: 1 !important;
+			visibility: visible !important;
+		}
+
+		.stk-block-accordion .stk-block-accordion__content strong,
+		.stk-block-accordion > :not(summary) strong {
+			font-weight: 700 !important;
+			color: #0f172a !important;
 		}
 	</style>
 	<?php
