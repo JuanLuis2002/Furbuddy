@@ -619,7 +619,7 @@ add_action( 'wp_head', function() {
 		}
 
 		/* =========================================================
-		   2. TARJETA UNICA Y ELIMINACION DE TARJETA INTERNA ANIDADA
+		   2. TARJETA UNICA (ELIMINAR DEFINITIVAMENTE TARJETA INTERNA)
 		   ========================================================= */
 		/* Contenedor exterior: La UNICA tarjeta visible */
 		.stk-e839a25 .stk-block-accordion,
@@ -651,19 +651,17 @@ add_action( 'wp_head', function() {
 			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
 		}
 
-		/* ELIMINAR LA SEGUNDA TARJETA INTERNA: reset completo de contenedores hijos */
-		.stk-block-accordion .stk-column-wrapper,
-		.stk-block-accordion .stk-container,
-		.stk-block-accordion .stk-block-column,
-		.stk-block-accordion .stk-block-column__content,
-		.stk-block-accordion .stk-hover-parent,
-		.stk-block-accordion .stk-block-accordion__heading {
-			background: transparent !important;
-			border: none !important;
+		/* ANULAR COMPLETAMENTE CUALQUIER BORDE O FONDO INTERNO DE STACKABLE */
+		.stk-block-accordion summary,
+		.stk-block-accordion summary *,
+		.stk-block-accordion summary *:before,
+		.stk-block-accordion summary *:after {
+			border-color: transparent !important;
+			border-width: 0 !important;
+			border-style: none !important;
 			box-shadow: none !important;
-			border-radius: 0 !important;
-			padding: 0 !important;
-			margin: 0 !important;
+			outline: none !important;
+			background-color: transparent !important;
 		}
 
 		/* 3. Cabecera (Summary): Altura uniforme y alineacion vertical limpia */
@@ -673,12 +671,11 @@ add_action( 'wp_head', function() {
 			display: flex !important;
 			align-items: center !important;
 			justify-content: space-between !important;
-			padding: 14px 20px !important;
+			padding: 14px 22px !important;
 			cursor: pointer !important;
 			background: transparent !important;
 			list-style: none !important;
 			border: none !important;
-			box-shadow: none !important;
 			outline: none !important;
 		}
 
@@ -686,7 +683,8 @@ add_action( 'wp_head', function() {
 			display: none !important;
 		}
 
-		.stk-block-accordion .stk-block-icon-label .stk-row {
+		.stk-block-accordion .stk-row {
+			display: flex !important;
 			align-items: center !important;
 			justify-content: space-between !important;
 			width: 100% !important;
@@ -703,18 +701,29 @@ add_action( 'wp_head', function() {
 			margin: 0 !important;
 		}
 
-		/* 4. Icono / Flecha: Capsula circular con rotacion fluida y color neutro permanente */
-		.stk-block-accordion .stk-block-icon {
-			width: 32px !important;
-			height: 32px !important;
-			background: #f0f4f6 !important;
+		/* =========================================================
+		   4. FLECHA / CHEVRON: CIRCULO PERFECTO (NUNCA OVALO)
+		   ========================================================= */
+		.stk-block-accordion .stk-block-icon,
+		.stk-e839a25 .stk-block-icon {
+			width: 34px !important;
+			height: 34px !important;
+			min-width: 34px !important;
+			min-height: 34px !important;
+			max-width: 34px !important;
+			max-height: 34px !important;
+			box-sizing: border-box !important;
+			aspect-ratio: 1 / 1 !important;
 			border-radius: 50% !important;
+			background: #f0f4f6 !important;
+			align-self: center !important;
+			flex: 0 0 34px !important;
 			display: flex !important;
 			align-items: center !important;
 			justify-content: center !important;
-			flex-shrink: 0 !important;
-			margin-left: 12px !important;
-			transition: transform 0.3s ease !important;
+			margin: 0 0 0 14px !important;
+			padding: 0 !important;
+			transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 		}
 
 		.stk-block-accordion[open] .stk-block-icon {
@@ -722,11 +731,30 @@ add_action( 'wp_head', function() {
 			transform: rotate(180deg) !important;
 		}
 
+		.stk-block-accordion .stk-block-icon .stk--svg-wrapper,
+		.stk-block-accordion .stk-block-icon .stk--inner-svg {
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			width: 100% !important;
+			height: 100% !important;
+			margin: 0 !important;
+			padding: 0 !important;
+		}
+
 		.stk-block-accordion .stk-block-icon svg,
 		.stk-block-accordion[open] .stk-block-icon svg {
 			width: 12px !important;
 			height: 12px !important;
+			min-width: 12px !important;
+			max-width: 12px !important;
+			min-height: 12px !important;
+			max-height: 12px !important;
 			fill: #365b6c !important;
+			color: #365b6c !important;
+			display: block !important;
+			margin: auto !important;
+			transition: none !important;
 		}
 
 		/* 5. Cuerpo de la respuesta al desplegar */
