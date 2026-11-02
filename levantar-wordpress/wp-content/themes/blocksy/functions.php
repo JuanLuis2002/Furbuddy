@@ -378,3 +378,110 @@ add_action( 'wp_footer', function() {
 	</script>
 	<?php
 }, 999 );
+
+/**
+ * =========================================================
+ * FURBUDDY: ESTILO MODERNO PARA PREGUNTAS FRECUENTES (FAQ)
+ * =========================================================
+ */
+add_action( 'wp_head', function() {
+	?>
+	<style id="furbuddy-faq-accordions">
+		/* 1. Contenedor principal de cada acordeon */
+		.stk-e839a25 .stk-block-accordion,
+		.stk-block-accordion {
+			background: #ffffff !important;
+			border-radius: 14px !important;
+			margin-bottom: 14px !important;
+			box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+			border: 1px solid rgba(0, 0, 0, 0.04) !important;
+			transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+			overflow: hidden !important;
+		}
+
+		/* Efecto hover al pasar el cursor */
+		.stk-e839a25 .stk-block-accordion:hover,
+		.stk-block-accordion:hover {
+			transform: translateY(-3px) !important;
+			box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14) !important;
+		}
+
+		/* 2. Cabecera (Pregunta): Altura uniforme y alineacion vertical */
+		.stk-e839a25 .stk-block-accordion__heading,
+		.stk-block-accordion > summary {
+			min-height: 68px !important;
+			display: flex !important;
+			align-items: center !important;
+			padding: 12px 20px !important;
+			cursor: pointer !important;
+			background: transparent !important;
+			list-style: none !important;
+		}
+
+		.stk-block-accordion > summary::-webkit-details-marker {
+			display: none !important;
+		}
+
+		.stk-block-accordion .stk-column-wrapper {
+			width: 100% !important;
+			background: transparent !important;
+		}
+
+		.stk-block-accordion .stk-block-icon-label .stk-row {
+			align-items: center !important;
+			justify-content: space-between !important;
+			width: 100% !important;
+		}
+
+		/* Tipografia de la pregunta */
+		.stk-block-accordion .stk-block-heading__text,
+		.stk-block-accordion .stk-highlight,
+		.stk-block-accordion h3 {
+			font-size: 0.98rem !important;
+			font-weight: 600 !important;
+			line-height: 1.35 !important;
+			color: #17383e !important;
+		}
+
+		/* 3. Icono / Flecha con contenedor circular y rotacion suave */
+		.stk-block-accordion .stk-block-icon {
+			width: 32px !important;
+			height: 32px !important;
+			background: #f0f4f6 !important;
+			border-radius: 50% !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			flex-shrink: 0 !important;
+			margin-left: 12px !important;
+			transition: background-color 0.25s ease, transform 0.3s ease !important;
+		}
+
+		.stk-block-accordion[open] .stk-block-icon {
+			background: #e2f0d9 !important;
+			transform: rotate(180deg) !important;
+		}
+
+		.stk-block-accordion .stk-block-icon svg {
+			width: 12px !important;
+			height: 12px !important;
+			fill: #365b6c !important;
+			transition: fill 0.25s ease !important;
+		}
+
+		.stk-block-accordion[open] .stk-block-icon svg {
+			fill: #155734 !important;
+		}
+
+		/* 4. Cuerpo de la respuesta al desplegar */
+		.stk-block-accordion .stk-block-accordion__content {
+			padding: 8px 22px 18px 22px !important;
+			color: #4a5568 !important;
+			font-size: 0.92rem !important;
+			line-height: 1.55 !important;
+			border-top: 1px solid #f2f2f2 !important;
+		}
+	</style>
+	<?php
+}, 999 );
+
