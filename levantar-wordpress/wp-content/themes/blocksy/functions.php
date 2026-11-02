@@ -67,9 +67,25 @@ add_action( 'wp_head', function() {
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600;700&display=swap">
 
 	<style id="furbuddy-navidad-styles">
-		/* 1. Tipografia Global Comfortaa */
-		body, h1, h2, h3, h4, h5, h6, .site-title, nav, .menu, button, input, select, textarea, .woocommerce, .woocommerce-Price-amount, .entry-title, p, a, span {
+		/* 1. Tipografia Global Comfortaa (Excluyendo Iconos de Estrellas) */
+		body, h1, h2, h3, h4, h5, h6, .site-title, nav, .menu, button, input, select, textarea, .woocommerce-Price-amount, .entry-title, p, a, span:not(.star-rating):not(.star-rating *) {
 			font-family: 'Comfortaa', cursive, sans-serif !important;
+		}
+
+		/* Restauracion de fuente de iconos para estrellas de valoracion (Adios letras S S S S S) */
+		.woocommerce .star-rating,
+		.woocommerce .star-rating span,
+		.woocommerce ul.products li.product .star-rating,
+		.star-rating,
+		.star-rating span,
+		.star-rating::before,
+		.star-rating span::before {
+			font-family: star !important;
+			color: #FFB800 !important;
+			letter-spacing: 2px !important;
+		}
+		.star-rating span::before {
+			color: #FFB800 !important;
 		}
 
 		/* 2. Reemplazo Global de Naranjas por Paleta Navidena */
@@ -151,6 +167,15 @@ add_action( 'wp_head', function() {
 			color: #fff8f8 !important;
 			opacity: 0.95 !important;
 		}
+		.stk-4754272 .stk-f6cbe4c .stk--svg-wrapper {
+			background: transparent !important;
+			border: none !important;
+			box-shadow: none !important;
+			width: auto !important;
+			height: auto !important;
+			margin: 0 !important;
+			border-radius: 0 !important;
+		}
 		.stk-4754272 .stk-f6cbe4c svg,
 		.stk-4754272 .stk-f6cbe4c svg path {
 			fill: #ffffff !important;
@@ -164,14 +189,17 @@ add_action( 'wp_head', function() {
 		.stk-4754272 .stk-2b904ee .stk-button .stk-button__inner-text {
 			color: #E50914 !important;
 			font-weight: 800 !important;
+			transition: all 0.3s ease !important;
 		}
 		.stk-4754272 .stk-2b904ee .stk-button:hover {
-			background: #ffd700 !important;
+			background: #1a1a1a !important;
+			border-color: #FFB800 !important;
 			transform: translateY(-2px) scale(1.04) !important;
-			box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4) !important;
+			box-shadow: 0 8px 24px rgba(255, 184, 0, 0.45) !important;
 		}
 		.stk-4754272 .stk-2b904ee .stk-button:hover .stk-button__inner-text {
-			color: #1a1a1a !important;
+			color: #FFB800 !important;
+			text-shadow: 0 0 10px rgba(255, 184, 0, 0.6) !important;
 		}
 
 		/* 5. Tarjetas de Categorias (Juguetes, Ropa, Camas, Portadoras) - Modernas, Limpias e Iconos Siempre Visibles */
@@ -182,10 +210,10 @@ add_action( 'wp_head', function() {
 		.wp-block-stackable-column.stk-block-column .stk-hover-parent {
 			background: #ffffff !important;
 			background-color: #ffffff !important;
-			border-radius: 24px !important;
+			border-radius: 20px !important;
 			border: 1.5px solid #edf2f7 !important;
 			box-shadow: 0 6px 20px rgba(0,0,0,0.04) !important;
-			padding: 36px 18px 30px 18px !important;
+			padding: 32px 16px 26px 16px !important;
 			transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
 			position: relative !important;
 			text-align: center !important;
@@ -198,8 +226,8 @@ add_action( 'wp_head', function() {
 		.wp-block-stackable-column.stk-block-column .stk-hover-parent:hover {
 			background: #ffffff !important;
 			background-color: #ffffff !important;
-			border-color: #E50914 !important;
-			box-shadow: 0 16px 36px rgba(229, 9, 20, 0.12) !important;
+			border-color: #FFB800 !important;
+			box-shadow: 0 14px 32px rgba(255, 184, 0, 0.18) !important;
 			transform: translateY(-5px) !important;
 		}
 
@@ -215,68 +243,69 @@ add_action( 'wp_head', function() {
 			background-color: transparent !important;
 		}
 
-		/* Insignia Circular Festiva para Iconos */
+		/* Sin envoltorios circulares que deformen o reduzcan los iconos */
 		.stk-block-column .stk--svg-wrapper,
 		.stk-hover-parent .stk--svg-wrapper {
-			width: 82px !important;
-			height: 82px !important;
-			margin: 0 auto 10px auto !important;
-			border-radius: 50% !important;
-			background: #fbf8f3 !important;
-			border: 1.5px solid #fae8c8 !important;
+			width: auto !important;
+			height: auto !important;
+			margin: 0 auto 12px auto !important;
+			border-radius: 0 !important;
+			background: transparent !important;
+			border: none !important;
 			display: flex !important;
 			align-items: center !important;
 			justify-content: center !important;
-			transition: all 0.3s ease !important;
-			box-shadow: 0 4px 12px rgba(212, 136, 6, 0.08) !important;
+			box-shadow: none !important;
 		}
 
 		.stk-block-column:hover .stk--svg-wrapper,
 		.stk-hover-parent:hover .stk--svg-wrapper {
-			background: #fef2f2 !important;
-			border-color: #fecaca !important;
-			transform: scale(1.08) !important;
-			box-shadow: 0 8px 20px rgba(229, 9, 20, 0.18) !important;
+			background: transparent !important;
+			border: none !important;
+			box-shadow: none !important;
 		}
 
-		/* Asegurar que NINGUN icono se vuelva blanco o invisible en hover */
+		/* Asegurar que NINGUN icono se vuelva blanco o invisible en reposo ni en hover */
 		.stk-block-column svg,
 		.stk-block-column svg path,
 		.stk-block-icon svg,
 		.stk-block-icon svg path,
 		.wp-block-stackable-icon svg,
 		.wp-block-stackable-icon svg path,
+		:where(.stk-hover-parent) svg,
+		:where(.stk-hover-parent) svg path,
 		:where(.stk-hover-parent:hover) svg,
 		:where(.stk-hover-parent:hover) svg path,
 		:where(.stk-hover-parent.stk--is-hovered) svg,
 		:where(.stk-hover-parent.stk--is-hovered) svg path {
 			fill: #E50914 !important;
-			width: 42px !important;
-			height: 42px !important;
-			max-width: 42px !important;
-			max-height: 42px !important;
-			transition: fill 0.3s ease !important;
+			width: 52px !important;
+			height: 52px !important;
+			max-width: 52px !important;
+			max-height: 52px !important;
+			transition: all 0.3s ease !important;
 		}
 
 		.stk-block-column:hover svg,
 		.stk-block-column:hover svg path,
 		.stk-hover-parent:hover svg,
 		.stk-hover-parent:hover svg path {
-			fill: #b80710 !important;
+			fill: #FFB800 !important;
+			transform: scale(1.08) !important;
 		}
 
 		/* Textos de Categorias (Juguetes, Ropa, Camas, Portadoras) */
 		.stk-block-column .stk-block-heading__text {
 			color: #1e293b !important;
-			font-size: 1.12rem !important;
+			font-size: 1.15rem !important;
 			font-weight: 700 !important;
-			margin-top: 10px !important;
+			margin-top: 8px !important;
 			transition: color 0.3s ease !important;
 		}
 
 		.stk-block-column:hover .stk-block-heading__text,
 		.stk-hover-parent:hover .stk-block-heading__text {
-			color: #E50914 !important;
+			color: #FFB800 !important;
 		}
 
 		/* 6. Suavizado del tono Rojo en Botones Hover a Granate Elegante */
