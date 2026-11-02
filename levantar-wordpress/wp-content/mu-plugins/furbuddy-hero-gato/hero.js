@@ -68,7 +68,13 @@
 		thread.setAttribute("aria-hidden", "true");
 		thread.setAttribute("preserveAspectRatio", "none");
 		var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+		var tipDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+		tipDot.setAttribute("r", "9");
+		tipDot.setAttribute("fill", "#ff9aa8");
+		tipDot.setAttribute("stroke", "rgba(255,235,238,0.9)");
+		tipDot.setAttribute("stroke-width", "2");
 		thread.appendChild(path);
+		thread.appendChild(tipDot);
 
 		var ball = document.createElement("img");
 		ball.className = "furbuddy-hero-ball";
@@ -80,6 +86,8 @@
 		tip.type = "button";
 		tip.className = "furbuddy-thread-tip";
 		tip.setAttribute("aria-label", "Jala el lazo de la pelota");
+		// El punto visible vive en el SVG (misma escala que el lazo); este boton solo recibe el arrastre.
+		tip.style.opacity = "0";
 
 		var sound = document.createElement("button");
 		sound.type = "button";
@@ -293,6 +301,16 @@
 			};
 		}
 
+		function pointerOnStage(event) {
+			var box = stage.getBoundingClientRect();
+			var w = Math.max(1, stage.clientWidth);
+			var h = Math.max(1, stage.clientHeight);
+			return {
+				x: ((event.clientX - box.left) / Math.max(1, box.width)) * w,
+				y: ((event.clientY - box.top) / Math.max(1, box.height)) * h
+			};
+		}
+
 		function positionBall() {
 			ball.style.left = toy.x + "px";
 			ball.style.top = toy.y + "px";
@@ -317,6 +335,8 @@
 				d = "M " + attach.x.toFixed(1) + " " + attach.y.toFixed(1) + " Q " + cx.toFixed(1) + " " + cy.toFixed(1) + " " + tipX.toFixed(1) + " " + tipY.toFixed(1);
 			}
 			path.setAttribute("d", d);
+			tipDot.setAttribute("cx", tipX.toFixed(1));
+			tipDot.setAttribute("cy", tipY.toFixed(1));
 			tip.style.left = tipX + "px";
 			tip.style.top = tipY + "px";
 		}
@@ -458,10 +478,10 @@
 			if (!draggingBall) {
 				return;
 			}
-			var box = stage.getBoundingClientRect();
+			var point = pointerOnStage(event);
 			var bounds = ballBounds();
-			var x = clamp(event.clientX - box.left, bounds.minX, bounds.maxX);
-			var y = clamp(event.clientY - box.top, bounds.minY, bounds.maxY);
+			var x = clamp(point.x, bounds.minX, bounds.maxX);
+			var y = clamp(point.y, bounds.minY, bounds.maxY);
 			var now = performance.now();
 			var dt = Math.max(0.008, (now - toy.lastAt) / 1000);
 			toy.vx = clamp((x - toy.x) / dt, -1000, 1000);
@@ -504,9 +524,9 @@
 			if (!draggingTip) {
 				return;
 			}
-			var box = stage.getBoundingClientRect();
-			tipX = clamp(event.clientX - box.left, 8, box.width - 8);
-			tipY = clamp(event.clientY - box.top, 8, box.height - 8);
+			var point = pointerOnStage(event);
+			tipX = clamp(point.x, 8, stage.clientWidth - 8);
+			tipY = clamp(point.y, 8, stage.clientHeight - 8);
 			placeThread();
 			event.stopPropagation();
 		});
