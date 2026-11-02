@@ -202,7 +202,7 @@ add_action( 'wp_head', function() {
 			text-shadow: 0 0 10px rgba(255, 184, 0, 0.6) !important;
 		}
 
-		/* 5. Tarjetas de Categorias (Juguetes, Ropa, Camas, Portadoras) - Centrado Optico, Animacion y Contraste Navideno */
+		/* 5. Tarjetas de Categorias (Juguetes, Ropa, Camas, Portadoras) - Iconos Vectoriales Modernos Premium */
 		.stk-dcb23ef,
 		.stk-dcb23ef-container,
 		.stk-7154f94,
@@ -292,96 +292,45 @@ add_action( 'wp_head', function() {
 			box-shadow: none !important;
 		}
 
-		/* Dimension y balance geometrico de los SVGs */
-		.stk-dcb23ef svg,
-		.stk-dcb23ef-container svg,
-		.stk-7154f94 svg,
-		.stk-7154f94-container svg,
-		.stk-4652df5 svg,
-		.stk-4652df5-container svg,
-		.stk-cf8053e svg,
-		.stk-cf8053e-container svg,
-		.stk-block-column svg,
-		.stk-block-icon svg {
+		/* Ocultar iconos antiguos de Stackable */
+		.stk-dcb23ef svg.ugb-custom-icon,
+		.stk-7154f94 svg.ugb-custom-icon,
+		.stk-4652df5 svg.ugb-custom-icon,
+		.stk-cf8053e svg.ugb-custom-icon,
+		.stk-dcb23ef-container svg.ugb-custom-icon,
+		.stk-7154f94-container svg.ugb-custom-icon,
+		.stk-4652df5-container svg.ugb-custom-icon,
+		.stk-cf8053e-container svg.ugb-custom-icon,
+		.stk-7154f94 svg[viewBox="0 0 576 512"],
+		.stk-7154f94-container svg[viewBox="0 0 576 512"] {
+			display: none !important;
+		}
+
+		/* Estilos de los Nuevos Iconos Vectoriales Premium */
+		.fb-cat-icon {
 			width: 48px !important;
 			height: 48px !important;
 			max-width: 48px !important;
 			max-height: 48px !important;
 			display: block !important;
 			margin: 0 auto !important;
+			color: #E50914 !important;
+			stroke: #E50914 !important;
 			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 		}
 
-		/* Camas: Compensacion optica para que no luzca achatado respecto a las otras */
-		.stk-4652df5 svg,
-		.stk-4652df5-container svg {
-			width: 54px !important;
-			height: 54px !important;
-			max-width: 54px !important;
-			max-height: 54px !important;
-		}
-
-		/* Colorear tanto el trazo (stroke) como el relleno (fill) a Rojo Festivo #E50914 */
-		.stk-dcb23ef svg path,
-		.stk-dcb23ef-container svg path,
-		.stk-7154f94 svg path,
-		.stk-7154f94-container svg path,
-		.stk-4652df5 svg path,
-		.stk-4652df5-container svg path,
-		.stk-cf8053e svg path,
-		.stk-cf8053e-container svg path,
-		.stk-dcb23ef svg *,
-		.stk-dcb23ef-container svg *,
-		.stk-7154f94 svg *,
-		.stk-7154f94-container svg *,
-		.stk-4652df5 svg *,
-		.stk-4652df5-container svg *,
-		.stk-cf8053e svg *,
-		.stk-cf8053e-container svg *,
-		.stk-block-column svg path,
-		.stk-block-column svg * {
-			fill: #E50914 !important;
-			color: #E50914 !important;
-			transition: fill 0.3s ease, color 0.3s ease, stroke 0.3s ease !important;
-		}
-
 		/* Hover sobre la tarjeta: el icono escala suavemente y cambia a Dorado Festivo #FFB800 */
-		.stk-dcb23ef:hover svg,
-		.stk-dcb23ef-container:hover svg,
-		.stk-7154f94:hover svg,
-		.stk-7154f94-container:hover svg,
-		.stk-4652df5:hover svg,
-		.stk-4652df5-container:hover svg,
-		.stk-cf8053e:hover svg,
-		.stk-cf8053e-container:hover svg,
-		.stk-block-column:hover svg,
-		.stk-hover-parent:hover svg {
-			transform: scale(1.12) !important;
-		}
-
-		.stk-dcb23ef:hover svg path,
-		.stk-dcb23ef-container:hover svg path,
-		.stk-7154f94:hover svg path,
-		.stk-7154f94-container:hover svg path,
-		.stk-4652df5:hover svg path,
-		.stk-4652df5-container:hover svg path,
-		.stk-cf8053e:hover svg path,
-		.stk-cf8053e-container:hover svg path,
-		.stk-dcb23ef:hover svg *,
-		.stk-dcb23ef-container:hover svg *,
-		.stk-7154f94:hover svg *,
-		.stk-7154f94-container:hover svg *,
-		.stk-4652df5:hover svg *,
-		.stk-4652df5-container:hover svg *,
-		.stk-cf8053e:hover svg *,
-		.stk-cf8053e-container:hover svg *,
-		.stk-block-column:hover svg path,
-		.stk-block-column:hover svg *,
-		.stk-hover-parent:hover svg path,
-		.stk-hover-parent:hover svg * {
-			fill: #FFB800 !important;
+		.stk-dcb23ef:hover .fb-cat-icon,
+		.stk-dcb23ef-container:hover .fb-cat-icon,
+		.stk-7154f94:hover .fb-cat-icon,
+		.stk-7154f94-container:hover .fb-cat-icon,
+		.stk-4652df5:hover .fb-cat-icon,
+		.stk-4652df5-container:hover .fb-cat-icon,
+		.stk-cf8053e:hover .fb-cat-icon,
+		.stk-cf8053e-container:hover .fb-cat-icon {
 			color: #FFB800 !important;
 			stroke: #FFB800 !important;
+			transform: scale(1.12) !important;
 		}
 
 		/* Textos de Categorias (Juguetes, Ropa, Camas, Portadoras) */
@@ -705,6 +654,36 @@ add_action( 'wp_footer', function() {
 				}
 			};
 		})();
+
+		// Inyeccion de Iconos Vectoriales Modernos Premium para Categorias
+		(function() {
+			function injectModernCategoryIcons() {
+				var icons = {
+					'.stk-dcb23ef': '<svg class="fb-cat-icon fb-icon-juguetes" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16a4 4 0 0 0-4-4 4 4 0 0 0-4 4 4 4 0 0 0 4 4c-2.2 0-4 1.8-4 4s1.8 4 4 4a4 4 0 0 0 4-4h24a4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4c2.2 0 4-1.8 4-4s-1.8-4-4-4a4 4 0 0 0-4 4H12z"/><circle cx="24" cy="20" r="1.5" fill="currentColor"/></svg>',
+					'.stk-7154f94': '<svg class="fb-cat-icon fb-icon-ropa" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 12c2 3 12 3 14 0"/><path d="M17 12l-7 8c-1 1-1 3 0 4l4 2 2-3v14c0 1.5 1.5 3 3 3h10c1.5 0 3-1.5 3-3V23l2 3 4-2c1-1 1-3 0-4l-7-8"/><path d="M20 28h8"/><path d="M20 33h8"/></svg>',
+					'.stk-4652df5': '<svg class="fb-cat-icon fb-icon-camas" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 26c0-6.6 7.2-12 16-12s16 5.4 16 12-7.2 12-16 12-16-5.4-16-12z"/><path d="M13 27c0-4 4.9-7.5 11-7.5s11 3.5 11 7.5-4.9 7.5-11 7.5-11-3.5-11-7.5z"/><path d="M18 24c2 2 10 2 12 0"/></svg>',
+					'.stk-cf8053e': '<svg class="fb-cat-icon fb-icon-portadoras" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14v-4c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2v4"/><rect x="7" y="14" width="34" height="24" rx="6"/><circle cx="24" cy="26" r="6"/><path d="M21 26h6"/><path d="M24 23v6"/></svg>'
+				};
+
+				for (var sel in icons) {
+					var cols = document.querySelectorAll(sel);
+					for (var i = 0; i < cols.length; i++) {
+						var col = cols[i];
+						var wrapper = col.querySelector('.stk--svg-wrapper') || col.querySelector('.stk-block-icon');
+						if (wrapper && !wrapper.querySelector('.fb-cat-icon')) {
+							wrapper.innerHTML = icons[sel];
+						}
+					}
+				}
+			}
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', injectModernCategoryIcons);
+			} else {
+				injectModernCategoryIcons();
+			}
+		})();
+
 	</script>
 	<?php
 }, 999 );
