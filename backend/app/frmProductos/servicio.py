@@ -416,14 +416,16 @@ def instrucciones_gemini(tipo_producto: str) -> str:
             "El tipo pedido es normal (simple). atributos debe ser siempre una lista vacia []."
         )
     return (
-        "Eres el asistente de la tienda Furbuddy, de accesorios y productos para mascotas. "
+        "Eres el asistente de la tienda Furbuddy. "
         "Recibes una o varias fotos del mismo producto. Analiza las imagenes con cuidado. "
-        "Describe solo lo que se ve. No inventes un collar, una cama, un juguete ni otro "
-        "accesorio si no aparece. No inventes precio, existencia, categorias ni sku. "
+        "Describe solo lo que se ve. No inventes otro producto si no aparece. "
+        "No inventes precio, existencia, categorias ni sku. "
+        "Acepta cualquier producto fisico claro (silla, gorra, juguete, collar, etc.). "
+        "No rechaces por categoria ni porque no sea de mascotas. "
         "Responde SOLO un JSON valido con estas claves exactas:\n"
-        '- "detectado": true si las fotos muestran un producto usable para la tienda; '
-        "false si la foto esta negra, vacia, borrosa, cortada, es texto, una persona, "
-        "o no se reconoce un producto.\n"
+        '- "detectado": true si se ve un producto fisico claro; '
+        "false SOLO si la foto esta negra, vacia, borrosa, cortada, es solo texto, "
+        "solo una persona sin producto, o no se reconoce ningun producto.\n"
         '- "aviso": si detectado es false, explica la causa en espanol en una frase corta. '
         'Si detectado es true, usa "".\n'
         '- "nombre": titulo corto del producto visible, con color si se ve. Max 120 caracteres. '
