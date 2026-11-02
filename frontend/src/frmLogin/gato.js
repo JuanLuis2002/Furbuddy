@@ -259,12 +259,26 @@ export function montarGato(host) {
 			};
 		}
 
+		function yarnAngle() {
+			// El cabo del ovillo en yarn-ball.webp sale hacia arriba-izquierda.
+			return toy.angle * Math.PI / 180 - Math.PI * 0.72;
+		}
+
 		function ballAttachment() {
-			var angle = toy.angle * Math.PI / 180;
-			var offset = -(ball.offsetWidth || 48) * 0.28;
+			var radius = (ball.offsetWidth || 48) * 0.42;
+			var dir = yarnAngle();
 			return {
-				x: toy.x + offset * Math.cos(angle) - offset * Math.sin(angle),
-				y: toy.y + offset * Math.sin(angle) + offset * Math.cos(angle)
+				x: toy.x + Math.cos(dir) * radius,
+				y: toy.y + Math.sin(dir) * radius
+			};
+		}
+
+		function tipHome() {
+			var radius = (ball.offsetWidth || 48) * 0.72;
+			var dir = yarnAngle();
+			return {
+				x: toy.x + Math.cos(dir) * radius,
+				y: toy.y + Math.sin(dir) * radius
 			};
 		}
 
@@ -283,7 +297,7 @@ export function montarGato(host) {
 			thread.setAttribute("viewBox", "0 0 " + width + " " + height);
 			var attach = ballAttachment();
 			var cx = (attach.x + tipX) / 2;
-			var cy = (attach.y + tipY) / 2 + Math.min(28, 7 + Math.abs(tipX - attach.x) * 0.06);
+			var cy = (attach.y + tipY) / 2 + Math.min(18, 4 + Math.abs(tipX - attach.x) * 0.04);
 			path.setAttribute("d", "M " + attach.x.toFixed(1) + " " + attach.y.toFixed(1) + " Q " + cx.toFixed(1) + " " + cy.toFixed(1) + " " + tipX.toFixed(1) + " " + tipY.toFixed(1));
 			tip.style.left = tipX + "px";
 			tip.style.top = tipY + "px";
@@ -301,9 +315,9 @@ export function montarGato(host) {
 			toy.angle = 0;
 			toy.angleV = 0;
 			toy.ready = true;
-			var attach = ballAttachment();
-			tipX = attach.x - 43;
-			tipY = attach.y - 27;
+			var home = tipHome();
+			tipX = home.x;
+			tipY = home.y;
 			tipVx = 0;
 			tipVy = 0;
 			positionBall();
@@ -343,13 +357,25 @@ export function montarGato(host) {
 				positionBall();
 			}
 			if (!draggingTip) {
-				var attach = ballAttachment();
-				var targetX = attach.x - 43;
-				var targetY = attach.y - 27;
-				tipVx = (tipVx + (targetX - tipX) * 75 * dt) * Math.exp(-12 * dt);
-				tipVy = (tipVy + (targetY - tipY) * 75 * dt) * Math.exp(-12 * dt);
-				tipX += tipVx * dt;
-				tipY += tipVy * dt;
+				var home = tipHome();
+				// Pegado al cabo al mover la pelota; al soltar el lazo vuelve sin rebotar aparte.
+				if (draggingBall || reduced) {
+					tipX = home.x;
+					tipY = home.y;
+					tipVx = 0;
+					tipVy = 0;
+				} else {
+					tipVx = (tipVx + (home.x - tipX) * 160 * dt) * Math.exp(-26 * dt);
+					tipVy = (tipVy + (home.y - tipY) * 160 * dt) * Math.exp(-26 * dt);
+					tipX += tipVx * dt;
+					tipY += tipVy * dt;
+					if (Math.hypot(home.x - tipX, home.y - tipY) < 1.2 && Math.hypot(tipVx, tipVy) < 28) {
+						tipX = home.x;
+						tipY = home.y;
+						tipVx = 0;
+						tipVy = 0;
+					}
+				}
 			}
 			placeThread();
 		}
@@ -428,6 +454,13 @@ export function montarGato(host) {
 			toy.y = y;
 			toy.lastAt = now;
 			positionBall();
+			if (!draggingTip) {
+				var home = tipHome();
+				tipX = home.x;
+				tipY = home.y;
+				tipVx = 0;
+				tipVy = 0;
+			}
 			placeThread();
 			event.stopPropagation();
 		});
