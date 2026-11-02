@@ -450,15 +450,18 @@ add_action( 'wp_footer', function() {
 add_action( 'wp_head', function() {
 	?>
 	<style id="furbuddy-faq-accordions">
-		/* 1. Contenedor principal de cada acordeon */
+		/* 1. Contenedor principal: Estilo Acento Furbuddy */
 		.stk-e839a25 .stk-block-accordion,
 		.stk-block-accordion {
 			background: #ffffff !important;
 			border-radius: 14px !important;
 			margin-bottom: 14px !important;
 			box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
-			border: 1px solid rgba(0, 0, 0, 0.04) !important;
-			transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+			border-left: 5px solid #0E8A42 !important;
+			border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+			border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+			border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+			transition: transform 0.25s ease, box-shadow 0.25s ease, border-left-color 0.25s ease !important;
 			overflow: hidden !important;
 		}
 
@@ -467,6 +470,13 @@ add_action( 'wp_head', function() {
 		.stk-block-accordion:hover {
 			transform: translateY(-3px) !important;
 			box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14) !important;
+			border-left-color: #0b7336 !important;
+		}
+
+		/* Estado abierto */
+		.stk-block-accordion[open] {
+			border-left-color: #0E8A42 !important;
+			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
 		}
 
 		/* 2. Cabecera (Pregunta): Altura uniforme y alineacion vertical */
@@ -501,12 +511,12 @@ add_action( 'wp_head', function() {
 		.stk-block-accordion .stk-highlight,
 		.stk-block-accordion h3 {
 			font-size: 0.98rem !important;
-			font-weight: 600 !important;
+			font-weight: 700 !important;
 			line-height: 1.35 !important;
-			color: #17383e !important;
+			color: #14171A !important;
 		}
 
-		/* 3. Icono / Flecha con contenedor circular y rotacion suave */
+		/* 3. Icono / Flecha: Rotacion suave SIN cambio de color */
 		.stk-block-accordion .stk-block-icon {
 			width: 32px !important;
 			height: 32px !important;
@@ -517,23 +527,19 @@ add_action( 'wp_head', function() {
 			justify-content: center !important;
 			flex-shrink: 0 !important;
 			margin-left: 12px !important;
-			transition: background-color 0.25s ease, transform 0.3s ease !important;
+			transition: transform 0.3s ease !important;
 		}
 
 		.stk-block-accordion[open] .stk-block-icon {
-			background: #e2f0d9 !important;
+			background: #f0f4f6 !important; /* Mantiene su color neutro */
 			transform: rotate(180deg) !important;
 		}
 
-		.stk-block-accordion .stk-block-icon svg {
+		.stk-block-accordion .stk-block-icon svg,
+		.stk-block-accordion[open] .stk-block-icon svg {
 			width: 12px !important;
 			height: 12px !important;
-			fill: #365b6c !important;
-			transition: fill 0.25s ease !important;
-		}
-
-		.stk-block-accordion[open] .stk-block-icon svg {
-			fill: #155734 !important;
+			fill: #365b6c !important; /* Color consistente permanente */
 		}
 
 		/* 4. Cuerpo de la respuesta al desplegar */
@@ -542,9 +548,8 @@ add_action( 'wp_head', function() {
 			color: #4a5568 !important;
 			font-size: 0.92rem !important;
 			line-height: 1.55 !important;
-			border-top: 1px solid #f2f2f2 !important;
-		}
-	</style>
+			border-top: 1px solid #f0f0f0 !important;
+		}</style>
 	<?php
 }, 999 );
 
