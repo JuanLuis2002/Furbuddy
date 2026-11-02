@@ -202,7 +202,7 @@ add_action( 'wp_head', function() {
 			text-shadow: 0 0 10px rgba(255, 184, 0, 0.6) !important;
 		}
 
-		/* 5. Tarjetas de Categorias (Juguetes, Ropa, Camas, Portadoras) - Modernas, Limpias e Iconos Siempre Visibles */
+		/* 5. Tarjetas de Categorias (Juguetes, Ropa, Camas, Portadoras) - Centrado Optico, Animacion y Contraste Navideno */
 		.stk-dcb23ef-container,
 		.stk-7154f94-container,
 		.stk-4652df5-container,
@@ -227,8 +227,8 @@ add_action( 'wp_head', function() {
 			background: #ffffff !important;
 			background-color: #ffffff !important;
 			border-color: #FFB800 !important;
-			box-shadow: 0 14px 32px rgba(255, 184, 0, 0.18) !important;
-			transform: translateY(-5px) !important;
+			box-shadow: 0 16px 36px rgba(255, 184, 0, 0.22) !important;
+			transform: translateY(-6px) !important;
 		}
 
 		.stk-dcb23ef-container:before,
@@ -243,11 +243,25 @@ add_action( 'wp_head', function() {
 			background-color: transparent !important;
 		}
 
-		/* Sin envoltorios circulares que deformen o reduzcan los iconos */
+		/* Caja contenedora unificada: Centrado optico perfecto para los 4 iconos */
+		.stk-dcb23ef-container .stk--svg-wrapper,
+		.stk-7154f94-container .stk--svg-wrapper,
+		.stk-4652df5-container .stk--svg-wrapper,
+		.stk-cf8053e-container .stk--svg-wrapper,
+		.stk-dcb23ef-container .stk--inner-svg,
+		.stk-7154f94-container .stk--inner-svg,
+		.stk-4652df5-container .stk--inner-svg,
+		.stk-cf8053e-container .stk--inner-svg,
+		.stk-dcb23ef-container .stk-block-icon,
+		.stk-7154f94-container .stk-block-icon,
+		.stk-4652df5-container .stk-block-icon,
+		.stk-cf8053e-container .stk-block-icon,
 		.stk-block-column .stk--svg-wrapper,
 		.stk-hover-parent .stk--svg-wrapper {
-			width: auto !important;
-			height: auto !important;
+			height: 64px !important;
+			min-height: 64px !important;
+			max-height: 64px !important;
+			width: 100% !important;
 			margin: 0 auto 12px auto !important;
 			border-radius: 0 !important;
 			background: transparent !important;
@@ -258,43 +272,83 @@ add_action( 'wp_head', function() {
 			box-shadow: none !important;
 		}
 
-		.stk-block-column:hover .stk--svg-wrapper,
-		.stk-hover-parent:hover .stk--svg-wrapper {
-			background: transparent !important;
-			border: none !important;
-			box-shadow: none !important;
-		}
-
-		/* Asegurar que NINGUN icono se vuelva blanco o invisible en reposo ni en hover */
+		/* Dimension y balance geometrico de los SVGs */
+		.stk-dcb23ef-container svg,
+		.stk-7154f94-container svg,
+		.stk-4652df5-container svg,
+		.stk-cf8053e-container svg,
+		.stk-dcb23ef-container svg.ugb-custom-icon,
+		.stk-7154f94-container svg.ugb-custom-icon,
+		.stk-4652df5-container svg.ugb-custom-icon,
+		.stk-cf8053e-container svg.ugb-custom-icon,
 		.stk-block-column svg,
-		.stk-block-column svg path,
-		.stk-block-icon svg,
-		.stk-block-icon svg path,
-		.wp-block-stackable-icon svg,
-		.wp-block-stackable-icon svg path,
-		:where(.stk-hover-parent) svg,
-		:where(.stk-hover-parent) svg path,
-		:where(.stk-hover-parent:hover) svg,
-		:where(.stk-hover-parent:hover) svg path,
-		:where(.stk-hover-parent.stk--is-hovered) svg,
-		:where(.stk-hover-parent.stk--is-hovered) svg path {
-			fill: #E50914 !important;
-			width: 52px !important;
-			height: 52px !important;
-			max-width: 52px !important;
-			max-height: 52px !important;
-			transition: all 0.3s ease !important;
+		.stk-block-icon svg {
+			width: 48px !important;
+			height: 48px !important;
+			max-width: 48px !important;
+			max-height: 48px !important;
+			display: block !important;
+			margin: 0 auto !important;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 		}
 
+		/* Camas: Compensacion optica para que no luzca achatado respecto a las otras */
+		.stk-4652df5-container svg,
+		.stk-4652df5-container svg.ugb-custom-icon {
+			width: 54px !important;
+			height: 54px !important;
+			max-width: 54px !important;
+			max-height: 54px !important;
+		}
+
+		/* Colorear tanto el trazo (stroke) como el relleno (fill) a Rojo Festivo #E50914 */
+		.stk-dcb23ef-container svg path,
+		.stk-7154f94-container svg path,
+		.stk-4652df5-container svg path,
+		.stk-cf8053e-container svg path,
+		.stk-dcb23ef-container svg *,
+		.stk-7154f94-container svg *,
+		.stk-4652df5-container svg *,
+		.stk-cf8053e-container svg *,
+		.stk-block-column svg path,
+		.stk-block-column svg * {
+			fill: #E50914 !important;
+			color: #E50914 !important;
+			transition: fill 0.3s ease, color 0.3s ease, stroke 0.3s ease !important;
+		}
+
+		/* Hover sobre la tarjeta: el icono escala suavemente y cambia a Dorado Festivo #FFB800 */
+		.stk-dcb23ef-container:hover svg,
+		.stk-7154f94-container:hover svg,
+		.stk-4652df5-container:hover svg,
+		.stk-cf8053e-container:hover svg,
 		.stk-block-column:hover svg,
+		.stk-hover-parent:hover svg {
+			transform: scale(1.12) !important;
+		}
+
+		.stk-dcb23ef-container:hover svg path,
+		.stk-7154f94-container:hover svg path,
+		.stk-4652df5-container:hover svg path,
+		.stk-cf8053e-container:hover svg path,
+		.stk-dcb23ef-container:hover svg *,
+		.stk-7154f94-container:hover svg *,
+		.stk-4652df5-container:hover svg *,
+		.stk-cf8053e-container:hover svg *,
 		.stk-block-column:hover svg path,
-		.stk-hover-parent:hover svg,
-		.stk-hover-parent:hover svg path {
+		.stk-block-column:hover svg *,
+		.stk-hover-parent:hover svg path,
+		.stk-hover-parent:hover svg * {
 			fill: #FFB800 !important;
-			transform: scale(1.08) !important;
+			color: #FFB800 !important;
+			stroke: #FFB800 !important;
 		}
 
 		/* Textos de Categorias (Juguetes, Ropa, Camas, Portadoras) */
+		.stk-dcb23ef-container .stk-block-heading__text,
+		.stk-7154f94-container .stk-block-heading__text,
+		.stk-4652df5-container .stk-block-heading__text,
+		.stk-cf8053e-container .stk-block-heading__text,
 		.stk-block-column .stk-block-heading__text {
 			color: #1e293b !important;
 			font-size: 1.15rem !important;
@@ -303,6 +357,10 @@ add_action( 'wp_head', function() {
 			transition: color 0.3s ease !important;
 		}
 
+		.stk-dcb23ef-container:hover .stk-block-heading__text,
+		.stk-7154f94-container:hover .stk-block-heading__text,
+		.stk-4652df5-container:hover .stk-block-heading__text,
+		.stk-cf8053e-container:hover .stk-block-heading__text,
 		.stk-block-column:hover .stk-block-heading__text,
 		.stk-hover-parent:hover .stk-block-heading__text {
 			color: #FFB800 !important;
