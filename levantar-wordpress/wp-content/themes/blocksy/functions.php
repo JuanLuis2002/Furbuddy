@@ -72,13 +72,22 @@ add_action( 'wp_head', function() {
 			font-family: 'Comfortaa', cursive, sans-serif !important;
 		}
 
-		/* 2. Paleta Global y Hero Verde Pino Navideno */
+		/* 2. Reemplazo Global de Naranjas por Paleta Navidena */
 		:root {
-			--theme-palette-color-4: #0d3820 !important;
+			--theme-palette-color-1: #E50914 !important; /* Rojo Navideno (reemplaza cualquier naranja) */
+			--theme-palette-color-2: #9E1B22 !important; /* Granate suave para hovers */
+			--theme-palette-color-3: #17383e !important; /* Gris carbon / Texto */
+			--theme-palette-color-4: #0d3820 !important; /* Verde Pino Profundo */
+			--wp--preset--color--palette-color-1: #E50914 !important;
+			--wp--preset--color--palette-color-2: #9E1B22 !important;
+			--wp--preset--color--palette-color-4: #0d3820 !important;
 			--theme-button-background-color: #E50914 !important;
 			--theme-button-hover-background-color: #9E1B22 !important;
+			--theme-link-initial-color: #E50914 !important;
+			--theme-link-hover-color: #9E1B22 !important;
 		}
 
+		/* 3. Banner Hero Verde Pino Navideno */
 		.stk-5cc302c,
 		.stk-block-background.stk--has-background-overlay,
 		.stk-block-columns.stk--has-background-overlay,
@@ -118,7 +127,75 @@ add_action( 'wp_head', function() {
 			z-index: 1 !important;
 		}
 
-		/* 3. Iconos de Categorias (SVGs Vectoriales de Stackable) */
+		/* 4. Banner "Sorprende a tu mascota" (Adios Naranja -> Verde Pino Elegante) */
+		.stk-4754272,
+		.stk-4754272.stk-block-background {
+			background: linear-gradient(135deg, #0d3820 0%, #155734 100%) !important;
+			background-color: #0d3820 !important;
+			border-radius: 24px !important;
+			box-shadow: 0 12px 32px rgba(13, 56, 32, 0.18) !important;
+		}
+		.stk-4754272:before {
+			background: transparent !important;
+			background-color: transparent !important;
+		}
+		.stk-4754272 .stk-2b904ee .stk-button {
+			background: #ffffff !important;
+			border-radius: 50px !important;
+			transition: all 0.3s ease !important;
+		}
+		.stk-4754272 .stk-2b904ee .stk-button .stk-button__inner-text {
+			color: #0d3820 !important;
+			font-weight: 700 !important;
+		}
+		.stk-4754272 .stk-2b904ee .stk-button:hover {
+			background: #ffd700 !important;
+			transform: translateY(-2px) !important;
+			box-shadow: 0 6px 18px rgba(0,0,0,0.15) !important;
+		}
+
+		/* 5. Tarjetas de Categorias (Juguetes, Ropa, Camas, Portadoras) - Modernas, Blancas y Sin Animaciones Bruscas */
+		.stk-dcb23ef-container,
+		.stk-7154f94-container,
+		.stk-4652df5-container,
+		.stk-cf8053e-container,
+		.wp-block-stackable-column.stk-block-column .stk-hover-parent {
+			background: #ffffff !important;
+			background-color: #ffffff !important;
+			border-radius: 20px !important;
+			border: 1.5px solid #edf2f7 !important;
+			box-shadow: 0 6px 20px rgba(0,0,0,0.04) !important;
+			padding: 42px 20px 38px 20px !important;
+			transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
+			position: relative !important;
+		}
+
+		/* Anular el fondo naranja por completo en hover */
+		.stk-dcb23ef-container:hover,
+		.stk-7154f94-container:hover,
+		.stk-4652df5-container:hover,
+		.stk-cf8053e-container:hover,
+		.wp-block-stackable-column.stk-block-column .stk-hover-parent:hover {
+			background: #ffffff !important;
+			background-color: #ffffff !important;
+			border-color: #155734 !important;
+			box-shadow: 0 14px 32px rgba(13, 56, 32, 0.12) !important;
+			transform: translateY(-4px) !important;
+		}
+
+		.stk-dcb23ef-container:before,
+		.stk-7154f94-container:before,
+		.stk-4652df5-container:before,
+		.stk-cf8053e-container:before,
+		.stk-dcb23ef-container:hover:before,
+		.stk-7154f94-container:hover:before,
+		.stk-4652df5-container:hover:before,
+		.stk-cf8053e-container:hover:before {
+			background: transparent !important;
+			background-color: transparent !important;
+		}
+
+		/* Iconos de Categorias - Limpios, alineados y sin rotaciones bruscas */
 		.wp-block-stackable-icon svg,
 		.wp-block-stackable-icon svg path,
 		.stk-block-icon svg,
@@ -126,28 +203,32 @@ add_action( 'wp_head', function() {
 		.home .wp-block-columns .wp-block-column svg,
 		.home .wp-block-columns .wp-block-column svg path {
 			fill: #E50914 !important;
-			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+			transform: none !important;
+			transition: fill 0.3s ease, transform 0.3s ease !important;
 		}
 
 		.stk-block-column:hover .wp-block-stackable-icon svg,
 		.stk-block-column:hover .wp-block-stackable-icon svg path,
-		.wp-block-stackable-icon:hover svg,
-		.wp-block-stackable-icon:hover svg path,
-		.home .wp-block-columns .wp-block-column:hover svg,
-		.home .wp-block-columns .wp-block-column:hover svg path {
-			fill: #FFB800 !important;
-			transform: scale(1.14) rotate(-4deg) !important;
+		.stk-hover-parent:hover .wp-block-stackable-icon svg,
+		.stk-hover-parent:hover .wp-block-stackable-icon svg path {
+			fill: #155734 !important; /* Verde pino elegante en hover */
+			transform: translateY(-3px) scale(1.05) !important; /* Movimiento sutil y profesional sin rotar */
 		}
 
+		/* Textos de Categorias (Juguetes, Ropa, Camas, Portadoras) */
 		.stk-block-column .stk-block-heading__text {
+			color: #1e293b !important; /* Carbon oscuro legible y moderno */
+			font-size: 1.15rem !important;
 			font-weight: 700 !important;
+			margin-top: 14px !important;
 			transition: color 0.3s ease !important;
 		}
-		.stk-block-column:hover .stk-block-heading__text {
-			color: #E50914 !important;
+		.stk-block-column:hover .stk-block-heading__text,
+		.stk-hover-parent:hover .stk-block-heading__text {
+			color: #155734 !important;
 		}
 
-		/* 4. Suavizado del tono Rojo en Botones Hover a Granate Elegante */
+		/* 6. Suavizado del tono Rojo en Botones Hover a Granate Elegante */
 		button, input[type="submit"], .button, .btn, .ct-button,
 		.woocommerce a.button, .woocommerce button.button, .stk-button {
 			background-color: #E50914 !important;
@@ -174,7 +255,7 @@ add_action( 'wp_head', function() {
 			transform: translateY(-2px) !important;
 		}
 
-		/* 5. Migas de pan (Breadcrumbs) en Preguntas Frecuentes y paginas secundarias */
+		/* 7. Migas de pan (Breadcrumbs) en Preguntas Frecuentes y paginas secundarias */
 		.entry-header .ct-breadcrumbs,
 		.ct-breadcrumbs a,
 		.ct-breadcrumbs span {
@@ -185,27 +266,27 @@ add_action( 'wp_head', function() {
 			color: #ffd700 !important;
 		}
 
-		/* 6. Tarjetas de Productos en el Home y Tienda */
+		/* 8. Tarjetas de Productos en el Home y Tienda - Limpias, Proporcionales y Elegantes */
 		html body [data-products] .product,
 		html body ul.products li.product,
 		html body .products .product {
-			padding: 26px 20px 28px 20px !important;
-			border-radius: 24px !important;
+			padding: 24px 18px 24px 18px !important;
+			border-radius: 20px !important;
 			background: #ffffff !important;
 			border: 1.5px solid #edf2f7 !important;
-			box-shadow: 0 4px 18px rgba(0,0,0,0.06) !important;
+			box-shadow: 0 4px 16px rgba(0,0,0,0.05) !important;
 			transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
 		}
 		html body [data-products] .product:hover,
 		html body ul.products li.product:hover,
 		html body .products .product:hover {
-			transform: translateY(-8px) !important;
-			box-shadow: 0 16px 36px rgba(13, 56, 32, 0.15) !important;
+			transform: translateY(-5px) !important;
+			box-shadow: 0 14px 30px rgba(13, 56, 32, 0.12) !important;
 			border-color: #155734 !important;
 		}
 		html body .products .product .woocommerce-loop-product__title {
-			margin: 14px 0 8px 0 !important;
-			font-size: 1.05rem !important;
+			margin: 12px 0 6px 0 !important;
+			font-size: 1.02rem !important;
 			font-weight: 600 !important;
 			color: #1e293b !important;
 			text-align: center !important;
@@ -213,14 +294,14 @@ add_action( 'wp_head', function() {
 		html body .products .product .price,
 		html body .products .product .price * {
 			color: #155734 !important;
-			font-size: 1.2rem !important;
+			font-size: 1.15rem !important;
 			font-weight: 700 !important;
 			text-align: center !important;
-			margin-bottom: 14px !important;
+			margin-bottom: 12px !important;
 		}
 		html body .products .product .button.add_to_cart_button {
 			border-radius: 50px !important;
-			padding: 10px 24px !important;
+			padding: 10px 22px !important;
 			font-weight: 700 !important;
 			background: #E50914 !important;
 			color: #ffffff !important;
