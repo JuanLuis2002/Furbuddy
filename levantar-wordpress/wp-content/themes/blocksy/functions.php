@@ -127,34 +127,54 @@ add_action( 'wp_head', function() {
 			z-index: 1 !important;
 		}
 
-		/* 4. Banner "Sorprende a tu mascota" (Adios Naranja -> Verde Pino Elegante) */
+		/* 4. Banner "Sorprende a tu mascota" (Rojo Navideno Vibrante y Tipografia Blanca Nitida) */
 		.stk-4754272,
 		.stk-4754272.stk-block-background {
-			background: linear-gradient(135deg, #0d3820 0%, #155734 100%) !important;
-			background-color: #0d3820 !important;
+			background: linear-gradient(135deg, #E50914 0%, #b80710 100%) !important;
+			background-color: #E50914 !important;
 			border-radius: 24px !important;
-			box-shadow: 0 12px 32px rgba(13, 56, 32, 0.18) !important;
+			box-shadow: 0 14px 36px rgba(229, 9, 20, 0.22) !important;
 		}
 		.stk-4754272:before {
 			background: transparent !important;
 			background-color: transparent !important;
 		}
+		.stk-4754272 .stk-8d6006f .stk-block-heading__text,
+		.stk-4754272 h6,
+		.stk-4754272 .stk-block-heading__text {
+			color: #ffffff !important;
+			font-weight: 700 !important;
+			text-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+		}
+		.stk-4754272 .stk-0b75cce .stk-block-text__text,
+		.stk-4754272 p {
+			color: #fff8f8 !important;
+			opacity: 0.95 !important;
+		}
+		.stk-4754272 .stk-f6cbe4c svg,
+		.stk-4754272 .stk-f6cbe4c svg path {
+			fill: #ffffff !important;
+		}
 		.stk-4754272 .stk-2b904ee .stk-button {
 			background: #ffffff !important;
 			border-radius: 50px !important;
+			box-shadow: 0 6px 18px rgba(0,0,0,0.15) !important;
 			transition: all 0.3s ease !important;
 		}
 		.stk-4754272 .stk-2b904ee .stk-button .stk-button__inner-text {
-			color: #0d3820 !important;
-			font-weight: 700 !important;
+			color: #E50914 !important;
+			font-weight: 800 !important;
 		}
 		.stk-4754272 .stk-2b904ee .stk-button:hover {
 			background: #ffd700 !important;
-			transform: translateY(-2px) !important;
-			box-shadow: 0 6px 18px rgba(0,0,0,0.15) !important;
+			transform: translateY(-2px) scale(1.04) !important;
+			box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4) !important;
+		}
+		.stk-4754272 .stk-2b904ee .stk-button:hover .stk-button__inner-text {
+			color: #1a1a1a !important;
 		}
 
-		/* 5. Tarjetas de Categorias (Juguetes, Ropa, Camas, Portadoras) - Modernas, Blancas y Sin Animaciones Bruscas */
+		/* 5. Tarjetas de Categorias (Juguetes, Ropa, Camas, Portadoras) - Modernas, Limpias e Iconos Siempre Visibles */
 		.stk-dcb23ef-container,
 		.stk-7154f94-container,
 		.stk-4652df5-container,
@@ -162,15 +182,15 @@ add_action( 'wp_head', function() {
 		.wp-block-stackable-column.stk-block-column .stk-hover-parent {
 			background: #ffffff !important;
 			background-color: #ffffff !important;
-			border-radius: 20px !important;
+			border-radius: 24px !important;
 			border: 1.5px solid #edf2f7 !important;
 			box-shadow: 0 6px 20px rgba(0,0,0,0.04) !important;
-			padding: 42px 20px 38px 20px !important;
+			padding: 36px 18px 30px 18px !important;
 			transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
 			position: relative !important;
+			text-align: center !important;
 		}
 
-		/* Anular el fondo naranja por completo en hover */
 		.stk-dcb23ef-container:hover,
 		.stk-7154f94-container:hover,
 		.stk-4652df5-container:hover,
@@ -178,9 +198,9 @@ add_action( 'wp_head', function() {
 		.wp-block-stackable-column.stk-block-column .stk-hover-parent:hover {
 			background: #ffffff !important;
 			background-color: #ffffff !important;
-			border-color: #155734 !important;
-			box-shadow: 0 14px 32px rgba(13, 56, 32, 0.12) !important;
-			transform: translateY(-4px) !important;
+			border-color: #E50914 !important;
+			box-shadow: 0 16px 36px rgba(229, 9, 20, 0.12) !important;
+			transform: translateY(-5px) !important;
 		}
 
 		.stk-dcb23ef-container:before,
@@ -195,37 +215,68 @@ add_action( 'wp_head', function() {
 			background-color: transparent !important;
 		}
 
-		/* Iconos de Categorias - Limpios, alineados y sin rotaciones bruscas */
-		.wp-block-stackable-icon svg,
-		.wp-block-stackable-icon svg path,
-		.stk-block-icon svg,
-		.stk-block-icon svg path,
-		.home .wp-block-columns .wp-block-column svg,
-		.home .wp-block-columns .wp-block-column svg path {
-			fill: #E50914 !important;
-			transform: none !important;
-			transition: fill 0.3s ease, transform 0.3s ease !important;
+		/* Insignia Circular Festiva para Iconos */
+		.stk-block-column .stk--svg-wrapper,
+		.stk-hover-parent .stk--svg-wrapper {
+			width: 82px !important;
+			height: 82px !important;
+			margin: 0 auto 10px auto !important;
+			border-radius: 50% !important;
+			background: #fbf8f3 !important;
+			border: 1.5px solid #fae8c8 !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			transition: all 0.3s ease !important;
+			box-shadow: 0 4px 12px rgba(212, 136, 6, 0.08) !important;
 		}
 
-		.stk-block-column:hover .wp-block-stackable-icon svg,
-		.stk-block-column:hover .wp-block-stackable-icon svg path,
-		.stk-hover-parent:hover .wp-block-stackable-icon svg,
-		.stk-hover-parent:hover .wp-block-stackable-icon svg path {
-			fill: #155734 !important; /* Verde pino elegante en hover */
-			transform: translateY(-3px) scale(1.05) !important; /* Movimiento sutil y profesional sin rotar */
+		.stk-block-column:hover .stk--svg-wrapper,
+		.stk-hover-parent:hover .stk--svg-wrapper {
+			background: #fef2f2 !important;
+			border-color: #fecaca !important;
+			transform: scale(1.08) !important;
+			box-shadow: 0 8px 20px rgba(229, 9, 20, 0.18) !important;
+		}
+
+		/* Asegurar que NINGUN icono se vuelva blanco o invisible en hover */
+		.stk-block-column svg,
+		.stk-block-column svg path,
+		.stk-block-icon svg,
+		.stk-block-icon svg path,
+		.wp-block-stackable-icon svg,
+		.wp-block-stackable-icon svg path,
+		:where(.stk-hover-parent:hover) svg,
+		:where(.stk-hover-parent:hover) svg path,
+		:where(.stk-hover-parent.stk--is-hovered) svg,
+		:where(.stk-hover-parent.stk--is-hovered) svg path {
+			fill: #E50914 !important;
+			width: 42px !important;
+			height: 42px !important;
+			max-width: 42px !important;
+			max-height: 42px !important;
+			transition: fill 0.3s ease !important;
+		}
+
+		.stk-block-column:hover svg,
+		.stk-block-column:hover svg path,
+		.stk-hover-parent:hover svg,
+		.stk-hover-parent:hover svg path {
+			fill: #b80710 !important;
 		}
 
 		/* Textos de Categorias (Juguetes, Ropa, Camas, Portadoras) */
 		.stk-block-column .stk-block-heading__text {
-			color: #1e293b !important; /* Carbon oscuro legible y moderno */
-			font-size: 1.15rem !important;
+			color: #1e293b !important;
+			font-size: 1.12rem !important;
 			font-weight: 700 !important;
-			margin-top: 14px !important;
+			margin-top: 10px !important;
 			transition: color 0.3s ease !important;
 		}
+
 		.stk-block-column:hover .stk-block-heading__text,
 		.stk-hover-parent:hover .stk-block-heading__text {
-			color: #155734 !important;
+			color: #E50914 !important;
 		}
 
 		/* 6. Suavizado del tono Rojo en Botones Hover a Granate Elegante */
@@ -330,7 +381,7 @@ add_action( 'wp_head', function() {
 			margin-right: auto !important;
 		}
 
-		/* 8. Nieve Navidena Multitono de Alto Contraste */
+		/* 8. Nieve Navidena Integrada (Blanco Nieve Puro y Destellos Dorados) */
 		#furbuddy-snow-layer {
 			position: fixed;
 			top: 0; left: 0; width: 100%; height: 100%;
@@ -344,7 +395,7 @@ add_action( 'wp_head', function() {
 			animation: furbuddyFall linear infinite;
 			user-select: none;
 			will-change: transform;
-			text-shadow: 0 0 5px rgba(0, 180, 216, 0.8), 0 0 10px rgba(255, 215, 0, 0.4);
+			text-shadow: 0 0 6px rgba(255, 215, 0, 0.45), 0 0 3px rgba(255, 255, 255, 0.9);
 		}
 		@keyframes furbuddyFall {
 			0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
@@ -404,12 +455,12 @@ add_action( 'wp_footer', function() {
 	</div>
 
 	<script id="furbuddy-navidad-scripts">
-		// Generador de copos de nieve con destello de alto contraste
+		// Generador de copos de nieve integrados (Blanco y Oro)
 		(function() {
 			var container = document.getElementById('furbuddy-snow-layer');
 			if (!container) return;
 			var flakeChars = ['\u2744', '\u2745', '\u2746', '\u2022', '\u2726', '\u2727'];
-			var flakeColors = ['#00b4d8', '#ffd700', '#ffffff', '#90e0ef', '#ffea79'];
+			var flakeColors = ['#ffffff', '#ffd700', '#fff9e6', '#fef08a', '#fffaed'];
 			var flakeCount = 42;
 
 			for (var i = 0; i < flakeCount; i++) {
