@@ -66,10 +66,34 @@
 		var thread = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 		thread.setAttribute("class", "furbuddy-thread");
 		thread.setAttribute("aria-hidden", "true");
-		// Igual que Vue en coordenadas; en WP el stage no es cuadrado y sin esto el lazo y el punto se desfasaban.
+		// En WP el stage no es cuadrado: sin esto el lazo HTML/SVG se desfasa. Vue no lo necesita.
 		thread.setAttribute("preserveAspectRatio", "none");
+		var tipGrad = document.createElementNS("http://www.w3.org/2000/svg", "radialGradient");
+		tipGrad.setAttribute("id", "furbuddy-tip-grad");
+		tipGrad.setAttribute("cx", "34%");
+		tipGrad.setAttribute("cy", "30%");
+		tipGrad.setAttribute("r", "70%");
+		[["0%", "#ffece8"], ["56%", "#ff9aa8"], ["100%", "#d75a8e"]].forEach(function (stop) {
+			var node = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+			node.setAttribute("offset", stop[0]);
+			node.setAttribute("stop-color", stop[1]);
+			tipGrad.appendChild(node);
+		});
+		var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+		defs.appendChild(tipGrad);
 		var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+		// Punto visible en el mismo SVG que el lazo (en WP el boton HTML se separaba del path).
+		var tipDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+		tipDot.setAttribute("r", "9");
+		tipDot.setAttribute("fill", "url(#furbuddy-tip-grad)");
+		tipDot.setAttribute("stroke", "rgba(255,235,238,0.85)");
+		tipDot.setAttribute("stroke-width", "2");
+		tipDot.style.cursor = "grab";
+		tipDot.style.pointerEvents = "auto";
+		tipDot.setAttribute("aria-label", "Jala el lazo de la pelota");
+		thread.appendChild(defs);
 		thread.appendChild(path);
+		thread.appendChild(tipDot);
 
 		var ball = document.createElement("img");
 		ball.className = "furbuddy-hero-ball";
@@ -81,6 +105,8 @@
 		tip.type = "button";
 		tip.className = "furbuddy-thread-tip";
 		tip.setAttribute("aria-label", "Jala el lazo de la pelota");
+		tip.style.opacity = "0";
+		tip.style.pointerEvents = "none";
 
 		var sound = document.createElement("button");
 		sound.type = "button";
@@ -313,6 +339,8 @@
 			var cx = (attach.x + tipX) / 2;
 			var cy = (attach.y + tipY) / 2 + Math.min(28, 7 + Math.abs(tipX - attach.x) * 0.06);
 			path.setAttribute("d", "M " + attach.x.toFixed(1) + " " + attach.y.toFixed(1) + " Q " + cx.toFixed(1) + " " + cy.toFixed(1) + " " + tipX.toFixed(1) + " " + tipY.toFixed(1));
+			tipDot.setAttribute("cx", tipX.toFixed(1));
+			tipDot.setAttribute("cy", tipY.toFixed(1));
 			tip.style.left = tipX + "px";
 			tip.style.top = tipY + "px";
 		}
@@ -470,14 +498,16 @@
 		ball.addEventListener("pointerup", releaseBall);
 		ball.addEventListener("pointercancel", releaseBall);
 
-		tip.addEventListener("pointerdown", function (event) {
+		function onTipDown(event) {
 			draggingTip = true;
 			tipVx = 0;
 			tipVy = 0;
-			tip.setPointerCapture(event.pointerId);
+			tipDot.style.cursor = "grabbing";
+			tipDot.setPointerCapture(event.pointerId);
 			event.stopPropagation();
-		});
-		tip.addEventListener("pointermove", function (event) {
+			event.preventDefault();
+		}
+		function onTipMove(event) {
 			if (!draggingTip) {
 				return;
 			}
@@ -486,20 +516,24 @@
 			tipY = clamp(point.y, 8, stage.clientHeight - 8);
 			placeThread();
 			event.stopPropagation();
-		});
+		}
 		function releaseTip() {
 			if (!draggingTip) {
 				return;
 			}
 			draggingTip = false;
+			tipDot.style.cursor = "grab";
 			toy.vx += clamp((tipX - toy.x) * 4.4, -940, 940);
 			toy.vy += clamp((tipY - toy.y) * 4.4 - 180, -900, 400);
 			toy.angleV = toy.vx * 0.75;
 			leap("got it!");
 		}
-		tip.addEventListener("pointerup", releaseTip);
-		tip.addEventListener("pointercancel", function () {
+		tipDot.addEventListener("pointerdown", onTipDown);
+		tipDot.addEventListener("pointermove", onTipMove);
+		tipDot.addEventListener("pointerup", releaseTip);
+		tipDot.addEventListener("pointercancel", function () {
 			draggingTip = false;
+			tipDot.style.cursor = "grab";
 		});
 
 		[
