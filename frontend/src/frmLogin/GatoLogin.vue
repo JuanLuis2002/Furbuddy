@@ -157,8 +157,6 @@ onUnmounted(() => {
   z-index: 4;
   cursor: grab;
   touch-action: none;
-  /* Oculta el cabo/nudo dibujado en yarn-ball.webp; el lazo vivo es SVG + tip. */
-  clip-path: circle(46% at 50% 50%);
 }
 
 .furbuddy-hero-ball.is-dragging {
