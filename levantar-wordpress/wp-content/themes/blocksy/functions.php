@@ -1010,18 +1010,19 @@ add_action( 'wp_head', function() {
 		/* Contenedor del Popup #pum-1414 */
 		#pum-1414.pum-container,
 		#pum-1414 .pum-container {
-			width: 380px !important;
+			width: 360px !important;
 			max-width: calc(100vw - 32px) !important;
-			padding: 30px 24px 26px !important;
+			padding: 24px 20px 22px !important;
 			background: #ffffff !important;
 			border-radius: 24px !important;
-			border: 1px solid rgba(229, 131, 39, 0.18) !important;
-			box-shadow: 0 20px 45px -10px rgba(30, 56, 67, 0.22), 0 0 0 1px rgba(30, 56, 67, 0.04) !important;
+			border: 1px solid #e2e8f0 !important;
+			box-shadow: 0 20px 45px -10px rgba(0, 71, 62, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
 			overflow: hidden !important;
 			position: relative !important;
+			box-sizing: border-box !important;
 		}
 
-		/* Barra decorativa superior con la paleta de marca */
+		/* Barra decorativa superior verde bosque */
 		#pum-1414 .pum-container::before {
 			content: "" !important;
 			position: absolute !important;
@@ -1029,21 +1030,21 @@ add_action( 'wp_head', function() {
 			left: 0 !important;
 			right: 0 !important;
 			height: 5px !important;
-			background: linear-gradient(90deg, #e58327 0%, #f3a652 50%, #365b6c 100%) !important;
+			background: #00473e !important;
 		}
 
-		/* Botón de cierre redondeado y moderno */
+		/* Botón de cierre redondeado */
 		#pum-1414 .pum-close {
-			top: 14px !important;
-			right: 14px !important;
-			width: 32px !important;
-			height: 32px !important;
-			background: #F4F4F5 !important;
-			color: #365b6c !important;
+			top: 12px !important;
+			right: 12px !important;
+			width: 30px !important;
+			height: 30px !important;
+			background: #f1f5f9 !important;
+			color: #64748b !important;
 			border-radius: 50% !important;
 			border: none !important;
-			font-size: 15px !important;
-			line-height: 32px !important;
+			font-size: 14px !important;
+			line-height: 30px !important;
 			font-weight: 700 !important;
 			display: flex !important;
 			align-items: center !important;
@@ -1055,102 +1056,164 @@ add_action( 'wp_head', function() {
 		}
 
 		#pum-1414 .pum-close:hover {
-			background: #e58327 !important;
+			background: #00473e !important;
 			color: #ffffff !important;
-			transform: rotate(90deg) !important;
+			transform: scale(1.08) !important;
 		}
 
-		/* Badge superior */
-		#pum-1414 .fb-popup-badge {
-			display: inline-flex !important;
-			align-items: center !important;
-			gap: 6px !important;
-			background: #fff4e8 !important;
-			color: #e58327 !important;
-			font-size: 11px !important;
+		/* Contenedor interno del popup */
+		#pum-1414 .fb-popup-wrapper {
+			text-align: center !important;
+			box-sizing: border-box !important;
+		}
+
+		#pum-1414 .fb-badge {
+			display: inline-block !important;
+			font-size: 10px !important;
 			font-weight: 800 !important;
+			letter-spacing: 0.08em !important;
 			text-transform: uppercase !important;
-			letter-spacing: 0.05em !important;
-			padding: 4px 12px !important;
+			color: #00473e !important;
+			background: #ecfdf5 !important;
+			border: 1px solid #a7f3d0 !important;
+			padding: 3px 11px !important;
 			border-radius: 50px !important;
+			margin-bottom: 6px !important;
+		}
+
+		#pum-1414 .fb-title {
+			font-size: 21px !important;
+			font-weight: 800 !important;
+			color: #00473e !important;
+			line-height: 1.25 !important;
+			margin: 4px 0 2px 0 !important;
+			text-align: center !important;
+			letter-spacing: -0.02em !important;
+		}
+
+		#pum-1414 .fb-subtitle {
+			font-size: 12px !important;
+			color: #64748b !important;
+			text-align: center !important;
+			margin: 0 0 14px 0 !important;
+		}
+
+		/* Caja de Beneficios */
+		#pum-1414 .fb-benefits-box {
+			background: #f8fafc !important;
+			border: 1px solid #e2e8f0 !important;
+			border-radius: 14px !important;
+			padding: 12px 14px !important;
+			margin-bottom: 13px !important;
+			text-align: left !important;
+		}
+
+		#pum-1414 .fb-benefit-item {
+			display: flex !important;
+			align-items: flex-start !important;
+			gap: 8px !important;
+			font-size: 12.5px !important;
+			line-height: 1.45 !important;
+			color: #334155 !important;
 			margin-bottom: 8px !important;
 		}
 
-		/* Título */
-		#pum-1414 .fb-popup-title {
-			font-size: 20px !important;
+		#pum-1414 .fb-benefit-item:last-child {
+			margin-bottom: 0 !important;
+		}
+
+		#pum-1414 .fb-check {
+			color: #059669 !important;
 			font-weight: 800 !important;
-			color: #1e3843 !important;
-			line-height: 1.25 !important;
-			margin: 4px 0 10px 0 !important;
-			letter-spacing: -0.01em !important;
-			text-align: left !important;
-			text-shadow: none !important;
+			font-size: 13px !important;
+			line-height: 1.3 !important;
+			flex-shrink: 0 !important;
 		}
 
-		/* Descripción */
-		#pum-1414 .fb-popup-desc {
-			font-size: 13.5px !important;
-			line-height: 1.5 !important;
-			color: #4a5568 !important;
-			margin-bottom: 14px !important;
-			text-align: left !important;
+		/* Caja de Cupón */
+		#pum-1414 .fb-coupon-card {
+			display: flex !important;
+			align-items: center !important;
+			justify-content: space-between !important;
+			background: #f0fdf4 !important;
+			border: 1.5px dashed #34d399 !important;
+			border-radius: 12px !important;
+			padding: 9px 12px !important;
+			margin-bottom: 6px !important;
 		}
 
-		/* Tarjeta estilo Cupón */
-		#pum-1414 .fb-coupon-box {
-			background: #FBFBFB !important;
-			border: 1.5px dashed #e58327 !important;
-			border-radius: 14px !important;
-			padding: 12px !important;
-			margin: 14px 0 16px !important;
-			text-align: center !important;
+		#pum-1414 .fb-coupon-info {
+			text-align: left !important;
 		}
 
 		#pum-1414 .fb-coupon-label {
-			font-size: 10.5px !important;
-			text-transform: uppercase !important;
+			display: block !important;
+			font-size: 10px !important;
 			font-weight: 700 !important;
-			color: #718096 !important;
-			margin-bottom: 2px !important;
+			text-transform: uppercase !important;
+			color: #065f46 !important;
+			letter-spacing: 0.05em !important;
 		}
 
 		#pum-1414 .fb-coupon-code {
-			font-size: 19px !important;
-			font-weight: 800 !important;
-			color: #1e3843 !important;
-			letter-spacing: 2.5px !important;
-			font-family: monospace, sans-serif !important;
+			display: block !important;
+			font-size: 17px !important;
+			font-weight: 900 !important;
+			font-family: monospace, monospace !important;
+			color: #00473e !important;
+			letter-spacing: 2px !important;
 		}
 
-		#pum-1414 .fb-coupon-subtext {
-			font-size: 10px !important;
-			color: #a0aec0 !important;
-			margin-top: 2px !important;
+		#pum-1414 .fb-coupon-copy {
+			background: #00473e !important;
+			color: #ffffff !important;
+			border: none !important;
+			border-radius: 8px !important;
+			padding: 6px 14px !important;
+			font-size: 12px !important;
+			font-weight: 700 !important;
+			cursor: pointer !important;
+			transition: all 0.2s ease !important;
 		}
 
-		/* Botón CTA FurBuddy */
-		#pum-1414 .fb-popup-btn {
+		#pum-1414 .fb-coupon-copy:hover {
+			background: #059669 !important;
+		}
+
+		#pum-1414 .fb-coupon-copy.copied {
+			background: #10b981 !important;
+		}
+
+		#pum-1414 .fb-coupon-terms {
+			font-size: 10.5px !important;
+			color: #94a3b8 !important;
+			text-align: center !important;
+			font-style: italic !important;
+			margin-bottom: 14px !important;
+		}
+
+		/* Botón CTA Principal */
+		#pum-1414 .fb-cta-btn {
 			display: block !important;
 			width: 100% !important;
-			background: linear-gradient(135deg, #e58327 0%, #d46b08 100%) !important;
+			background: #00473e !important;
 			color: #ffffff !important;
 			font-size: 14px !important;
 			font-weight: 700 !important;
 			text-align: center !important;
 			text-decoration: none !important;
-			padding: 13px 18px !important;
-			border-radius: 50px !important;
-			box-shadow: 0 8px 18px -4px rgba(229, 131, 39, 0.45) !important;
+			padding: 13px 16px !important;
+			border-radius: 12px !important;
+			box-shadow: 0 6px 16px -2px rgba(0, 71, 62, 0.35) !important;
 			transition: all 0.2s ease !important;
-			border: none !important;
-			cursor: pointer !important;
+			box-sizing: border-box !important;
 		}
 
-		#pum-1414 .fb-popup-btn:hover {
-			transform: translateY(-2px) !important;
-			box-shadow: 0 12px 22px -4px rgba(229, 131, 39, 0.6) !important;
+		#pum-1414 .fb-cta-btn:hover {
+			background: #065f46 !important;
 			color: #ffffff !important;
+			transform: translateY(-1px) !important;
+			box-shadow: 0 10px 20px -2px rgba(0, 71, 62, 0.45) !important;
 		}
 	</style>
 	<?php
