@@ -470,33 +470,17 @@ add_action( 'wp_head', function() {
 			display: none !important;
 		}
 
-		/* Animaciones de Fondo Aurora y Resplandor Suave */
-		@keyframes fbAurora {
-			0% { background-position: 0% 50%; }
-			50% { background-position: 100% 50%; }
-			100% { background-position: 0% 50%; }
-		}
-
-		@keyframes fbPulseGlow {
-			0%, 100% {
-				box-shadow: 0 16px 44px rgba(0, 0, 0, 0.4), 0 0 24px rgba(255, 184, 0, 0.1);
-			}
-			50% {
-				box-shadow: 0 20px 52px rgba(0, 0, 0, 0.5), 0 0 42px rgba(255, 184, 0, 0.22);
-			}
-		}
-
 		/* Contenedor del Track del Carrusel */
 		.fb-carousel-track {
 			position: relative !important;
 			width: 100% !important;
-			min-height: 380px !important;
+			min-height: 360px !important;
 			display: flex !important;
 			align-items: center !important;
 			justify-content: center !important;
 		}
 
-		/* Tarjetas de Diapositiva con Transicion Fluida */
+		/* Tarjetas de Diapositiva: Acabado Verde Pino Festivo Sobrio y Elegante (Sin efectos artificiales) */
 		.fb-carousel-slide {
 			position: absolute !important;
 			top: 0 !important;
@@ -505,18 +489,23 @@ add_action( 'wp_head', function() {
 			height: 100% !important;
 			opacity: 0 !important;
 			visibility: hidden !important;
-			transform: scale(0.97) !important;
-			transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1), transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.55s !important;
+			transform: scale(0.98) !important;
+			transition: opacity 0.45s ease, transform 0.45s ease, visibility 0.45s !important;
 			pointer-events: none !important;
 			display: flex !important;
 			flex-direction: column !important;
 			align-items: center !important;
 			justify-content: center !important;
 			text-align: center !important;
-			padding: 44px 36px !important;
-			border-radius: 28px !important;
+			padding: 40px 32px !important;
+			border-radius: 24px !important;
 			box-sizing: border-box !important;
 			color: #ffffff !important;
+			background: rgba(10, 38, 24, 0.78) !important;
+			backdrop-filter: blur(14px) !important;
+			-webkit-backdrop-filter: blur(14px) !important;
+			border: 1.5px solid rgba(255, 184, 0, 0.28) !important;
+			box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3) !important;
 			overflow: hidden !important;
 		}
 
@@ -528,33 +517,10 @@ add_action( 'wp_head', function() {
 			pointer-events: auto !important;
 		}
 
-		/* Fondos Animados Vivos y Distintivos para Cada Diapositiva */
-		.fb-theme-recetas {
-			background: linear-gradient(135deg, rgba(18, 46, 32, 0.94) 0%, rgba(44, 30, 18, 0.92) 50%, rgba(18, 42, 30, 0.94) 100%) !important;
-			background-size: 200% 200% !important;
-			animation: fbAurora 10s ease infinite, fbPulseGlow 4s ease-in-out infinite !important;
-			border: 1.5px solid rgba(255, 184, 0, 0.38) !important;
-		}
-
-		.fb-theme-moda {
-			background: linear-gradient(135deg, rgba(52, 18, 24, 0.94) 0%, rgba(30, 20, 38, 0.92) 50%, rgba(56, 18, 26, 0.94) 100%) !important;
-			background-size: 200% 200% !important;
-			animation: fbAurora 10s ease infinite, fbPulseGlow 4s ease-in-out infinite !important;
-			border: 1.5px solid rgba(229, 9, 20, 0.42) !important;
-		}
-
-		.fb-theme-comunidad {
-			background: linear-gradient(135deg, rgba(22, 28, 52, 0.94) 0%, rgba(48, 18, 44, 0.92) 50%, rgba(20, 42, 48, 0.94) 100%) !important;
-			background-size: 200% 200% !important;
-			animation: fbAurora 10s ease infinite, fbPulseGlow 4s ease-in-out infinite !important;
-			border: 1.5px solid rgba(255, 184, 0, 0.38) !important;
-		}
-
-		.fb-theme-blog {
-			background: linear-gradient(135deg, rgba(16, 44, 42, 0.94) 0%, rgba(22, 34, 50, 0.92) 50%, rgba(16, 48, 38, 0.94) 100%) !important;
-			background-size: 200% 200% !important;
-			animation: fbAurora 10s ease infinite, fbPulseGlow 4s ease-in-out infinite !important;
-			border: 1.5px solid rgba(16, 185, 129, 0.38) !important;
+		.fb-carousel-slide:hover {
+			border-color: rgba(255, 184, 0, 0.5) !important;
+			box-shadow: 0 20px 44px rgba(0, 0, 0, 0.38) !important;
+			transform: translateY(-2px) !important;
 		}
 
 		/* Insignia / Badge Tematico Superior */
