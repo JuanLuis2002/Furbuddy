@@ -927,45 +927,54 @@ add_action( 'wp_footer', function() {
 
 /**
  * =========================================================
- * FURBUDDY: ESTILO MODERNO PARA PREGUNTAS FRECUENTES (FAQ)
+ * FURBUDDY: ESTILO MODERNO PARA PREGUNTAS FRECUENTES Y RECETAS CASERAS
  * =========================================================
  */
 add_action( 'wp_head', function() {
 	?>
 	<style id="furbuddy-faq-accordions">
 		/* =========================================================
-		   1. TITULO PREGUNTAS FRECUENTES: PILDORA MODERNA (PORTADA)
+		   1. TITULOS ESTILO PILDORA MODERNA (FAQ Y RECETAS CASERAS)
 		   ========================================================= */
 		.stk-93afa3a,
-		[data-block-id="93afa3a"] {
+		[data-block-id="93afa3a"],
+		.stk-7eeaf3c,
+		[data-block-id="7eeaf3c"],
+		#heading-placeholder {
 			text-align: center !important;
 			margin-bottom: 32px !important;
 		}
 
 		.stk-93afa3a .stk-block-heading__text,
-		[data-block-id="93afa3a"] .stk-block-heading__text {
+		[data-block-id="93afa3a"] .stk-block-heading__text,
+		.stk-7eeaf3c .stk-block-heading__text,
+		[data-block-id="7eeaf3c"] .stk-block-heading__text,
+		#heading-placeholder .stk-block-heading__text {
 			display: inline-block !important;
 			color: #ffffff !important;
 			font-size: 1.1rem !important;
 			font-weight: 700 !important;
 			letter-spacing: 2px !important;
 			text-transform: uppercase !important;
-			background: rgba(0, 0, 0, 0.22) !important;
-			border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
+			background: linear-gradient(135deg, #0d3820 0%, #155734 100%) !important;
+			border: 1.5px solid rgba(255, 255, 255, 0.55) !important;
 			border-radius: 50px !important;
-			padding: 10px 32px !important;
-			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 0 12px rgba(255, 255, 255, 0.06) !important;
-			text-shadow: 0 0 12px rgba(100, 181, 246, 0.45), 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+			padding: 10px 34px !important;
+			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22), inset 0 0 12px rgba(255, 255, 255, 0.1) !important;
+			text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
 			backdrop-filter: blur(8px) !important;
 			-webkit-backdrop-filter: blur(8px) !important;
 			transition: all 0.3s ease !important;
 		}
 
 		.stk-93afa3a .stk-block-heading__text:hover,
-		[data-block-id="93afa3a"] .stk-block-heading__text:hover {
+		[data-block-id="93afa3a"] .stk-block-heading__text:hover,
+		.stk-7eeaf3c .stk-block-heading__text:hover,
+		[data-block-id="7eeaf3c"] .stk-block-heading__text:hover,
+		#heading-placeholder .stk-block-heading__text:hover {
 			border-color: #ffd700 !important;
 			color: #ffd700 !important;
-			box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3) !important;
+			box-shadow: 0 6px 20px rgba(255, 215, 0, 0.35) !important;
 			transform: translateY(-2px) !important;
 		}
 
@@ -1077,18 +1086,14 @@ add_action( 'wp_head', function() {
 			padding: 0 !important;
 		}
 
-		/* Pregunta centrada verticalmente */
-		.stk-block-accordion summary .stk-block-heading {
-			margin: 0 !important;
-			padding: 0 !important;
-			flex: 1 1 auto !important;
-			display: flex !important;
-			align-items: center !important;
-			text-align: left !important;
-		}
-
+		/* Titulo de la pregunta / receta: Siempre oscuro nitido (no amarillo) */
+		.stk-block-accordion summary .stk-block-heading,
+		.stk-block-accordion summary .stk-block-heading *,
 		.stk-block-accordion summary .stk-block-heading__text,
+		.stk-block-accordion summary h2,
 		.stk-block-accordion summary h3,
+		.stk-block-accordion summary h4,
+		.stk-block-accordion summary span,
 		.stk-block-accordion summary .stk-highlight {
 			font-size: 0.98rem !important;
 			font-weight: 700 !important;
@@ -1097,6 +1102,13 @@ add_action( 'wp_head', function() {
 			margin: 0 !important;
 			padding: 0 !important;
 			text-align: left !important;
+			text-decoration: none !important;
+		}
+
+		.stk-block-accordion summary .stk-block-heading {
+			flex: 1 1 auto !important;
+			display: flex !important;
+			align-items: center !important;
 		}
 
 		/* =========================================================
@@ -1167,7 +1179,7 @@ add_action( 'wp_head', function() {
 		}
 
 		/* =========================================================
-		   7. CONTENIDO DE LA RESPUESTA AL DESPLEGAR
+		   7. CONTENIDO DE LA RESPUESTA / RECETA AL DESPLEGAR
 		   ========================================================= */
 		.stk-block-accordion .stk-block-accordion__content,
 		.stk-block-accordion > :not(summary) {
@@ -1177,21 +1189,23 @@ add_action( 'wp_head', function() {
 			border: none !important;
 			border-left: 5px solid #0E8A42 !important;
 			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08) !important;
-			padding: 12px 20px 20px 20px !important;
+			padding: 14px 22px 22px 22px !important;
 			margin: 0 !important;
 			display: block !important;
 		}
 
-		/* Forzar visibilidad y color oscuro legible (anula texto blanco inline) */
+		/* Textos dentro de la respuesta/receta: oscuros, legibles y nítidos */
 		.stk-block-accordion .stk-block-accordion__content *,
 		.stk-block-accordion .stk-block-accordion__content p,
 		.stk-block-accordion .stk-block-accordion__content span,
 		.stk-block-accordion .stk-block-accordion__content strong,
+		.stk-block-accordion .stk-block-accordion__content li,
 		.stk-block-accordion .stk-block-accordion__content .stk-highlight,
 		.stk-block-accordion > :not(summary) *,
 		.stk-block-accordion > :not(summary) p,
 		.stk-block-accordion > :not(summary) span,
 		.stk-block-accordion > :not(summary) strong,
+		.stk-block-accordion > :not(summary) li,
 		.stk-block-accordion > :not(summary) .stk-highlight {
 			color: #334155 !important;
 			font-size: 0.94rem !important;
@@ -1205,6 +1219,240 @@ add_action( 'wp_head', function() {
 			font-weight: 700 !important;
 			color: #0f172a !important;
 		}
+
+		.stk-block-accordion .stk-block-accordion__content ul,
+		.stk-block-accordion .stk-block-accordion__content ol,
+		.stk-block-accordion > :not(summary) ul,
+		.stk-block-accordion > :not(summary) ol {
+			padding-left: 20px !important;
+			margin: 10px 0 !important;
+		}
+
+		.stk-block-accordion .stk-block-accordion__content li,
+		.stk-block-accordion > :not(summary) li {
+			margin-bottom: 6px !important;
+		}
 	</style>
 	<?php
 }, 99999 );
+
+/**
+ * =========================================================
+ * FURBUDDY: ESTILOS PERSONALIZADOS PARA POP-UP DE OFERTA (#pum-1414)
+ * =========================================================
+ */
+add_action( 'wp_head', function() {
+	?>
+	<style id="furbuddy-popup-styles">
+		/* Contenedor del Popup #pum-1414 */
+		#pum-1414.pum-container,
+		#pum-1414 .pum-container {
+			width: 360px !important;
+			max-width: calc(100vw - 32px) !important;
+			padding: 24px 20px 22px !important;
+			background: #ffffff !important;
+			border-radius: 24px !important;
+			border: 1px solid #e2e8f0 !important;
+			box-shadow: 0 20px 45px -10px rgba(0, 71, 62, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
+			overflow: hidden !important;
+			position: relative !important;
+			box-sizing: border-box !important;
+		}
+
+		/* Barra decorativa superior verde bosque */
+		#pum-1414 .pum-container::before {
+			content: "" !important;
+			position: absolute !important;
+			top: 0 !important;
+			left: 0 !important;
+			right: 0 !important;
+			height: 5px !important;
+			background: #00473e !important;
+		}
+
+		/* Botón de cierre redondeado */
+		#pum-1414 .pum-close {
+			top: 12px !important;
+			right: 12px !important;
+			width: 30px !important;
+			height: 30px !important;
+			background: #f1f5f9 !important;
+			color: #64748b !important;
+			border-radius: 50% !important;
+			border: none !important;
+			font-size: 14px !important;
+			line-height: 30px !important;
+			font-weight: 700 !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			box-shadow: none !important;
+			text-shadow: none !important;
+			transition: all 0.2s ease !important;
+			cursor: pointer !important;
+		}
+
+		#pum-1414 .pum-close:hover {
+			background: #00473e !important;
+			color: #ffffff !important;
+			transform: scale(1.08) !important;
+		}
+
+		/* Contenedor interno del popup */
+		#pum-1414 .fb-popup-wrapper {
+			text-align: center !important;
+			box-sizing: border-box !important;
+		}
+
+		#pum-1414 .fb-badge {
+			display: inline-block !important;
+			font-size: 10px !important;
+			font-weight: 800 !important;
+			letter-spacing: 0.08em !important;
+			text-transform: uppercase !important;
+			color: #00473e !important;
+			background: #ecfdf5 !important;
+			border: 1px solid #a7f3d0 !important;
+			padding: 3px 11px !important;
+			border-radius: 50px !important;
+			margin-bottom: 6px !important;
+		}
+
+		#pum-1414 .fb-title {
+			font-size: 21px !important;
+			font-weight: 800 !important;
+			color: #00473e !important;
+			line-height: 1.25 !important;
+			margin: 4px 0 2px 0 !important;
+			text-align: center !important;
+			letter-spacing: -0.02em !important;
+		}
+
+		#pum-1414 .fb-subtitle {
+			font-size: 12px !important;
+			color: #64748b !important;
+			text-align: center !important;
+			margin: 0 0 14px 0 !important;
+		}
+
+		/* Caja de Beneficios */
+		#pum-1414 .fb-benefits-box {
+			background: #f8fafc !important;
+			border: 1px solid #e2e8f0 !important;
+			border-radius: 14px !important;
+			padding: 12px 14px !important;
+			margin-bottom: 13px !important;
+			text-align: left !important;
+		}
+
+		#pum-1414 .fb-benefit-item {
+			display: flex !important;
+			align-items: flex-start !important;
+			gap: 8px !important;
+			font-size: 12.5px !important;
+			line-height: 1.45 !important;
+			color: #334155 !important;
+			margin-bottom: 8px !important;
+		}
+
+		#pum-1414 .fb-benefit-item:last-child {
+			margin-bottom: 0 !important;
+		}
+
+		#pum-1414 .fb-check {
+			color: #059669 !important;
+			font-weight: 800 !important;
+			font-size: 13px !important;
+			line-height: 1.3 !important;
+			flex-shrink: 0 !important;
+		}
+
+		/* Caja de Cupón */
+		#pum-1414 .fb-coupon-card {
+			display: flex !important;
+			align-items: center !important;
+			justify-content: space-between !important;
+			background: #f0fdf4 !important;
+			border: 1.5px dashed #34d399 !important;
+			border-radius: 12px !important;
+			padding: 9px 12px !important;
+			margin-bottom: 6px !important;
+		}
+
+		#pum-1414 .fb-coupon-info {
+			text-align: left !important;
+		}
+
+		#pum-1414 .fb-coupon-label {
+			display: block !important;
+			font-size: 10px !important;
+			font-weight: 700 !important;
+			text-transform: uppercase !important;
+			color: #065f46 !important;
+			letter-spacing: 0.05em !important;
+		}
+
+		#pum-1414 .fb-coupon-code {
+			display: block !important;
+			font-size: 17px !important;
+			font-weight: 900 !important;
+			font-family: monospace, monospace !important;
+			color: #00473e !important;
+			letter-spacing: 2px !important;
+		}
+
+		#pum-1414 .fb-coupon-copy {
+			background: #00473e !important;
+			color: #ffffff !important;
+			border: none !important;
+			border-radius: 8px !important;
+			padding: 6px 14px !important;
+			font-size: 12px !important;
+			font-weight: 700 !important;
+			cursor: pointer !important;
+			transition: all 0.2s ease !important;
+		}
+
+		#pum-1414 .fb-coupon-copy:hover {
+			background: #059669 !important;
+		}
+
+		#pum-1414 .fb-coupon-copy.copied {
+			background: #10b981 !important;
+		}
+
+		#pum-1414 .fb-coupon-terms {
+			font-size: 10.5px !important;
+			color: #94a3b8 !important;
+			text-align: center !important;
+			font-style: italic !important;
+			margin-bottom: 14px !important;
+		}
+
+		/* Botón CTA Principal */
+		#pum-1414 .fb-cta-btn {
+			display: block !important;
+			width: 100% !important;
+			background: #00473e !important;
+			color: #ffffff !important;
+			font-size: 14px !important;
+			font-weight: 700 !important;
+			text-align: center !important;
+			text-decoration: none !important;
+			padding: 13px 16px !important;
+			border-radius: 12px !important;
+			box-shadow: 0 6px 16px -2px rgba(0, 71, 62, 0.35) !important;
+			transition: all 0.2s ease !important;
+			box-sizing: border-box !important;
+		}
+
+		#pum-1414 .fb-cta-btn:hover {
+			background: #065f46 !important;
+			color: #ffffff !important;
+			transform: translateY(-1px) !important;
+			box-shadow: 0 10px 20px -2px rgba(0, 71, 62, 0.45) !important;
+		}
+	</style>
+	<?php
+}, 99999 );
+
