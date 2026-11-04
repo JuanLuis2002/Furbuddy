@@ -453,9 +453,10 @@ add_action( 'wp_head', function() {
 		/* 7. Carrusel Stackable: Escaparate Interactivo y Decorativo Furbuddy */
 		.wp-block-stackable-carousel,
 		.stk-block-carousel {
-			margin: 30px auto !important;
-			max-width: 1040px !important;
+			margin: 34px auto !important;
+			max-width: 980px !important;
 			width: 100% !important;
+			position: relative !important;
 		}
 
 		/* Ocultar definitivamente el contador expirado en ceros y fondos toscos */
@@ -466,41 +467,94 @@ add_action( 'wp_head', function() {
 		.stk-71d0377 .stk-block-card > .stk-container,
 		.stk-ba4f5c1-container,
 		.stk-5e7d40b-container {
-			background: transparent !important;
-			box-shadow: none !important;
-			border: none !important;
-		}
-
-		.stk-block-countdown,
-		.stk-0ba44b4,
-		.stk-71d0377 .stk-block-countdown {
 			display: none !important;
 		}
 
-		/* Contenedor de la diapositiva: Elegante efecto glassmorphism integrado al fondo */
+		/* Animaciones de Fondo Aurora y Resplandor Suave */
+		@keyframes fbAurora {
+			0% { background-position: 0% 50%; }
+			50% { background-position: 100% 50%; }
+			100% { background-position: 0% 50%; }
+		}
+
+		@keyframes fbPulseGlow {
+			0%, 100% {
+				box-shadow: 0 16px 44px rgba(0, 0, 0, 0.4), 0 0 24px rgba(255, 184, 0, 0.1);
+			}
+			50% {
+				box-shadow: 0 20px 52px rgba(0, 0, 0, 0.5), 0 0 42px rgba(255, 184, 0, 0.22);
+			}
+		}
+
+		/* Contenedor del Track del Carrusel */
+		.fb-carousel-track {
+			position: relative !important;
+			width: 100% !important;
+			min-height: 380px !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+		}
+
+		/* Tarjetas de Diapositiva con Transicion Fluida */
 		.fb-carousel-slide {
+			position: absolute !important;
+			top: 0 !important;
+			left: 0 !important;
+			width: 100% !important;
+			height: 100% !important;
+			opacity: 0 !important;
+			visibility: hidden !important;
+			transform: scale(0.97) !important;
+			transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1), transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.55s !important;
+			pointer-events: none !important;
 			display: flex !important;
 			flex-direction: column !important;
 			align-items: center !important;
 			justify-content: center !important;
 			text-align: center !important;
-			padding: 40px 32px !important;
-			border-radius: 24px !important;
-			background: rgba(255, 255, 255, 0.08) !important;
-			border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
-			backdrop-filter: blur(14px) !important;
-			-webkit-backdrop-filter: blur(14px) !important;
-			box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22) !important;
+			padding: 44px 36px !important;
+			border-radius: 28px !important;
+			box-sizing: border-box !important;
 			color: #ffffff !important;
-			margin: 12px auto !important;
-			max-width: 820px !important;
-			transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+			overflow: hidden !important;
 		}
 
-		.fb-carousel-slide:hover {
-			border-color: rgba(255, 184, 0, 0.45) !important;
-			box-shadow: 0 20px 48px rgba(0, 0, 0, 0.3) !important;
-			transform: translateY(-3px) !important;
+		.fb-carousel-slide.fb-active {
+			position: relative !important;
+			opacity: 1 !important;
+			visibility: visible !important;
+			transform: scale(1) !important;
+			pointer-events: auto !important;
+		}
+
+		/* Fondos Animados Vivos y Distintivos para Cada Diapositiva */
+		.fb-theme-recetas {
+			background: linear-gradient(135deg, rgba(18, 46, 32, 0.94) 0%, rgba(44, 30, 18, 0.92) 50%, rgba(18, 42, 30, 0.94) 100%) !important;
+			background-size: 200% 200% !important;
+			animation: fbAurora 10s ease infinite, fbPulseGlow 4s ease-in-out infinite !important;
+			border: 1.5px solid rgba(255, 184, 0, 0.38) !important;
+		}
+
+		.fb-theme-moda {
+			background: linear-gradient(135deg, rgba(52, 18, 24, 0.94) 0%, rgba(30, 20, 38, 0.92) 50%, rgba(56, 18, 26, 0.94) 100%) !important;
+			background-size: 200% 200% !important;
+			animation: fbAurora 10s ease infinite, fbPulseGlow 4s ease-in-out infinite !important;
+			border: 1.5px solid rgba(229, 9, 20, 0.42) !important;
+		}
+
+		.fb-theme-comunidad {
+			background: linear-gradient(135deg, rgba(22, 28, 52, 0.94) 0%, rgba(48, 18, 44, 0.92) 50%, rgba(20, 42, 48, 0.94) 100%) !important;
+			background-size: 200% 200% !important;
+			animation: fbAurora 10s ease infinite, fbPulseGlow 4s ease-in-out infinite !important;
+			border: 1.5px solid rgba(255, 184, 0, 0.38) !important;
+		}
+
+		.fb-theme-blog {
+			background: linear-gradient(135deg, rgba(16, 44, 42, 0.94) 0%, rgba(22, 34, 50, 0.92) 50%, rgba(16, 48, 38, 0.94) 100%) !important;
+			background-size: 200% 200% !important;
+			animation: fbAurora 10s ease infinite, fbPulseGlow 4s ease-in-out infinite !important;
+			border: 1.5px solid rgba(16, 185, 129, 0.38) !important;
 		}
 
 		/* Insignia / Badge Tematico Superior */
@@ -525,15 +579,15 @@ add_action( 'wp_head', function() {
 			color: #ffffff !important;
 			margin: 0 0 14px 0 !important;
 			line-height: 1.3 !important;
-			text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
+			text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
 		}
 
 		/* Descripcion clara y legible */
 		.fb-carousel-desc {
 			font-size: 1.05rem !important;
 			line-height: 1.65 !important;
-			color: #e2e8f0 !important;
-			max-width: 600px !important;
+			color: #f1f5f9 !important;
+			max-width: 620px !important;
 			margin: 0 auto 24px auto !important;
 		}
 
@@ -546,7 +600,7 @@ add_action( 'wp_head', function() {
 			color: #ffffff !important;
 			font-weight: 700 !important;
 			font-size: 0.98rem !important;
-			padding: 13px 30px !important;
+			padding: 13px 32px !important;
 			border-radius: 50px !important;
 			border: 1.5px solid #E50914 !important;
 			text-decoration: none !important;
@@ -568,7 +622,7 @@ add_action( 'wp_head', function() {
 			display: inline-flex !important;
 			align-items: center !important;
 			gap: 12px !important;
-			background: rgba(0, 0, 0, 0.4) !important;
+			background: rgba(0, 0, 0, 0.45) !important;
 			border: 1.5px dashed #FFB800 !important;
 			padding: 8px 18px !important;
 			border-radius: 12px !important;
@@ -602,8 +656,8 @@ add_action( 'wp_head', function() {
 
 		/* Flechas de Navegacion del Carrusel: Estilizadas y Circulares */
 		.stk-block-carousel__button {
-			background: rgba(255, 255, 255, 0.15) !important;
-			border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+			background: rgba(255, 255, 255, 0.18) !important;
+			border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
 			border-radius: 50% !important;
 			width: 44px !important;
 			height: 44px !important;
@@ -613,6 +667,7 @@ add_action( 'wp_head', function() {
 			color: #ffffff !important;
 			backdrop-filter: blur(8px) !important;
 			transition: all 0.3s ease !important;
+			z-index: 10 !important;
 		}
 
 		.stk-block-carousel__button:hover {
@@ -626,6 +681,33 @@ add_action( 'wp_head', function() {
 			fill: currentColor !important;
 			width: 16px !important;
 			height: 16px !important;
+		}
+
+		/* Indicadores de Puntos (Dots) del Carrusel */
+		.stk-block-carousel__dots {
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			gap: 8px !important;
+			margin-top: 18px !important;
+		}
+
+		.fb-carousel-dot {
+			width: 12px !important;
+			height: 12px !important;
+			border-radius: 50% !important;
+			background: rgba(255, 255, 255, 0.35) !important;
+			border: none !important;
+			cursor: pointer !important;
+			transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+			padding: 0 !important;
+		}
+
+		.fb-carousel-dot.fb-active {
+			width: 28px !important;
+			border-radius: 12px !important;
+			background: #FFB800 !important;
+			box-shadow: 0 0 12px rgba(255, 184, 0, 0.65) !important;
 		}
 
 		/* 8. Nieve Navidena Integrada (Blanco Nieve Puro y Destellos Dorados) */
@@ -818,28 +900,34 @@ add_action( 'wp_footer', function() {
 			};
 		})();
 
-		// Inyeccion del Escaparate Interactivo para el Carrusel (Fase 1)
+		// Inyeccion del Escaparate Interactivo para el Carrusel (Fase 1 - 4 Diapositivas Reales)
 		(function() {
 			function initFurbuddyCarouselShowcase() {
-				var slider = document.querySelector('.stk-block-carousel__slider');
-				if (!slider || slider.getAttribute('data-fb-showcase') === 'true') return;
+				var carouselBlock = document.querySelector('.wp-block-stackable-carousel, .stk-block-carousel');
+				if (!carouselBlock || carouselBlock.getAttribute('data-fb-ready') === 'true') return;
+
+				var slider = carouselBlock.querySelector('.stk-block-carousel__slider');
+				if (!slider) return;
 
 				var slidesData = [
 					{
+						theme: 'fb-theme-recetas',
 						badge: '100% Natural y Nutritivo',
 						title: 'Premios y Recetas Caseras para Mascotas',
-						desc: 'Aprende a preparar deliciosas galletas y snacks nutritivos en casa con ingredientes seguros y saludables.',
+						desc: 'Consiente a tu mejor amigo con galletas y snacks nutritivos hechos en casa. Ingredientes sencillos, aprobados y saludables.',
 						btnText: 'Ver Recetas Caseras',
 						btnLink: 'https://furbuddy.xyz/recetas-caseras/'
 					},
 					{
+						theme: 'fb-theme-moda',
 						badge: 'Coleccion de Temporada',
 						title: 'Moda, Abrigos y Disfraces para Mascotas',
-						desc: 'Disenos confortables, suaves y calientitos para paseos invernales y momentos especiales en familia.',
+						desc: 'Prendas suaves, confortables y abrigadas para paseos y momentos especiales en familia. La mejor proteccion contra el frio.',
 						btnText: 'Explorar Coleccion',
 						btnLink: 'https://furbuddy.xyz/product-category/disfraces/'
 					},
 					{
+						theme: 'fb-theme-comunidad',
 						badge: 'Comunidad Furbuddy',
 						title: 'Unete a Nuestra Manada en Redes Sociales',
 						desc: 'Siguenos en Instagram, comparte los mejores momentos de tu mascota y aprovecha un 10% de descuento en tu compra.',
@@ -849,40 +937,112 @@ add_action( 'wp_footer', function() {
 						btnLink: 'https://instagram.com'
 					},
 					{
+						theme: 'fb-theme-blog',
 						badge: 'Guias de Bienestar',
 						title: 'Estimulacion Mental y Cuidado Diario',
-						desc: 'Tecnicas sencillas para reducir el estres, evitar el aburrimiento y fortalecer la felicidad de tu mascota.',
+						desc: 'Aprende tecnicas sencillas para reducir el estres, evitar el aburrimiento y fortalecer la felicidad de tu mascota.',
 						btnText: 'Leer Articulos del Blog',
 						btnLink: 'https://furbuddy.xyz/blog/'
 					}
 				];
 
-				var columns = slider.querySelectorAll('.stk-block-column');
-				if (columns.length >= 4) {
-					for (var i = 0; i < slidesData.length; i++) {
-						var d = slidesData[i];
-						var col = columns[i];
-						var contentWrapper = col.querySelector('.stk-block-content') || col;
-
-						var couponHtml = '';
-						if (d.isCoupon) {
-							couponHtml = '<div class="fb-coupon-box" onclick="navigator.clipboard.writeText(\'' + d.coupon + '\'); this.querySelector(\'.fb-coupon-tag\').textContent = \'Copiado!\'; setTimeout(function(el){ el.querySelector(\'.fb-coupon-tag\').textContent = \'Copiar\'; }.bind(null, this), 2000);">' +
-								'<span class="fb-coupon-code">' + d.coupon + '</span>' +
-								'<span class="fb-coupon-tag">Copiar</span>' +
-								'</div>';
-						}
-
-						contentWrapper.innerHTML = 
-							'<div class="fb-carousel-slide">' +
-								'<span class="fb-carousel-badge">' + d.badge + '</span>' +
-								'<h3 class="fb-carousel-title">' + d.title + '</h3>' +
-								'<p class="fb-carousel-desc">' + d.desc + '</p>' +
-								couponHtml +
-								'<a href="' + d.btnLink + '" class="fb-carousel-btn">' + d.btnText + '</a>' +
+				var slidesHtml = slidesData.map(function(d, index) {
+					var couponHtml = '';
+					if (d.isCoupon) {
+						couponHtml = '<div class="fb-coupon-box" onclick="navigator.clipboard.writeText(\'' + d.coupon + '\'); this.querySelector(\'.fb-coupon-tag\').textContent = \'Copiado!\'; setTimeout(function(el){ el.querySelector(\'.fb-coupon-tag\').textContent = \'Copiar\'; }.bind(null, this), 2000);">' +
+							'<span class="fb-coupon-code">' + d.coupon + '</span>' +
+							'<span class="fb-coupon-tag">Copiar</span>' +
 							'</div>';
 					}
-					slider.setAttribute('data-fb-showcase', 'true');
+					return '<div class="fb-carousel-slide ' + d.theme + (index === 0 ? ' fb-active' : '') + '">' +
+						'<span class="fb-carousel-badge">' + d.badge + '</span>' +
+						'<h3 class="fb-carousel-title">' + d.title + '</h3>' +
+						'<p class="fb-carousel-desc">' + d.desc + '</p>' +
+						couponHtml +
+						'<a href="' + d.btnLink + '" class="fb-carousel-btn">' + d.btnText + '</a>' +
+					'</div>';
+				}).join('');
+
+				slider.innerHTML = '<div class="fb-carousel-track">' + slidesHtml + '</div>';
+
+				var dotsContainer = carouselBlock.querySelector('.stk-block-carousel__dots');
+				if (dotsContainer) {
+					dotsContainer.innerHTML = slidesData.map(function(_, i) {
+						return '<button class="fb-carousel-dot' + (i === 0 ? ' fb-active' : '') + '" aria-label="Diapositiva ' + (i + 1) + '" data-slide="' + i + '"></button>';
+					}).join('');
 				}
+
+				var currentSlide = 0;
+				var totalSlides = slidesData.length;
+				var slides = slider.querySelectorAll('.fb-carousel-slide');
+				var dots = dotsContainer ? dotsContainer.querySelectorAll('.fb-carousel-dot') : [];
+				var timer = null;
+
+				function goToSlide(index) {
+					currentSlide = (index + totalSlides) % totalSlides;
+					for (var i = 0; i < slides.length; i++) {
+						if (i === currentSlide) {
+							slides[i].classList.add('fb-active');
+						} else {
+							slides[i].classList.remove('fb-active');
+						}
+					}
+					for (var j = 0; j < dots.length; j++) {
+						if (j === currentSlide) {
+							dots[j].classList.add('fb-active');
+						} else {
+							dots[j].classList.remove('fb-active');
+						}
+					}
+				}
+
+				var prevBtn = carouselBlock.querySelector('.stk-block-carousel__button__prev');
+				var nextBtn = carouselBlock.querySelector('.stk-block-carousel__button__next');
+
+				if (prevBtn) {
+					prevBtn.onclick = function(e) {
+						e.preventDefault();
+						e.stopPropagation();
+						goToSlide(currentSlide - 1);
+						resetAutoPlay();
+					};
+				}
+				if (nextBtn) {
+					nextBtn.onclick = function(e) {
+						e.preventDefault();
+						e.stopPropagation();
+						goToSlide(currentSlide + 1);
+						resetAutoPlay();
+					};
+				}
+
+				if (dotsContainer) {
+					dotsContainer.onclick = function(e) {
+						var dot = e.target.closest('.fb-carousel-dot');
+						if (dot) {
+							var sIdx = parseInt(dot.getAttribute('data-slide'), 10);
+							goToSlide(sIdx);
+							resetAutoPlay();
+						}
+					};
+				}
+
+				function startAutoPlay() {
+					timer = setInterval(function() {
+						goToSlide(currentSlide + 1);
+					}, 6000);
+				}
+
+				function resetAutoPlay() {
+					clearInterval(timer);
+					startAutoPlay();
+				}
+
+				carouselBlock.onmouseenter = function() { clearInterval(timer); };
+				carouselBlock.onmouseleave = function() { startAutoPlay(); };
+
+				startAutoPlay();
+				carouselBlock.setAttribute('data-fb-ready', 'true');
 			}
 
 			if (document.readyState === 'loading') {
