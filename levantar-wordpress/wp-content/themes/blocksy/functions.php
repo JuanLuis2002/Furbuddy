@@ -450,19 +450,182 @@ add_action( 'wp_head', function() {
 			background: #9E1B22 !important;
 		}
 
-		/* 7. Carrusel Stackable Centrado */
-		.wp-block-stackable-carousel .stk-block-card__content,
-		.wp-block-stackable-carousel .stk-block-content,
-		.wp-block-stackable-carousel .stk-block-heading,
-		.wp-block-stackable-carousel .stk-block-text,
-		.wp-block-stackable-carousel .stk-button-group,
-		.ct-carousel .entry-content,
-		.ct-carousel .content-container,
-		[data-id*="carousel"] {
-			text-align: center !important;
+		/* 7. Carrusel Stackable: Escaparate Interactivo y Decorativo Furbuddy */
+		.wp-block-stackable-carousel,
+		.stk-block-carousel {
+			margin: 30px auto !important;
+			max-width: 1040px !important;
+			width: 100% !important;
+		}
+
+		/* Ocultar definitivamente el contador expirado en ceros y fondos toscos */
+		.stk-block-countdown,
+		.stk-0ba44b4,
+		.stk-71d0377 .stk-block-countdown,
+		.stk-71d0377 .stk-block-card,
+		.stk-71d0377 .stk-block-card > .stk-container,
+		.stk-ba4f5c1-container,
+		.stk-5e7d40b-container {
+			background: transparent !important;
+			box-shadow: none !important;
+			border: none !important;
+		}
+
+		.stk-block-countdown,
+		.stk-0ba44b4,
+		.stk-71d0377 .stk-block-countdown {
+			display: none !important;
+		}
+
+		/* Contenedor de la diapositiva: Elegante efecto glassmorphism integrado al fondo */
+		.fb-carousel-slide {
+			display: flex !important;
+			flex-direction: column !important;
+			align-items: center !important;
 			justify-content: center !important;
-			margin-left: auto !important;
-			margin-right: auto !important;
+			text-align: center !important;
+			padding: 40px 32px !important;
+			border-radius: 24px !important;
+			background: rgba(255, 255, 255, 0.08) !important;
+			border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
+			backdrop-filter: blur(14px) !important;
+			-webkit-backdrop-filter: blur(14px) !important;
+			box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22) !important;
+			color: #ffffff !important;
+			margin: 12px auto !important;
+			max-width: 820px !important;
+			transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+		}
+
+		.fb-carousel-slide:hover {
+			border-color: rgba(255, 184, 0, 0.45) !important;
+			box-shadow: 0 20px 48px rgba(0, 0, 0, 0.3) !important;
+			transform: translateY(-3px) !important;
+		}
+
+		/* Insignia / Badge Tematico Superior */
+		.fb-carousel-badge {
+			display: inline-block !important;
+			padding: 6px 18px !important;
+			border-radius: 50px !important;
+			background: rgba(255, 184, 0, 0.18) !important;
+			border: 1px solid #FFB800 !important;
+			color: #FFB800 !important;
+			font-size: 0.82rem !important;
+			font-weight: 700 !important;
+			letter-spacing: 0.06em !important;
+			text-transform: uppercase !important;
+			margin-bottom: 16px !important;
+		}
+
+		/* Titulo de la diapositiva */
+		.fb-carousel-title {
+			font-size: 1.85rem !important;
+			font-weight: 800 !important;
+			color: #ffffff !important;
+			margin: 0 0 14px 0 !important;
+			line-height: 1.3 !important;
+			text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
+		}
+
+		/* Descripcion clara y legible */
+		.fb-carousel-desc {
+			font-size: 1.05rem !important;
+			line-height: 1.65 !important;
+			color: #e2e8f0 !important;
+			max-width: 600px !important;
+			margin: 0 auto 24px auto !important;
+		}
+
+		/* Boton Principal de Accion e Hipervinculo */
+		.fb-carousel-btn {
+			display: inline-flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			background: #E50914 !important;
+			color: #ffffff !important;
+			font-weight: 700 !important;
+			font-size: 0.98rem !important;
+			padding: 13px 30px !important;
+			border-radius: 50px !important;
+			border: 1.5px solid #E50914 !important;
+			text-decoration: none !important;
+			box-shadow: 0 8px 24px rgba(229, 9, 20, 0.35) !important;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+			cursor: pointer !important;
+		}
+
+		.fb-carousel-btn:hover {
+			background: #1a1a1a !important;
+			color: #FFB800 !important;
+			border-color: #FFB800 !important;
+			box-shadow: 0 12px 28px rgba(255, 184, 0, 0.45) !important;
+			transform: translateY(-2px) scale(1.03) !important;
+		}
+
+		/* Caja Interactiva de Cupon (Slide 3) */
+		.fb-coupon-box {
+			display: inline-flex !important;
+			align-items: center !important;
+			gap: 12px !important;
+			background: rgba(0, 0, 0, 0.4) !important;
+			border: 1.5px dashed #FFB800 !important;
+			padding: 8px 18px !important;
+			border-radius: 12px !important;
+			margin-bottom: 22px !important;
+			cursor: pointer !important;
+			transition: all 0.25s ease !important;
+		}
+
+		.fb-coupon-box:hover {
+			background: rgba(255, 184, 0, 0.15) !important;
+			transform: scale(1.04) !important;
+		}
+
+		.fb-coupon-code {
+			font-family: monospace, sans-serif !important;
+			font-weight: 800 !important;
+			font-size: 1.18rem !important;
+			color: #FFB800 !important;
+			letter-spacing: 0.12em !important;
+		}
+
+		.fb-coupon-tag {
+			font-size: 0.78rem !important;
+			background: #FFB800 !important;
+			color: #1a1a1a !important;
+			padding: 3px 9px !important;
+			border-radius: 6px !important;
+			font-weight: 700 !important;
+			text-transform: uppercase !important;
+		}
+
+		/* Flechas de Navegacion del Carrusel: Estilizadas y Circulares */
+		.stk-block-carousel__button {
+			background: rgba(255, 255, 255, 0.15) !important;
+			border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+			border-radius: 50% !important;
+			width: 44px !important;
+			height: 44px !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			color: #ffffff !important;
+			backdrop-filter: blur(8px) !important;
+			transition: all 0.3s ease !important;
+		}
+
+		.stk-block-carousel__button:hover {
+			background: #FFB800 !important;
+			border-color: #FFB800 !important;
+			color: #1a1a1a !important;
+			transform: scale(1.1) !important;
+		}
+
+		.stk-block-carousel__button svg {
+			fill: currentColor !important;
+			width: 16px !important;
+			height: 16px !important;
 		}
 
 		/* 8. Nieve Navidena Integrada (Blanco Nieve Puro y Destellos Dorados) */
@@ -653,6 +816,80 @@ add_action( 'wp_footer', function() {
 					playNextNote();
 				}
 			};
+		})();
+
+		// Inyeccion del Escaparate Interactivo para el Carrusel (Fase 1)
+		(function() {
+			function initFurbuddyCarouselShowcase() {
+				var slider = document.querySelector('.stk-block-carousel__slider');
+				if (!slider || slider.getAttribute('data-fb-showcase') === 'true') return;
+
+				var slidesData = [
+					{
+						badge: '100% Natural y Nutritivo',
+						title: 'Premios y Recetas Caseras para Mascotas',
+						desc: 'Aprende a preparar deliciosas galletas y snacks nutritivos en casa con ingredientes seguros y saludables.',
+						btnText: 'Ver Recetas Caseras',
+						btnLink: 'https://furbuddy.xyz/recetas-caseras/'
+					},
+					{
+						badge: 'Coleccion de Temporada',
+						title: 'Moda, Abrigos y Disfraces para Mascotas',
+						desc: 'Disenos confortables, suaves y calientitos para paseos invernales y momentos especiales en familia.',
+						btnText: 'Explorar Coleccion',
+						btnLink: 'https://furbuddy.xyz/product-category/disfraces/'
+					},
+					{
+						badge: 'Comunidad Furbuddy',
+						title: 'Unete a Nuestra Manada en Redes Sociales',
+						desc: 'Siguenos en Instagram, comparte los mejores momentos de tu mascota y aprovecha un 10% de descuento en tu compra.',
+						isCoupon: true,
+						coupon: 'DIVERSION20',
+						btnText: 'Seguir en Instagram',
+						btnLink: 'https://instagram.com'
+					},
+					{
+						badge: 'Guias de Bienestar',
+						title: 'Estimulacion Mental y Cuidado Diario',
+						desc: 'Tecnicas sencillas para reducir el estres, evitar el aburrimiento y fortalecer la felicidad de tu mascota.',
+						btnText: 'Leer Articulos del Blog',
+						btnLink: 'https://furbuddy.xyz/blog/'
+					}
+				];
+
+				var columns = slider.querySelectorAll('.stk-block-column');
+				if (columns.length >= 4) {
+					for (var i = 0; i < slidesData.length; i++) {
+						var d = slidesData[i];
+						var col = columns[i];
+						var contentWrapper = col.querySelector('.stk-block-content') || col;
+
+						var couponHtml = '';
+						if (d.isCoupon) {
+							couponHtml = '<div class="fb-coupon-box" onclick="navigator.clipboard.writeText(\'' + d.coupon + '\'); this.querySelector(\'.fb-coupon-tag\').textContent = \'Copiado!\'; setTimeout(function(el){ el.querySelector(\'.fb-coupon-tag\').textContent = \'Copiar\'; }.bind(null, this), 2000);">' +
+								'<span class="fb-coupon-code">' + d.coupon + '</span>' +
+								'<span class="fb-coupon-tag">Copiar</span>' +
+								'</div>';
+						}
+
+						contentWrapper.innerHTML = 
+							'<div class="fb-carousel-slide">' +
+								'<span class="fb-carousel-badge">' + d.badge + '</span>' +
+								'<h3 class="fb-carousel-title">' + d.title + '</h3>' +
+								'<p class="fb-carousel-desc">' + d.desc + '</p>' +
+								couponHtml +
+								'<a href="' + d.btnLink + '" class="fb-carousel-btn">' + d.btnText + '</a>' +
+							'</div>';
+					}
+					slider.setAttribute('data-fb-showcase', 'true');
+				}
+			}
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', initFurbuddyCarouselShowcase);
+			} else {
+				initFurbuddyCarouselShowcase();
+			}
 		})();
 
 		// Inyeccion de Iconos Vectoriales Modernos Premium para Categorias
