@@ -743,11 +743,16 @@ add_action( 'wp_footer', function() {
 	<div id="furbuddy-snow-layer"></div>
 
 	<!-- Widget Flotante de Musica Navidena Suave -->
-	<div id="furbuddy-music-widget" onclick="toggleFurbuddyMusic()" title="Activar / Pausar Musica Navidena Suave">
+	<div id="furbuddy-music-widget" onclick="toggleFurbuddyMusic()" title="Activar / Pausar Musica Navidena">
 		<span>&#128276;</span>
 		<span>M&uacute;sica Navide&ntilde;a</span>
 		<span id="furbuddy-music-status">&#9654;</span>
 	</div>
+
+	<!-- Elemento de Audio Nativo con el MP3 Navideno Oficial -->
+	<audio id="furbuddy-audio-player" preload="auto" loop style="display:none;">
+		<source src="<?php echo esc_url( get_template_directory_uri() . '/furbuddy-navidad.mp3' ); ?>" type="audio/mpeg">
+	</audio>
 
 	<script id="furbuddy-navidad-scripts">
 		// Generador de copos de nieve integrados (Blanco y Oro)
@@ -771,99 +776,53 @@ add_action( 'wp_footer', function() {
 			}
 		})();
 
-		// Caja de Musica Navidena Suave (Sweet Celesta / Music Box)
+		// Reproductor de Audio Navideno Furbuddy (MP3 Oficial)
 		(function() {
-			var audioCtx = null;
-			var isPlaying = false;
-			var timerId = null;
-			var step = 0;
+			var audio = document.getElementById('furbuddy-audio-player');
+			var status = document.getElementById('furbuddy-music-status');
+			var container = document.getElementById('furbuddy-music-widget');
 
-			// Melodia suave armonizada de Jingle Bells & Noche de Paz
-			var notes = [
-				[659.25, 0.22, 0.10], [659.25, 0.22, 0.10], [659.25, 0.44, 0.20],
-				[659.25, 0.22, 0.10], [659.25, 0.22, 0.10], [659.25, 0.44, 0.20],
-				[659.25, 0.22, 0.10], [783.99, 0.22, 0.10], [523.25, 0.32, 0.10], [587.33, 0.20, 0.10],
-				[659.25, 0.70, 0.35],
-				[698.46, 0.22, 0.10], [698.46, 0.22, 0.10], [698.46, 0.35, 0.10], [698.46, 0.20, 0.10],
-				[698.46, 0.22, 0.10], [659.25, 0.22, 0.10], [659.25, 0.22, 0.10], [659.25, 0.18, 0.10],
-				[659.25, 0.22, 0.10], [587.33, 0.22, 0.10], [587.33, 0.22, 0.10], [659.25, 0.22, 0.10],
-				[587.33, 0.45, 0.20], [783.99, 0.45, 0.35]
-			];
-
-			function getAudioContext() {
-				if (!audioCtx) {
-					var AudioContextClass = window.AudioContext || window.webkitAudioContext;
-					if (AudioContextClass) {
-						audioCtx = new AudioContextClass();
-					}
-				}
-				if (audioCtx && audioCtx.state === 'suspended') {
-					audioCtx.resume();
-				}
-				return audioCtx;
-			}
-
-			function playCelestaNote(freq, duration) {
-				var ctx = getAudioContext();
-				if (!ctx) return;
-				var now = ctx.currentTime;
-
-				// Oscilador 1: Tono fundamental suave (sine)
-				var osc1 = ctx.createOscillator();
-				var gain1 = ctx.createGain();
-				osc1.type = 'sine';
-				osc1.frequency.setValueAtTime(freq, now);
-
-				// Oscilador 2: Armonico superior de campanilla de cristal (sine afinado a la octava superior)
-				var osc2 = ctx.createOscillator();
-				var gain2 = ctx.createGain();
-				osc2.type = 'sine';
-				osc2.frequency.setValueAtTime(freq * 2.0, now);
-
-				// Volumen muy sutil y suave (estilo caja de musica de salon)
-				gain1.gain.setValueAtTime(0.0001, now);
-				gain1.gain.linearRampToValueAtTime(0.045, now + 0.015);
-				gain1.gain.exponentialRampToValueAtTime(0.0001, now + duration + 0.15);
-
-				gain2.gain.setValueAtTime(0.0001, now);
-				gain2.gain.linearRampToValueAtTime(0.012, now + 0.01);
-				gain2.gain.exponentialRampToValueAtTime(0.0001, now + (duration * 0.7) + 0.05);
-
-				osc1.connect(gain1);
-				gain1.connect(ctx.destination);
-				osc2.connect(gain2);
-				gain2.connect(ctx.destination);
-
-				osc1.start(now);
-				osc2.start(now);
-				osc1.stop(now + duration + 0.2);
-				osc2.stop(now + duration + 0.2);
-			}
-
-			function playNextNote() {
-				if (!isPlaying) return;
-				var n = notes[step];
-				playCelestaNote(n[0], n[1]);
-				var waitMs = (n[1] + n[2]) * 1000;
-				step = (step + 1) % notes.length;
-				timerId = setTimeout(playNextNote, waitMs);
+			if (audio) {
+				audio.volume = 0.35; // Volumen balanceado y acogedor
 			}
 
 			window.toggleFurbuddyMusic = function() {
-				var status = document.getElementById('furbuddy-music-status');
-				var container = document.getElementById('furbuddy-music-widget');
-				if (isPlaying) {
-					isPlaying = false;
-					clearTimeout(timerId);
+				if (!audio) {
+					audio = document.getElementById('furbuddy-audio-player');
+				}
+				if (!audio) return;
+
+				if (!audio.paused) {
+					audio.pause();
 					if (status) status.textContent = '\u25B6';
 					if (container) container.classList.remove('is-playing');
 				} else {
-					isPlaying = true;
-					if (status) status.textContent = '\u23F8';
-					if (container) container.classList.add('is-playing');
-					playNextNote();
+					var playPromise = audio.play();
+					if (playPromise !== undefined) {
+						playPromise.then(function() {
+							if (status) status.textContent = '\u23F8';
+							if (container) container.classList.add('is-playing');
+						}).catch(function(err) {
+							console.log('Reproduccion de audio Furbuddy requiere interaccion:', err);
+						});
+					}
 				}
 			};
+
+			if (audio) {
+				audio.addEventListener('ended', function() {
+					audio.currentTime = 0;
+					audio.play();
+				});
+				audio.addEventListener('pause', function() {
+					if (status) status.textContent = '\u25B6';
+					if (container) container.classList.remove('is-playing');
+				});
+				audio.addEventListener('play', function() {
+					if (status) status.textContent = '\u23F8';
+					if (container) container.classList.add('is-playing');
+				});
+			}
 		})();
 
 		// Inyeccion del Escaparate Interactivo para el Carrusel (Fase 1 - 4 Diapositivas Reales)
