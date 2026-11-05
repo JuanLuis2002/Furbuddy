@@ -781,9 +781,10 @@ add_action( 'wp_footer', function() {
 			var audio = document.getElementById('furbuddy-audio-player');
 			var status = document.getElementById('furbuddy-music-status');
 			var container = document.getElementById('furbuddy-music-widget');
+			var AMBIENT_VOLUME = 0.12; // Nivel ambiental suave, calido y nada invasivo (12%)
 
 			if (audio) {
-				audio.volume = 0.35; // Volumen balanceado y acogedor
+				audio.volume = AMBIENT_VOLUME;
 			}
 
 			window.toggleFurbuddyMusic = function() {
@@ -791,6 +792,7 @@ add_action( 'wp_footer', function() {
 					audio = document.getElementById('furbuddy-audio-player');
 				}
 				if (!audio) return;
+				audio.volume = AMBIENT_VOLUME;
 
 				if (!audio.paused) {
 					audio.pause();
