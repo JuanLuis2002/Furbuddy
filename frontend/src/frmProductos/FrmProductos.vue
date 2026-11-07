@@ -411,6 +411,13 @@ async function analizarAi() {
   errorAi.value = ""
   try {
     const datos = await proponerProducto(tipoAi.value, fotosAi.value.map((foto) => foto.archivo))
+    const categoriasAi = datos.categorias || []
+    for (const categoria of categoriasAi) {
+      if (!categorias.value.some((item) => item.id === categoria.id)) {
+        categorias.value.push(categoria)
+      }
+    }
+    categorias.value.sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
     silencio.value = true
     formulario.value = {
       ...vacio(),
@@ -420,7 +427,7 @@ async function analizarAi() {
       precio: "",
       existencia: 0,
       fotos: datos.fotos || [],
-      categorias: [],
+      categorias: categoriasAi.map((categoria) => categoria.id),
       atributos: datos.atributos?.length
         ? datos.atributos
         : datos.tipo === "variable"

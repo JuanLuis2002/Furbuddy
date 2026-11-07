@@ -339,6 +339,20 @@ def crear_categoria(nombre: str, cliente=None) -> dict:
     return {"id": creada["id"], "nombre": creada.get("name") or nombre}
 
 
+def resolver_categoria_ai(sugerida: str, existentes: list[dict] | None = None, cliente=None) -> dict:
+    sugerida = (sugerida or "").strip()[:80] or "General"
+    lista = existentes if existentes is not None else listar_categorias(cliente)
+    clave = sugerida.casefold()
+    for item in lista:
+        if (item.get("nombre") or "").casefold() == clave:
+            return item
+    for item in lista:
+        nombre = (item.get("nombre") or "").casefold()
+        if nombre and (clave in nombre or nombre in clave):
+            return item
+    return crear_categoria(sugerida, cliente)
+
+
 def eliminar_producto(producto_id: int, cliente=None) -> None:
     api = cliente or cliente_woocommerce()
     exigir(api.delete(f"products/{producto_id}", params={"force": True}), ok=(200, 204))
@@ -400,10 +414,11 @@ def interpretar_propuesta(texto: str, tipo: str) -> dict:
         "nombre": nombre,
         "descripcion": descripcion,
         "atributos": atributos,
+        "categoria": str(datos.get("categoria") or "").strip()[:80],
     }
 
 
-def instrucciones_gemini(tipo_producto: str) -> str:
+def instrucciones_gemini(tipo_producto: str, categorias_existentes: list[str] | None = None) -> str:
     if tipo_producto == "variable":
         regla_tipo = (
             "El tipo pedido es variable. En atributos pon como maximo 2 caracteristicas "
@@ -415,11 +430,25 @@ def instrucciones_gemini(tipo_producto: str) -> str:
         regla_tipo = (
             "El tipo pedido es normal (simple). atributos debe ser siempre una lista vacia []."
         )
+    nombres = [nombre.strip() for nombre in (categorias_existentes or []) if (nombre or "").strip()]
+    if nombres:
+        regla_categoria = (
+            "Categorias ya existentes en la tienda (elige una si encaja, con el nombre exacto): "
+            + ", ".join(nombres[:80])
+            + ". "
+            "Si ninguna encaja, propone un nombre nuevo corto en espanol (1 a 3 palabras), "
+            'por ejemplo Accesorios o Juguetes.'
+        )
+    else:
+        regla_categoria = (
+            "No hay categorias previas. Propone un nombre nuevo corto en espanol (1 a 3 palabras) "
+            "que clasifique el producto, por ejemplo Accesorios o Juguetes."
+        )
     return (
         "Eres el asistente de la tienda Furbuddy. "
         "Recibes una o varias fotos del mismo producto. Analiza las imagenes con cuidado. "
         "Describe solo lo que se ve. No inventes otro producto si no aparece. "
-        "No inventes precio, existencia, categorias ni sku. "
+        "No inventes precio, existencia ni sku. "
         "Acepta cualquier producto fisico claro (silla, gorra, juguete, collar, etc.). "
         "No rechaces por categoria ni porque no sea de mascotas. "
         "Responde SOLO un JSON valido con estas claves exactas:\n"
@@ -432,6 +461,9 @@ def instrucciones_gemini(tipo_producto: str) -> str:
         'Vacio "" si detectado es false.\n'
         '- "descripcion": dos oraciones sobre forma, material o uso visible, sin HTML. '
         'Max 500 caracteres. Vacia "" si detectado es false.\n'
+        '- "categoria": '
+        + regla_categoria
+        + ' Vacio "" si detectado es false.\n'
         '- "atributos": lista de objetos {"nombre": string, "opciones": [string, ...]}.\n'
         + regla_tipo
     )
@@ -444,6 +476,7 @@ ESQUEMA_PROPUESTA_AI = {
         "aviso": {"type": "string"},
         "nombre": {"type": "string"},
         "descripcion": {"type": "string"},
+        "categoria": {"type": "string"},
         "atributos": {
             "type": "array",
             "items": {
@@ -456,11 +489,15 @@ ESQUEMA_PROPUESTA_AI = {
             },
         },
     },
-    "required": ["detectado", "aviso", "nombre", "descripcion", "atributos"],
+    "required": ["detectado", "aviso", "nombre", "descripcion", "categoria", "atributos"],
 }
 
 
-def texto_groq(fotos: list[tuple[bytes, str]], tipo_producto: str) -> str:
+def texto_groq(
+    fotos: list[tuple[bytes, str]],
+    tipo_producto: str,
+    categorias_existentes: list[str] | None = None,
+) -> str:
     import base64
 
     import requests
@@ -468,7 +505,12 @@ def texto_groq(fotos: list[tuple[bytes, str]], tipo_producto: str) -> str:
     clave = clave_groq()
     if not clave:
         raise RuntimeError("Sin clave Groq")
-    partes = [{"type": "text", "text": instrucciones_gemini(tipo_producto)}]
+    partes = [
+        {
+            "type": "text",
+            "text": instrucciones_gemini(tipo_producto, categorias_existentes),
+        }
+    ]
     for contenido, tipo_mime in fotos[:MAXIMO_FOTOS_GROQ]:
         datos = base64.b64encode(contenido).decode("ascii")
         partes.append(
@@ -508,7 +550,11 @@ def texto_groq(fotos: list[tuple[bytes, str]], tipo_producto: str) -> str:
     return texto
 
 
-def texto_gemini(fotos: list[tuple[bytes, str]], tipo_producto: str) -> str:
+def texto_gemini(
+    fotos: list[tuple[bytes, str]],
+    tipo_producto: str,
+    categorias_existentes: list[str] | None = None,
+) -> str:
     clave = clave_gemini()
     if not clave:
         raise GeminiNoConfigurado()
@@ -519,7 +565,7 @@ def texto_gemini(fotos: list[tuple[bytes, str]], tipo_producto: str) -> str:
         types.Part.from_bytes(data=contenido, mime_type=tipo_mime)
         for contenido, tipo_mime in fotos
     ]
-    partes.append(instrucciones_gemini(tipo_producto))
+    partes.append(instrucciones_gemini(tipo_producto, categorias_existentes))
     texto = ""
     cliente = genai.Client(api_key=clave)
     try:
@@ -557,16 +603,31 @@ def analizar_fotos(fotos: list[tuple[bytes, str]], tipo_producto: str) -> dict:
         raise TiendaError("Elige un producto normal o variable", 400)
     if not clave_groq() and not clave_gemini():
         raise GeminiNoConfigurado()
+    existentes = listar_categorias()
+    nombres = [item["nombre"] for item in existentes if item.get("nombre")]
     if clave_groq():
         try:
-            return interpretar_propuesta(texto_groq(fotos, tipo_producto), tipo_producto)
+            propuesta = interpretar_propuesta(
+                texto_groq(fotos, tipo_producto, nombres),
+                tipo_producto,
+            )
         except TiendaError as error:
             if error.codigo == 422 or not clave_gemini():
                 raise
         except Exception:
             if not clave_gemini():
                 raise TiendaError("Groq no pudo analizar las fotos", 502)
-    return interpretar_propuesta(texto_gemini(fotos, tipo_producto), tipo_producto)
+        else:
+            categoria = resolver_categoria_ai(propuesta.pop("categoria", ""), existentes)
+            propuesta["categorias"] = [categoria]
+            return propuesta
+    propuesta = interpretar_propuesta(
+        texto_gemini(fotos, tipo_producto, nombres),
+        tipo_producto,
+    )
+    categoria = resolver_categoria_ai(propuesta.pop("categoria", ""), existentes)
+    propuesta["categorias"] = [categoria]
+    return propuesta
 
 
 def proponer_producto(fotos: list[tuple[str, bytes, str]], tipo_producto: str) -> dict:

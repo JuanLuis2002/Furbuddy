@@ -186,10 +186,11 @@ def test_interpreta_la_propuesta_variable():
     from app.frmProductos.servicio import interpretar_propuesta
 
     propuesta = interpretar_propuesta(
-        '{"detectado":true,"aviso":"","nombre":"Gorra deportiva","descripcion":"Comoda para salir.","atributos":[{"nombre":"Color","opciones":["Rojo","Azul","Rojo"]}]}',
+        '{"detectado":true,"aviso":"","nombre":"Gorra deportiva","descripcion":"Comoda para salir.","categoria":"Accesorios","atributos":[{"nombre":"Color","opciones":["Rojo","Azul","Rojo"]}]}',
         "variable",
     )
     assert propuesta["nombre"] == "Gorra deportiva"
+    assert propuesta["categoria"] == "Accesorios"
     assert propuesta["atributos"][0]["opciones"] == ["Rojo", "Azul"]
 
 
@@ -197,11 +198,12 @@ def test_producto_normal_no_guarda_caracteristicas():
     from app.frmProductos.servicio import interpretar_propuesta
 
     propuesta = interpretar_propuesta(
-        '{"detectado":true,"aviso":"","nombre":"Pelota","descripcion":"Rebota.","atributos":[{"nombre":"Color","opciones":["Rojo"]}]}',
+        '{"detectado":true,"aviso":"","nombre":"Pelota","descripcion":"Rebota.","categoria":"Juguetes","atributos":[{"nombre":"Color","opciones":["Rojo"]}]}',
         "simple",
     )
     assert propuesta["tipo"] == "simple"
     assert propuesta["atributos"] == []
+    assert propuesta["categoria"] == "Juguetes"
 
 
 def test_aviso_si_no_detecta_la_imagen():
@@ -209,7 +211,7 @@ def test_aviso_si_no_detecta_la_imagen():
 
     try:
         interpretar_propuesta(
-            '{"detectado":false,"aviso":"La foto esta negra y no se ve el producto","nombre":"","descripcion":"","atributos":[]}',
+            '{"detectado":false,"aviso":"La foto esta negra y no se ve el producto","nombre":"","descripcion":"","categoria":"","atributos":[]}',
             "simple",
         )
     except TiendaError as error:
@@ -225,7 +227,7 @@ def test_variable_sin_caracteristicas_avisa():
 
     try:
         interpretar_propuesta(
-            '{"detectado":true,"aviso":"","nombre":"Cama","descripcion":"Suave.","atributos":[]}',
+            '{"detectado":true,"aviso":"","nombre":"Cama","descripcion":"Suave.","categoria":"Camas","atributos":[]}',
             "variable",
         )
     except TiendaError as error:
@@ -234,6 +236,24 @@ def test_variable_sin_caracteristicas_avisa():
     else:
         raise AssertionError("Debia avisar que faltan caracteristicas")
 
+
+def test_resuelve_categoria_existente():
+    from app.frmProductos.servicio import resolver_categoria_ai
+
+    existentes = [{"id": 3, "nombre": "Accesorios"}, {"id": 5, "nombre": "Juguetes"}]
+    assert resolver_categoria_ai("accesorios", existentes)["id"] == 3
+    assert resolver_categoria_ai("juguete", existentes)["id"] == 5
+
+
+def test_crea_categoria_si_no_existe(monkeypatch):
+    from app.frmProductos.servicio import resolver_categoria_ai
+
+    monkeypatch.setattr(
+        "app.frmProductos.servicio.crear_categoria",
+        lambda nombre, cliente=None: {"id": 88, "nombre": nombre},
+    )
+    resultado = resolver_categoria_ai("Relojes", [{"id": 3, "nombre": "Accesorios"}])
+    assert resultado == {"id": 88, "nombre": "Relojes"}
 
 def test_ai_pide_el_tipo(monkeypatch):
     preparar_sesion(monkeypatch)
@@ -257,6 +277,7 @@ def test_ai_devuelve_la_propuesta(monkeypatch):
             "nombre": "Gorra",
             "descripcion": "Ligera.",
             "atributos": [{"id": 0, "nombre": "Color", "opciones": ["Rojo"]}],
+            "categorias": [{"id": 3, "nombre": "Accesorios"}],
             "fotos": [
                 {"id": 3, "src": "https://furbuddy.xyz/gorra.webp"},
                 {"id": 4, "src": "https://furbuddy.xyz/gorra-2.webp"},
@@ -278,13 +299,25 @@ def test_ai_devuelve_la_propuesta(monkeypatch):
     assert respuesta.json()["atributos"][0]["nombre"] == "Color"
 
 
+def _categorias_ai_fijas(monkeypatch):
+    monkeypatch.setattr(
+        "app.frmProductos.servicio.listar_categorias",
+        lambda cliente=None: [{"id": 3, "nombre": "Accesorios"}],
+    )
+    monkeypatch.setattr(
+        "app.frmProductos.servicio.crear_categoria",
+        lambda nombre, cliente=None: {"id": 88, "nombre": nombre},
+    )
+
+
 def test_reintenta_si_gemini_falla_una_vez(monkeypatch):
     from app.frmProductos.servicio import analizar_fotos
 
+    _categorias_ai_fijas(monkeypatch)
     llamadas = {"n": 0}
 
     class Respuesta:
-        text = '{"detectado":true,"aviso":"","nombre":"Pelota","descripcion":"Rebota suave.","atributos":[]}'
+        text = '{"detectado":true,"aviso":"","nombre":"Pelota","descripcion":"Rebota suave.","categoria":"Juguetes","atributos":[]}'
 
     class Modelos:
         @staticmethod
@@ -316,38 +349,42 @@ def test_reintenta_si_gemini_falla_una_vez(monkeypatch):
     assert llamadas["n"] == 2
     assert creados["n"] == 1
     assert propuesta["nombre"] == "Pelota"
+    assert propuesta["categorias"][0]["nombre"] == "Juguetes"
 
 
 def test_usa_groq_antes_que_gemini(monkeypatch):
     from app.frmProductos.servicio import analizar_fotos
 
+    _categorias_ai_fijas(monkeypatch)
     monkeypatch.setenv("GROQ_API_KEY", "gsk_prueba")
     monkeypatch.setenv("GEMINI_API_KEY", "AQ.prueba")
 
-    def groq(fotos, tipo_producto):
+    def groq(fotos, tipo_producto, categorias_existentes=None):
         assert len(fotos) == 1
-        return '{"detectado":true,"aviso":"","nombre":"Collar","descripcion":"De tela.","atributos":[]}'
+        return '{"detectado":true,"aviso":"","nombre":"Collar","descripcion":"De tela.","categoria":"Accesorios","atributos":[]}'
 
-    def gemini(fotos, tipo_producto):
+    def gemini(fotos, tipo_producto, categorias_existentes=None):
         raise AssertionError("No debia llamar a Gemini")
 
     monkeypatch.setattr("app.frmProductos.servicio.texto_groq", groq)
     monkeypatch.setattr("app.frmProductos.servicio.texto_gemini", gemini)
     propuesta = analizar_fotos([(b"abc", "image/webp")], "simple")
     assert propuesta["nombre"] == "Collar"
+    assert propuesta["categorias"][0]["id"] == 3
 
 
 def test_si_groq_falla_usa_gemini(monkeypatch):
     from app.frmProductos.servicio import analizar_fotos
 
+    _categorias_ai_fijas(monkeypatch)
     monkeypatch.setenv("GROQ_API_KEY", "gsk_prueba")
     monkeypatch.setenv("GEMINI_API_KEY", "AQ.prueba")
 
-    def groq(fotos, tipo_producto):
+    def groq(fotos, tipo_producto, categorias_existentes=None):
         raise RuntimeError("rate limit")
 
-    def gemini(fotos, tipo_producto):
-        return '{"detectado":true,"aviso":"","nombre":"Pelota","descripcion":"Rebota.","atributos":[]}'
+    def gemini(fotos, tipo_producto, categorias_existentes=None):
+        return '{"detectado":true,"aviso":"","nombre":"Pelota","descripcion":"Rebota.","categoria":"Juguetes","atributos":[]}'
 
     monkeypatch.setattr("app.frmProductos.servicio.texto_groq", groq)
     monkeypatch.setattr("app.frmProductos.servicio.texto_gemini", gemini)
@@ -361,8 +398,13 @@ def test_proponer_sube_fotos_en_paralelo(monkeypatch):
     orden = []
 
     def analizar(fotos, tipo_producto):
-        return {"tipo": tipo_producto, "nombre": "Gorra", "descripcion": "Ligera.", "atributos": []}
-
+        return {
+            "tipo": tipo_producto,
+            "nombre": "Gorra",
+            "descripcion": "Ligera.",
+            "atributos": [],
+            "categorias": [{"id": 3, "nombre": "Accesorios"}],
+        }
     def subir(nombre, contenido, tipo):
         orden.append(nombre)
         return {"id": len(orden), "src": f"https://furbuddy.xyz/{nombre}"}
