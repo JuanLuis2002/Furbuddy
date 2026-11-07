@@ -418,13 +418,14 @@ async function analizarAi() {
       }
     }
     categorias.value.sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
+    const precioAi = String(datos.precio || "").trim()
     silencio.value = true
     formulario.value = {
       ...vacio(),
       nombre: datos.nombre,
       tipo: datos.tipo,
       descripcion: datos.descripcion,
-      precio: "",
+      precio: precioAi,
       existencia: 0,
       fotos: datos.fotos || [],
       categorias: categoriasAi.map((categoria) => categoria.id),
@@ -436,6 +437,13 @@ async function analizarAi() {
     }
     silencio.value = false
     reconstruir()
+    if (datos.tipo === "variable" && precioAi) {
+      for (const variacion of formulario.value.variaciones) {
+        if (!variacion.precio) {
+          variacion.precio = precioAi
+        }
+      }
+    }
     desdeAi.value = true
     modalAi.value = false
     preparar(false)

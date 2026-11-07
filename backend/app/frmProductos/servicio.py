@@ -374,6 +374,18 @@ def aviso_sin_producto(aviso: str) -> str:
     return f"No se pudo detectar la imagen: {causa}"
 
 
+def normalizar_precio_ai(valor) -> str:
+    texto = str(valor or "").strip().replace(",", ".").replace("$", "").replace(" ", "")
+    if not re.fullmatch(r"\d+(\.\d{1,2})?", texto):
+        return ""
+    numero = float(texto)
+    if numero <= 0 or numero > 99999.99:
+        return ""
+    if numero == int(numero):
+        return str(int(numero))
+    return f"{numero:.2f}".rstrip("0").rstrip(".")
+
+
 def interpretar_propuesta(texto: str, tipo: str) -> dict:
     try:
         datos = json.loads(limpiar_json(texto))
@@ -413,6 +425,7 @@ def interpretar_propuesta(texto: str, tipo: str) -> dict:
         "tipo": tipo,
         "nombre": nombre,
         "descripcion": descripcion,
+        "precio": normalizar_precio_ai(datos.get("precio")),
         "atributos": atributos,
         "categoria": str(datos.get("categoria") or "").strip()[:80],
     }
@@ -445,10 +458,10 @@ def instrucciones_gemini(tipo_producto: str, categorias_existentes: list[str] | 
             "que clasifique el producto, por ejemplo Accesorios o Juguetes."
         )
     return (
-        "Eres el asistente de la tienda Furbuddy. "
+        "Eres el asistente de la tienda Furbuddy en El Salvador. "
         "Recibes una o varias fotos del mismo producto. Analiza las imagenes con cuidado. "
         "Describe solo lo que se ve. No inventes otro producto si no aparece. "
-        "No inventes precio, existencia ni sku. "
+        "No inventes existencia ni sku. "
         "Acepta cualquier producto fisico claro (silla, gorra, juguete, collar, etc.). "
         "No rechaces por categoria ni porque no sea de mascotas. "
         "Responde SOLO un JSON valido con estas claves exactas:\n"
@@ -461,6 +474,10 @@ def instrucciones_gemini(tipo_producto: str, categorias_existentes: list[str] | 
         'Vacio "" si detectado es false.\n'
         '- "descripcion": dos oraciones sobre forma, material o uso visible, sin HTML. '
         'Max 500 caracteres. Vacia "" si detectado es false.\n'
+        '- "precio": precio estimado de venta al publico en dolares de Estados Unidos (USD) '
+        "para El Salvador, segun calidad aparente y mercado local. "
+        'Solo numero con hasta 2 decimales, sin simbolo $. Ejemplo: "12.50". '
+        'Vacio "" si detectado es false.\n'
         '- "categoria": '
         + regla_categoria
         + ' Vacio "" si detectado es false.\n'
@@ -476,6 +493,7 @@ ESQUEMA_PROPUESTA_AI = {
         "aviso": {"type": "string"},
         "nombre": {"type": "string"},
         "descripcion": {"type": "string"},
+        "precio": {"type": "string"},
         "categoria": {"type": "string"},
         "atributos": {
             "type": "array",
@@ -489,7 +507,7 @@ ESQUEMA_PROPUESTA_AI = {
             },
         },
     },
-    "required": ["detectado", "aviso", "nombre", "descripcion", "categoria", "atributos"],
+    "required": ["detectado", "aviso", "nombre", "descripcion", "precio", "categoria", "atributos"],
 }
 
 
