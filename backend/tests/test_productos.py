@@ -247,6 +247,15 @@ def test_resuelve_categoria_existente():
     assert resolver_categoria_ai("juguete", existentes)["id"] == 5
 
 
+def test_enlace_precio_mercado_salvador():
+    from app.frmProductos.servicio import enlace_precio_mercado
+
+    enlace = enlace_precio_mercado("Peluche de Naruto")
+    assert enlace.startswith("https://www.google.com/search?q=")
+    assert "Peluche" in enlace or "peluche" in enlace.lower() or "Naruto" in enlace
+    assert "El+Salvador" in enlace or "El%20Salvador" in enlace
+
+
 def test_crea_categoria_si_no_existe(monkeypatch):
     from app.frmProductos.servicio import resolver_categoria_ai
 

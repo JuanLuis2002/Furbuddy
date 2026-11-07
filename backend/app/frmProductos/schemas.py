@@ -103,6 +103,7 @@ class PropuestaAi(BaseModel):
     nombre: str
     descripcion: str
     precio: str = ""
+    precio_enlace: str = ""
     atributos: list[AtributoSalida]
     categorias: list[CategoriaSalida] = []
     fotos: list[FotoSalida]

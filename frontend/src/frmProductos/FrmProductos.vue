@@ -38,6 +38,7 @@ const analizando = ref(false)
 let streamCamara = null
 const errorAi = ref("")
 const desdeAi = ref(false)
+const enlacePrecioAi = ref("")
 const editando = ref(false)
 const silencio = ref(false)
 const pendiente = ref(null)
@@ -223,6 +224,7 @@ function abrir() {
   formulario.value = vacio()
   silencio.value = false
   desdeAi.value = false
+  enlacePrecioAi.value = ""
   aviso.value = ""
   error.value = ""
   preparar(false)
@@ -444,6 +446,7 @@ async function analizarAi() {
         }
       }
     }
+    enlacePrecioAi.value = String(datos.precio_enlace || "").trim()
     desdeAi.value = true
     modalAi.value = false
     preparar(false)
@@ -456,6 +459,7 @@ async function analizarAi() {
 
 async function abrirEdicion(item) {
   desdeAi.value = false
+  enlacePrecioAi.value = ""
   aviso.value = ""
   error.value = ""
   errorModal.value = ""
@@ -701,6 +705,10 @@ async function confirmar() {
           <v-card-text class="pt-2">
             <v-alert v-if="desdeAi" type="info" variant="tonal" class="mb-4">
               Revisa el nombre, la descripcion y la categoria. Confirma el precio y la existencia. Al guardar, el producto se publica en la tienda.
+              <div v-if="enlacePrecioAi" class="mt-2">
+                Precio estimado segun el mercado salvadoreño.
+                <a :href="enlacePrecioAi" target="_blank" rel="noopener noreferrer">Ver referencia de precio</a>
+              </div>
             </v-alert>
             <v-alert v-if="errorModal" type="error" variant="tonal" class="mb-4">{{ errorModal }}</v-alert>
             <v-row>

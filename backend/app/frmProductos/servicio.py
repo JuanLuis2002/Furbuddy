@@ -1,6 +1,7 @@
 import json
 import re
 import time
+import urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 
 from app.configuracion import clave_gemini, clave_groq, claves_woocommerce, url_tienda
@@ -386,6 +387,15 @@ def normalizar_precio_ai(valor) -> str:
     return f"{numero:.2f}".rstrip("0").rstrip(".")
 
 
+def enlace_precio_mercado(nombre: str) -> str:
+    consulta = (nombre or "").strip()
+    if not consulta:
+        consulta = "producto precio El Salvador"
+    else:
+        consulta = f"{consulta} precio El Salvador"
+    return "https://www.google.com/search?q=" + urllib.parse.quote_plus(consulta)
+
+
 def interpretar_propuesta(texto: str, tipo: str) -> dict:
     try:
         datos = json.loads(limpiar_json(texto))
@@ -638,6 +648,7 @@ def analizar_fotos(fotos: list[tuple[bytes, str]], tipo_producto: str) -> dict:
         else:
             categoria = resolver_categoria_ai(propuesta.pop("categoria", ""), existentes)
             propuesta["categorias"] = [categoria]
+            propuesta["precio_enlace"] = enlace_precio_mercado(propuesta.get("nombre") or "")
             return propuesta
     propuesta = interpretar_propuesta(
         texto_gemini(fotos, tipo_producto, nombres),
@@ -645,6 +656,7 @@ def analizar_fotos(fotos: list[tuple[bytes, str]], tipo_producto: str) -> dict:
     )
     categoria = resolver_categoria_ai(propuesta.pop("categoria", ""), existentes)
     propuesta["categorias"] = [categoria]
+    propuesta["precio_enlace"] = enlace_precio_mercado(propuesta.get("nombre") or "")
     return propuesta
 
 
